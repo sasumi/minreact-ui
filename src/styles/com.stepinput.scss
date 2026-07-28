@@ -1,0 +1,31 @@
+@charset "UTF-8";
+@use "./mixin" as com;
+
+.step-input-wrap {
+	display: inline-flex;
+	cursor: default;
+	padding: 0;
+
+	input[type="text"] {
+		width: 3em !important;
+		min-width: 0;
+		text-align: center;
+		border-radius: 0;
+	}
+
+	.si-minus,
+	.si-plus {
+		height: var(--element-height);
+		width: 2em;
+		font-size: var(--font-small);
+		overflow: hidden;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&:before {
+			font-size: 1em;
+		}
+	}
+}

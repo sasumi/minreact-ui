@@ -1,0 +1,129 @@
+@charset "UTF-8";
+
+@mixin ElementBase {
+	color: var(--color);
+	background-color: var(--color-background);
+	transition: all 0.1s ease-in-out;
+	font-size: 1rem;
+	padding-left: var(--element-padding);
+	padding-right: var(--element-padding);
+	min-width: var(--element-height);
+	border-radius: var(--element-radius);
+	border: var(--element-border);
+	box-sizing: border-box;
+	line-height: 1;
+
+	&:hover,
+	&:focus {
+		border-color: var(--color-link);
+		outline: none;
+	}
+}
+
+@mixin RectElement {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: row;
+	height: var(--element-height);
+	@include ElementBase();
+}
+
+@mixin RectBorderIcon {
+	@include RectElement();
+	cursor: pointer;
+
+	&.popover-trigger {
+		padding-left: 4px;
+
+		&:after {
+			content: "\e839";
+			font-size: 0.7em;
+			font-family: var(--font-icon);
+			margin-left: 0.25em;
+		}
+	}
+
+	&.popover-trigger[data-state="open"] {
+		border: var(--element-border-active);
+	}
+
+	&.active {
+		color: black;
+		background-color: var(--color-element-border-active);
+		border: var(--element-border);
+	}
+
+	&:hover,
+	&:focus {
+		border: var(--element-border-active);
+	}
+}
+
+@mixin Button($type: "primary") {
+	@include RectElement();
+	cursor: pointer;
+	white-space: nowrap;
+
+	& {
+		--element-height: 2.25em;
+		--element-padding: 1em;
+	}
+
+	@if $type =="danger" {
+		& {
+			border-color: var(--color-danger);
+			background-color: var(--color-danger);
+		}
+
+		&:hover {
+			background-color: darken(var(--color-danger), 10%);
+		}
+	}
+
+	@else if $type =="tonal" {
+		& {
+			color: var(--color);
+			border-color: transparent;
+			background-color: var(--color-background-secondary);
+		}
+
+		&:hover {
+			border-color: transparent;
+			background-color: var(--color-background-hover);
+		}
+	}
+
+	@else if $type =="outlined" {
+		& {
+			color: inherit;
+			border-color: var(--element-border);
+			background-color: transparent;
+		}
+
+		&:hover {
+			border-color: var(--color-link);
+		}
+	}
+
+	@else {
+		& {
+			color: var(--color-background);
+			border-color: var(--color-link);
+			background-color: var(--color-link);
+		}
+
+		&:hover {
+			background-color: var(--color-link-hover);
+		}
+	}
+}
+
+@mixin ButtonSize($size: "small") {
+	@if $size =="small" {
+		& {
+			--element-height: 2rem;
+			font-size: var(--font-small);
+		}
+	}
+}

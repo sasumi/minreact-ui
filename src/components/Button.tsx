@@ -1,6 +1,5 @@
 import { memo, useEffect, useState } from "react";
-import "@/styles/components/com.checker.scss";
-import { lockElement } from "@/utils/Dom";
+import "@/styles/com.checker.scss";
 import { Spinner } from "./Spinner";
 import { lockElementInteraction } from "minutool";
 import { useTranslation } from "react-i18next";

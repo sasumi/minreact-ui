@@ -1,6 +1,10 @@
+import "@/styles/com.counter.scss";
 import { useEffect, useState } from "react";
-import "@/styles/components/com.counter.scss";
-export default function Counter({ refInput, maxLength }) {
+
+/**
+ * A React component that displays a character counter for an input or textarea element.
+ */
+export default function Counter({ refInput, max }: { refInput: React.RefObject<HTMLInputElement | HTMLTextAreaElement>; max?: number }) {
     const [count, setCount] = useState(0);
     useEffect(() => {
         if (refInput.current) {
@@ -9,14 +13,16 @@ export default function Counter({ refInput, maxLength }) {
                 refInput.current && setCount(refInput.current.value.length);
             };
             refInput.current.addEventListener("input", updCtn);
-            return updCtn;
+            return () => {
+                refInput.current && refInput.current.removeEventListener("input", updCtn);
+            };
         }
     }, [refInput.current]);
     return (
-        <span className={"input-counter " + (maxLength && count > maxLength ? "input-counter--overload" : "")}>
+        <span className={"input-counter " + (max && count > max ? "input-counter--overload" : "")}>
             <span className="ct">{count}</span>
-            {maxLength && <span className="slash">/</span>}
-            {maxLength && <span className="mx">{maxLength}</span>}
+            {max && <span className="slash">/</span>}
+            {max && <span className="mx">{max}</span>}
         </span>
     );
 }

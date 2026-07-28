@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+@mixin icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    &:before {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        font-family: var(--font-icon);
+        font-size: 1.25em;
+        font-style: normal;
+        font-weight: normal;
+        text-decoration: inherit;
+        text-align: center;
+        text-transform: none;
+        line-height: 1em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@mixin icon-button {
+    @include icon;
+    & {
+        cursor: pointer;
+    }
+    &:hover {
+        color: var(--color-secondary);
+    }
+}
+
+@mixin icon-text {
+    @include icon;
+    &:before {
+        margin-right: 0.1em;
+    }
+}
+
+@mixin icon-text-button {
+    @include icon-text;
+    cursor: pointer;
+}
+
+@mixin icon-vtext-button {
+    @include icon-button;
+    & {
+        display: inline-flex;
+        gap: 0.5em;
+        flex-direction: column;
+        justify-content: center;
+    }
+}

@@ -1,7 +1,26 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+    "compilerOptions": {
+        "target": "ES2020",
+        "useDefineForClassFields": true,
+        "lib": ["ES2020", "DOM", "DOM.Iterable", "ES2022.Intl"],
+        "module": "ESNext",
+        "jsx": "react-jsx",
+        "skipLibCheck": true,
+
+        /* 模块解析 */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+
+        /* 路径别名 */
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+
+    "include": ["src", "vite.config.ts", "vite.config.js"],
+    "exclude": ["node_modules", "dist"]
 }

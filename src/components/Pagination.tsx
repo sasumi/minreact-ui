@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SpanButton } from "@/components/Button";
-import "@/styles/components/com.pagination.scss";
+import "@/styles/com.pagination.scss";
 import { useTranslation } from "react-i18next";
 
 interface PaginationProps {

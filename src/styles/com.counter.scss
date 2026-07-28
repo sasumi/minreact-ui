@@ -1,0 +1,22 @@
+@charset "UTF-8";
+.input-counter {
+    pointer-events: none;
+    color: #aaa;
+    display: inline-flex;
+    font-size: var(--font-small);
+    .slash {
+        display: inline-block;
+        padding: 0 0.1em;
+    }
+    &--overload {
+        color: var(--color);
+        .ct {
+            color: red;
+        }
+    }
+}
+
+textarea ~ .input-counter {
+    float: right;
+    margin: -1.5em 0.5em 0 0;
+}
