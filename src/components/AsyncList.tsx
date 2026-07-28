@@ -121,7 +121,7 @@ export function CommonListAsyncRenderer<T>({
     return (
         <CommonAsyncRenderer state={state} loading={loading} error={error} keepPreviousData={keepPreviousData}>
             {(list, isLoading) => {
-                if (list.length === 0) {
+                if (!list || list.length === 0) {
                     return empty();
                 }
                 return children(list, isLoading);
@@ -145,12 +145,12 @@ export function CommonAsyncRenderer<T>({
     state?: AsyncState<T>;
     loading?: (...args: any[]) => ReactNode;
     error?: (error: Error) => ReactNode;
-    children: (data: T, isLoading: boolean) => ReactNode;
+    children: (data: T | undefined, isLoading: boolean) => ReactNode;
     keepPreviousData?: boolean;
 }) {
     return (
         <AsyncRenderer state={state} loading={loading} error={error} keepPreviousData={keepPreviousData}>
-            {(data, isLoading) => children(data, isLoading) || null}
+            {(data, isLoading) => children(data, Boolean(isLoading)) || null}
         </AsyncRenderer>
     );
 }
@@ -165,7 +165,7 @@ export function AsyncRenderer<T>({
     state?: AsyncState<T>;
     loading?: () => ReactNode;
     error?: (err: Error) => ReactNode;
-    children: (data?: T, isLoading?: boolean) => ReactNode;
+    children: (data: T | undefined, isLoading: boolean) => ReactNode;
     keepPreviousData?: boolean; //是否在loading状态下仍然显示数据（适用于分页加载等场景）
 }) {
     if (state?.loading) {
