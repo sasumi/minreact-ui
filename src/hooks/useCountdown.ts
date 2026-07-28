@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * 倒计时hook
@@ -7,46 +7,47 @@ import { useEffect, useRef, useState } from "react";
  * @returns 当前剩余秒数
  */
 export const useCountdown = (initialSeconds: number, min: number = 0) => {
-    const [seconds, setSeconds] = useState(initialSeconds);
-    const startTimeRef = useRef<number>(Date.now());
-    const targetSecondsRef = useRef<number>(initialSeconds);
-    const timerIdRef = useRef<number | undefined>(undefined);
+    const [countdown, setCountdown] = useState({
+        seconds: Math.max(min, initialSeconds),
+        targetSeconds: initialSeconds,
+    });
 
     useEffect(() => {
-        // 重置开始时间和目标秒数
-        startTimeRef.current = Date.now();
-        targetSecondsRef.current = initialSeconds;
-        setSeconds(initialSeconds);
-    }, [initialSeconds]);
-
-    useEffect(() => {
-        if (seconds <= min) {
+        if (initialSeconds <= min) {
             return;
         }
 
+        const startTime = Date.now();
+        let timerId: number | undefined;
+
         const tick = () => {
             const now = Date.now();
-            const elapsed = Math.floor((now - startTimeRef.current) / 1000);
-            const remaining = Math.max(min, targetSecondsRef.current - elapsed);
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(min, initialSeconds - elapsed);
 
-            setSeconds(remaining);
+            setCountdown({
+                seconds: remaining,
+                targetSeconds: initialSeconds,
+            });
 
             if (remaining > min) {
-                timerIdRef.current = window.setTimeout(tick, 1000);
+                const nextDelay = 1000 - ((now - startTime) % 1000) || 1000;
+                timerId = window.setTimeout(tick, nextDelay);
             }
         };
 
-        // 计算到下一秒的初始延迟
-        const now = Date.now();
-        const initialDelay = 1000 - ((now - startTimeRef.current) % 1000);
-        timerIdRef.current = window.setTimeout(tick, initialDelay);
+        timerId = window.setTimeout(tick, 1000);
 
         return () => {
-            if (timerIdRef.current !== undefined) {
-                clearTimeout(timerIdRef.current);
+            if (timerId !== undefined) {
+                clearTimeout(timerId);
             }
         };
-    }, [seconds, min]);
+    }, [initialSeconds, min]);
 
-    return seconds;
+    if (countdown.targetSeconds !== initialSeconds) {
+        return Math.max(min, initialSeconds);
+    }
+
+    return countdown.seconds;
 };
