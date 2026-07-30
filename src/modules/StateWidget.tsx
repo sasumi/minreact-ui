@@ -31,7 +31,7 @@ export const DataEmpty = ({ text, ...props }: { text?: string; [key: string]: an
 		<span className={className} {...props}>
 			{text || t("common:noData")}
 		</span>
-	);
+	); 
 };
 
 export const RequestError = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
