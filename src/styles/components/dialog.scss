@@ -1,5 +1,6 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
+@use "./../define.module.scss" as *;
 
 .#{$namespace}-dialog {
 	@include com.panel();
