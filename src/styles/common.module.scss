@@ -1,3 +1,5 @@
+@use "./mixins/icon.scss" as icon;
+
 $namespace: minui;
 
 @font-face {
@@ -58,4 +60,12 @@ $namespace: minui;
 
 :export {
 	namespace: $namespace;
+}
+
+.icon {
+	@include icon.icon;
+}
+
+.icon-button {
+	@include icon.icon-button;
 }

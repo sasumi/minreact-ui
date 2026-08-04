@@ -1,5 +1,6 @@
 import { SpanButton } from "@/components/Button";
 import "@/styles/components/novice.scss";
+import "@/styles/common.module.scss";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Popover, PopoverAnchor, PopoverContent } from "./Popover";

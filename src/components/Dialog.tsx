@@ -1,6 +1,6 @@
 import { NormalButton, SpanButton } from "@/components/Button";
 import "@/styles/components/dialog.scss";
-import styleDefines from "@/styles/define.module.scss";
+import styleDefines from "@/styles/common.module.scss";
 import { bindPanelMove, mountReactNode } from "@/utils/Dom";
 import { focusFirstElement } from "@/utils/Dom";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,7 @@ import { extractTitle } from "@/types/ComponentMeta";
 import { prettyTimeDuration } from "@/utils/Time";
 import { calcRemainingMSecs, lockElementInteraction } from "minutool";
 import { showWarning } from "./Toast";
+import { useMinuiTranslate } from "@/locale/i18n";
 
 const CSS_NS = styleDefines.namespace;
 
@@ -211,7 +212,7 @@ export default function Dialog({
                                 }}
                             ></SpanButton>
                         )}
-                        {title && <h2 className={`${CSS_NS}-dialog-title`}>{title}</h2>}
+                        {title && <div className={`${CSS_NS}-dialog-title`}>{title}</div>}
                         <div className={`${CSS_NS}-dialog-ctn`} style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
                             {children}
                         </div>
@@ -356,7 +357,7 @@ export const prompt = (
         function DialogWrap() {
             const formRef = useRef<HTMLFormElement>(null);
             const elRef = useRef<HTMLInputElement>(null);
-            const { t } = useTranslation(["common"]);
+            const t = useMinuiTranslate();
             const [inputValue, setInputValue] = useState(defaultValue);
             const doSubmit = () => {
                 let val = elRef.current!.value;

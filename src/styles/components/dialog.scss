@@ -1,12 +1,12 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
-@use "./../define.module.scss" as *;
+@use "./../common.module.scss" as *;
 
 .#{$namespace}-dialog {
 	@include com.panel();
-	--max-height: calc(100vh - 2em);
-	--content-max-height: calc(var(--max-height) - 8em);
-	max-width: calc(100vw - 1em); //预留一些缝隙
+	--max-height: calc(100vh - 2rem);
+	--content-max-height: calc(var(--max-height) - 8rem);
+	max-width: calc(100vw - 1rem); //预留一些缝隙
 	position: fixed;
 	z-index: var(--dialog-z-index);
 	inset: 0;
@@ -15,23 +15,23 @@
 
 	.#{$namespace}-dialog-title {
 		color: var(--color-secondary);
-		padding: 1em 0 0 1em;
+		padding: 1rem 0 0 1rem;
 	}
 
 	.#{$namespace}-dialog-ctn {
-		padding: 1em;
+		padding: 1rem;
 		overflow: auto;
-		max-width: calc(100vw - 2em);
+		max-width: calc(100vw - 2rem);
 		max-height: var(--content-max-height);
 	}
 
 	.#{$namespace}-dialog-close-btn {
-		font-size: 1em;
-		width: 1.5em;
-		height: 1.5em;
+		font-size: 1rem;
+		width: 1.5rem;
+		height: 1.5rem;
 		position: absolute;
-		right: 0.5em;
-		top: 0.5em;
+		right: 0.5rem;
+		top: 0.5rem;
 
 		&:before {
 			content: "\e625";
@@ -40,8 +40,8 @@
 
 	.#{$namespace}-dialog-buttons {
 		display: flex;
-		padding: 1em 0 0 0;
-		gap: 0.5em;
+		padding: 1rem 0 0 0;
+		gap: 0.5rem;
 		justify-content: right;
 	}
 
@@ -60,16 +60,16 @@
 
 	&-confirm {
 		.#{$namespace}-dialog-ctn {
-			padding: 1em 2em;
+			padding: 1rem 2rem;
 		}
 
 		.cf-title {
-			font-size: 1.2rem;
-			padding: 0.5em 2em 0.5em 0;
+			font-size: 1.2rrem;
+			padding: 0.5rem 2rem 0.5rem 0;
 		}
 
 		.cf-content {
-			padding-bottom: 0.5em;
+			padding-bottom: 0.5rem;
 		}
 
 		.#{$namespace}-dialog-buttons {
@@ -78,22 +78,22 @@
 	}
 
 	&-alert {
-		min-width: 15em;
-		max-width: min(30em, calc(100vw - 2em));
+		min-width: 15rem;
+		max-width: min(30rem, calc(100vw - 2rem));
 
 		.#{$namespace}-dialog-ctn {
-			padding: 1em 2em;
+			padding: 1rem 2rem;
 		}
 
 		.al-title {
-			font-size: 1.2rem;
-			padding: 0.5em 2em 0.5em 0;
+			font-size: 1.2rrem;
+			padding: 0.5rem 2rem 0.5rem 0;
 		}
 
 		.al-content {
-			max-height: calc(100vh - 20em);
+			max-height: calc(100vh - 20rem);
 			overflow: auto;
-			padding-bottom: 0.5em;
+			padding-bottom: 0.5rem;
 		}
 
 		.#{$namespace}-dialog-buttons {
@@ -102,14 +102,14 @@
 	}
 
 	&-prompt {
-		--element-width: 16em;
+		--elrement-width: 16rem;
 
 		.#{$namespace}-dialog-ctn {
-			padding: 2em 2em 1.5em 2em;
+			padding: 2rem 2rem 1.5rem 2rem;
 		}
 
 		.pt-inputs {
-			padding: 0.75em 0 0.5em;
+			padding: 0.75rem 0 0.5rem;
 
 			input[type="text"],
 			input[type="number"],
@@ -121,8 +121,8 @@
 			}
 
 			textarea {
-				height: 10em;
-				min-height: 8em;
+				height: 10rem;
+				min-height: 8rem;
 				resize: vertical;
 			}
 		}
@@ -136,7 +136,7 @@
 		iframe {
 			display: block;
 			width: 100%;
-			height: var(--init-height, var(--content-height, var(--default-height, 10em)));
+			height: var(--init-height, var(--content-height, var(--default-height, 10rem)));
 			border: none;
 			max-width: 100vw;
 			max-height: var(--content-max-height);
@@ -168,10 +168,10 @@
 		.#{$namespace}-dialog-close-btn {
 			background-color: var(--color-background);
 			border-radius: 50%;
-			width: 2.5em;
-			height: 2.5em;
-			top: -1em;
-			right: -1em;
+			width: 2.5rem;
+			height: 2.5rem;
+			top: -1rem;
+			right: -1rem;
 			opacity: 0.5;
 			transition: all 0.1s ease-in-out;
 
@@ -183,12 +183,12 @@
 
 	&-progress {
 		.#{$namespace}-dialog-ctn {
-			padding: 1.5em;
+			padding: 1.5rem;
 		}
 
 		progress {
-			width: 20em;
-			margin: 0.75em 0;
+			width: 20rem;
+			margin: 0.75rem 0;
 		}
 
 		.pd-title {}
@@ -221,7 +221,7 @@
 		}
 
 		.#{$namespace}-dialog {
-			border: 1px solid var(--color-element-border);
+			border: 1px solid var(--color-elrement-border);
 		}
 	}
 }

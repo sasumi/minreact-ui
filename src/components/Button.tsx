@@ -1,4 +1,5 @@
 import { memo, useEffect, useState } from "react";
+import "@/styles/common.module.scss";
 import "@/styles/components/checker.scss";
 import { Spinner } from "./Spinner";
 import { lockElementInteraction } from "minutool";

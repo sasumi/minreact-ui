@@ -1,3 +1,4 @@
+import "@/styles/common.module.scss";
 import "@/styles/components/counter.scss";
 import { useEffect, useState } from "react";
 
