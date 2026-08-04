@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@use "./com.icon.scss" as icon;
+@use "./../mixins/icon.scss" as icon;
 
 .checker {
     @include icon.icon-button;

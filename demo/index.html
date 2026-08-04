@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinUI 组件演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .component-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .component-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .component-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .component-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MinUI 组件演示</h1>
+            <p class="description">基于 Vite 8 + React 19 + TypeScript 6 的 UI 组件库</p>
+        </header>
+        
+        <div class="components-grid">
+            <a href="./Button.html" class="component-card">
+                <h2>Button 按钮</h2>
+                <p>多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等</p>
+                <span class="component-tag">基础组件</span>
+            </a>
+            
+            <a href="./Spinner.html" class="component-card">
+                <h2>Spinner 加载器</h2>
+                <p>旋转加载动画组件</p>
+                <span class="component-tag">基础组件</span>
+            </a>
+            
+            <a href="./Counter.html" class="component-card">
+                <h2>Counter 字符计数器</h2>
+                <p>显示输入框字符数量的计数器组件</p>
+                <span class="component-tag">基础组件</span>
+            </a>
+            
+            <a href="./Dialog.html" class="component-card">
+                <h2>Dialog 对话框</h2>
+                <p>可配置的模态对话框组件</p>
+                <span class="component-tag">交互组件</span>
+            </a>
+            
+            <a href="./Form.html" class="component-card">
+                <h2>Form 表单</h2>
+                <p>完整的表单组件，包含表单项、表单分组等</p>
+                <span class="component-tag">表单组件</span>
+            </a>
+            
+            <a href="./StepInput.html" class="component-card">
+                <h2>StepInput 步进输入</h2>
+                <p>带加减按钮的数字输入组件</p>
+                <span class="component-tag">表单组件</span>
+            </a>
+            
+            <a href="./RangeInput.html" class="component-card">
+                <h2>RangeInput 范围输入</h2>
+                <p>滑块式范围选择器</p>
+                <span class="component-tag">表单组件</span>
+            </a>
+            
+            <a href="./Pagination.html" class="component-card">
+                <h2>Pagination 分页</h2>
+                <p>数据分页组件</p>
+                <span class="component-tag">数据组件</span>
+            </a>
+            
+            <a href="./AsyncList.html" class="component-card">
+                <h2>AsyncList 异步列表</h2>
+                <p>支持分页的异步数据列表组件</p>
+                <span class="component-tag">数据组件</span>
+            </a>
+            
+            <a href="./StateWidget.html" class="component-card">
+                <h2>StateWidget 状态组件</h2>
+                <p>数据加载、空状态、错误状态展示组件</p>
+                <span class="component-tag">数据组件</span>
+            </a>
+            
+            <a href="./Popover.html" class="component-card">
+                <h2>Popover 气泡弹出层</h2>
+                <p>可定位的浮动弹出层组件</p>
+                <span class="component-tag">交互组件</span>
+            </a>
+            
+            <a href="./Toast.html" class="component-card">
+                <h2>Toast 消息提示</h2>
+                <p>全局消息提示组件</p>
+                <span class="component-tag">反馈组件</span>
+            </a>
+            
+            <a href="./Novice.html" class="component-card">
+                <h2>Novice 新手引导</h2>
+                <p>分步引导用户的新手教程组件</p>
+                <span class="component-tag">交互组件</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

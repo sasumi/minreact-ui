@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@use "./mixin" as com;
+@use "./../mixins/misc.scss" as com;
 
 .popover-content-wrap {
 	animation-duration: 0.6s;

@@ -1,6 +1,6 @@
 @charset "UTF-8";
-@use "./mixin" as com;
-@use "./com.icon.scss" as icon;
+@use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
 
 :root {
 	--novice-zindex: var(--novice-z-index);

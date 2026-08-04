@@ -21,6 +21,6 @@
         }
     },
 
-    "include": ["src", "vite.config.ts", "vite.config.js"],
+    "include": ["src", "demo", "vite.config.ts", "vite.config.js"],
     "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { SpanButton } from "./Button"
-import "@/styles/com.stepinput.scss"
+import "@/styles/components/stepinput.scss"
 export const StepInput = ({ value, onChange, min = 0, max = null as number | null, step = 1 }: { value: any; onChange?: (n: number) => void; min?: number; max?: number | null; step?: number }) => {
 	const [val, setVal] = useState(value ? parseInt(value) : 0);
 

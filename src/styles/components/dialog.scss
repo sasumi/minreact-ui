@@ -1,8 +1,7 @@
 @charset "UTF-8";
+@use "./../mixins/misc.scss" as com;
 
-@use "./mixin" as com;
-
-.paper-dialog {
+.#{$namespace}-dialog {
 	@include com.panel();
 	--max-height: calc(100vh - 2em);
 	--content-max-height: calc(var(--max-height) - 8em);
@@ -13,36 +12,19 @@
 	border: none;
 	padding: 0;
 
-	.dlg-title {
+	.#{$namespace}-dialog-title {
 		color: var(--color-secondary);
 		padding: 1em 0 0 1em;
 	}
 
-	.dlg-ctn {
+	.#{$namespace}-dialog-ctn {
 		padding: 1em;
 		overflow: auto;
 		max-width: calc(100vw - 2em);
 		max-height: var(--content-max-height);
 	}
 
-	//指定内容区域滚动
-	&:has(.scrollhere) {
-		// max-height: var(--content-max-height);
-		// @include com.scrollableinherit();
-		// .dlg-ctn {
-		// 	max-height: fit-content;
-		// 	overflow: hidden;
-		// }
-		// *:has(.scrollhere) {
-		// 	@include com.scrollableinherit();
-		// }
-
-		// .scrollhere {
-		// 	@include com.scrollhere();
-		// }
-	}
-
-	.dlg-close-btn {
+	.#{$namespace}-dialog-close-btn {
 		font-size: 1em;
 		width: 1.5em;
 		height: 1.5em;
@@ -55,14 +37,14 @@
 		}
 	}
 
-	.dlg-buttons {
+	.#{$namespace}-dialog-buttons {
 		display: flex;
 		padding: 1em 0 0 0;
 		gap: 0.5em;
 		justify-content: right;
 	}
 
-	.form-portrait .dlg-buttons {
+	.form-portrait .#{$namespace}-dialog-buttons {
 		padding: 0;
 	}
 
@@ -76,7 +58,7 @@
 	}
 
 	&-confirm {
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 1em 2em;
 		}
 
@@ -89,7 +71,7 @@
 			padding-bottom: 0.5em;
 		}
 
-		.dlg-buttons {
+		.#{$namespace}-dialog-buttons {
 			justify-content: center;
 		}
 	}
@@ -98,7 +80,7 @@
 		min-width: 15em;
 		max-width: min(30em, calc(100vw - 2em));
 
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 1em 2em;
 		}
 
@@ -113,7 +95,7 @@
 			padding-bottom: 0.5em;
 		}
 
-		.dlg-buttons {
+		.#{$namespace}-dialog-buttons {
 			justify-content: right;
 		}
 	}
@@ -121,7 +103,7 @@
 	&-prompt {
 		--element-width: 16em;
 
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 2em 2em 1.5em 2em;
 		}
 
@@ -146,7 +128,7 @@
 	}
 
 	&-iframe {
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 0 !important;
 		}
 
@@ -161,7 +143,7 @@
 	}
 
 	&-iframe-loading {
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			background: url("/assets/loading.gif") no-repeat center center;
 		}
 
@@ -171,7 +153,7 @@
 	}
 
 	&-img-preview {
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 0;
 
 			img {
@@ -182,7 +164,7 @@
 			}
 		}
 
-		.dlg-close-btn {
+		.#{$namespace}-dialog-close-btn {
 			background-color: var(--color-background);
 			border-radius: 50%;
 			width: 2.5em;
@@ -199,7 +181,7 @@
 	}
 
 	&-progress {
-		.dlg-ctn {
+		.#{$namespace}-dialog-ctn {
 			padding: 1.5em;
 		}
 
@@ -223,8 +205,8 @@
 	}
 }
 
-.dialog-wrap {
-	.dialog-masker {
+.#{$namespace}-dialog-wrap {
+	.#{$namespace}-dialog-masker {
 		position: absolute;
 		inset: 0;
 		background: rgba(0, 0, 0, 0.4);
@@ -233,11 +215,11 @@
 	}
 
 	&[data-modal="false"] {
-		.dialog-masker {
+		.#{$namespace}-dialog-masker {
 			display: none;
 		}
 
-		.paper-dialog {
+		.#{$namespace}-dialog {
 			border: 1px solid var(--color-element-border);
 		}
 	}

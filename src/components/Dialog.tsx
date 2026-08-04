@@ -1,5 +1,6 @@
 import { NormalButton, SpanButton } from "@/components/Button";
-import "@/styles/com.dialog.scss";
+import "@/styles/components/dialog.scss";
+import styleDefines from "@/styles/define.module.scss";
 import { bindPanelMove, mountReactNode } from "@/utils/Dom";
 import { focusFirstElement } from "@/utils/Dom";
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +13,8 @@ import { extractTitle } from "@/types/ComponentMeta";
 import { prettyTimeDuration } from "@/utils/Time";
 import { calcRemainingMSecs, lockElementInteraction } from "minutool";
 import { showWarning } from "./Toast";
+
+const CSS_NS = styleDefines.namespace;
 
 /**
  * 对话框大小
@@ -187,10 +190,10 @@ export default function Dialog({
     return ReactDOM.createPortal(
         open ? (
             <>
-                <div className="dialog-wrap" data-modal={modal} data-moveable={moveable}>
-                    <div className="dialog-masker"></div>
+                <div className={`${CSS_NS}-dialog-wrap`} data-modal={modal} data-moveable={moveable}>
+                    <div className={`${CSS_NS}-dialog-masker`}></div>
                     <dialog
-                        className={`paper-dialog ` + className}
+                        className={`${CSS_NS}-dialog ` + className}
                         style={{ width: size ?? undefined, maxWidth: maxSize ?? undefined }}
                         ref={handleDialogRef}
                         onClose={() => {
@@ -199,7 +202,7 @@ export default function Dialog({
                     >
                         {topCloseButton && (
                             <SpanButton
-                                className="icon-button dlg-close-btn"
+                                className={`icon-button ${CSS_NS}-dialog-close-btn`}
                                 onClick={() => {
                                     if (onCloseClick?.() === false) {
                                         return;
@@ -208,8 +211,8 @@ export default function Dialog({
                                 }}
                             ></SpanButton>
                         )}
-                        {title && <h2 className="dlg-title">{title}</h2>}
-                        <div className="dlg-ctn" style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
+                        {title && <h2 className={`${CSS_NS}-dialog-title`}>{title}</h2>}
+                        <div className={`${CSS_NS}-dialog-ctn`} style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
                             {children}
                         </div>
                     </dialog>
@@ -399,7 +402,7 @@ export const prompt = (
                     <div className="pt-inputs">
                         {makeElement({ type, defaultValue, step, required, ref: elRef, onChange: (e: any) => setInputValue(e.target.value) })}
                     </div>
-                    <div className="dlg-buttons">
+                    <div className={`${CSS_NS}-dialog-buttons`}>
                         <SpanButton
                             className="button"
                             disabled={required && FormTextTypes.includes(type) && !String(inputValue).trim().length}
@@ -563,7 +566,7 @@ const ConfirmContent = ({
         <>
             <div className="cf-title">{title}</div>
             <div className="cf-content" dangerouslySetInnerHTML={{ __html: message }}></div>
-            <div className="dlg-buttons">
+            <div className={`${CSS_NS}-dialog-buttons`}>
                 <SpanButton className="button" onClick={onConfirm}>
                     {t("common:confirm")}
                 </SpanButton>
@@ -626,7 +629,7 @@ const AlertContent = ({
             <div className="al-title">{title}</div>
             {!!option.html && <div className="al-content" dangerouslySetInnerHTML={{ __html: option.html }}></div>}
             {!option.html && <div className="al-content">{message}</div>}
-            <div className="dlg-buttons">
+            <div className={`${CSS_NS}-dialog-buttons`}>
                 <NormalButton onClick={onClose}>{option.closeButtonTitle || t("common:close")}</NormalButton>
             </div>
         </>
@@ -644,8 +647,8 @@ export const alert = (
 ) => {
     return new Promise<void>((resolve, reject) => {
         let closer = () => {
-			resolve();
-		}
+            resolve();
+        };
         const content = (
             <AlertContent
                 title={title}
