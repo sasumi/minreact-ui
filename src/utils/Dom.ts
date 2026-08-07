@@ -22,7 +22,7 @@ export function mountReactNode(node: ReactNode) {
  * @param {HTMLElement} element - 要移动的元素
  * @param {HTMLElement | null} handle - 拖动句柄，默认为元素本身
  */
-export function bindPanelMove(element: HTMLElement, handle: HTMLElement | null = null) {
+export function bindNodeMove(element: HTMLElement, handle: HTMLElement | null = null) {
     handle = handle || element;
     const previousPosition = element.style.position;
     const previousLeft = element.style.left;
@@ -75,10 +75,67 @@ export function bindPanelMove(element: HTMLElement, handle: HTMLElement | null =
 }
 
 /**
+ * 绑定点击事件，并返回一个解绑函数
+ * @param element - 要绑定事件的元素
+ * @param callback - 事件回调函数
+ * @returns 解绑函数
+ */
+export const bindClick = (element: HTMLElement, callback: (event: Event) => void) => {
+    return bindDomEvent(element, "click", callback);
+};
+
+/**
+ * 绑定键盘按键抬起事件，并返回一个解绑函数
+ * @param element - 要绑定事件的元素
+ * @param callback - 事件回调函数
+ * @returns 解绑函数
+ */
+export const bindKeyUp = (element: HTMLElement, callback: (event: Event) => void) => {
+    return bindDomEvent(element, "keyup", callback);
+};
+
+/**
+ * 绑定键盘按键按下事件，并返回一个解绑函数
+ * @param element - 要绑定事件的元素
+ * @param callback - 事件回调函数
+ * @returns 解绑函数
+ */
+export const bindKeyDown = (element: HTMLElement, callback: (event: Event) => void) => {
+    return bindDomEvent(element, "keydown", callback);
+};
+
+/**
+ * 绑定双击事件，并返回一个解绑函数
+ * @param element - 要绑定事件的元素
+ * @param callback - 事件回调函数
+ * @returns 解绑函数
+ */
+export const bindDoubleClick = (element: HTMLElement, callback: (event: Event) => void) => {
+    return bindDomEvent(element, "dblclick", callback);
+};
+
+/**
+ * 绑定DOM事件，并返回一个解绑函数
+ * @param element - 要绑定事件的元素
+ * @param eventName - 事件名称
+ * @param callback - 事件回调函数
+ * @returns 解绑函数
+ */
+export const bindDomEvent = (element: HTMLElement, eventName: string, callback: (event: Event) => void) => {
+    const onEvent = (event: Event) => {
+        callback(event);
+    };
+    element.addEventListener(eventName, onEvent);
+    return () => {
+        element.removeEventListener(eventName, onEvent);
+    };
+};
+
+/**
  * 将焦点设置到容器内的第一个可聚焦元素上
  * @param {HTMLElement | null} container - 容器元素
  */
-export function focusFirstElement(container: HTMLElement | null) {
+export const focusFirstElement = (container: HTMLElement | null) => {
     if (!container) {
         return;
     }
@@ -86,4 +143,4 @@ export function focusFirstElement(container: HTMLElement | null) {
     if (el && typeof el.focus === "function") {
         el.focus();
     }
-}
+};
