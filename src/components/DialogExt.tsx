@@ -6,7 +6,7 @@ import styleDefines from "@/styles/common.module.scss";
 import { mountReactNode } from "@/utils/Dom";
 import { prettyTimeDuration } from "@/utils/Time";
 import { calcRemainingMSecs, lockElementInteraction } from "minutool";
-import type { ComponentType, JSX, ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
@@ -14,62 +14,6 @@ import { Dialog, DIALOG_SIZE_SMALL } from "./Dialog";
 import { showWarning } from "./Toast";
 
 const CSS_NS = styleDefines.namespace;
-
-/**
- * 通用自定义内容弹窗，支持传入 React 组件
- */
-export const showCustomDialog = ({
-    title,
-    contentNode,
-    className = "",
-    autoFocus = false,
-    maxHeight = null,
-    maxWidth = null,
-    topCloseButton = true,
-    onClose = null,
-    size = null,
-    maxSize = null,
-}: {
-    title?: ReactNode;
-    contentNode?: ReactNode;
-    className?: string;
-    autoFocus?: boolean;
-    maxHeight?: string | number | null;
-    maxWidth?: string | number | null;
-    topCloseButton?: boolean;
-    onClose?: (() => void) | null;
-    size?: string | null;
-    maxSize?: string | null;
-}) => {
-    const DialogWrapper = () => {
-        const [open, setOpen] = useState(true);
-        useEffect(() => {
-            !open && setTimeout(destroy, 0);
-        }, [open]);
-        return (
-            <Dialog
-                open={open}
-                setOpen={setOpen}
-                maxHeight={maxHeight}
-                maxWidth={maxWidth}
-                className={className}
-                autoFocus={autoFocus}
-                size={size}
-                maxSize={maxSize}
-            >
-                {title && <Dialog.Title>{title}</Dialog.Title>}
-                {topCloseButton && <Dialog.TopCloser />}
-                {contentNode}
-            </Dialog>
-        );
-    };
-    const unmount = mountReactNode(<DialogWrapper />);
-    function destroy() {
-        unmount();
-        onClose?.();
-    }
-    return destroy;
-};
 
 /**
  * 显示 React 组件作为对话框
@@ -105,23 +49,23 @@ export const showDialogComponent = <P extends object>(
  */
 export const showDialog = ({
     title = undefined,
-    content = "",
+    content,
     actions = undefined,
     className = "",
     maxHeight = null,
-    size = null,
-    maxSize = null,
+    width = null,
+    maxWidth = null,
     topCloseButton = true,
     onClose = undefined,
     autoFocus = false,
 }: {
     title?: ReactNode;
-    content?: ReactNode;
+    content?: ReactNode | string;
     actions?: ReactNode;
     className?: string;
     maxHeight?: string | number | null;
-    size?: string | null;
-    maxSize?: string | null;
+    width?: string | null;
+    maxWidth?: string | null;
     topCloseButton?: boolean;
     onClose?: (() => void) | undefined;
     autoFocus?: boolean;
@@ -143,7 +87,15 @@ export const showDialog = ({
         }, [open]);
 
         return (
-            <Dialog open={open} setOpen={setOpen} maxHeight={maxHeight ?? undefined} autoFocus={autoFocus} className={className} size={size} maxSize={maxSize}>
+            <Dialog
+                open={open}
+                setOpen={setOpen}
+                maxHeight={maxHeight ?? undefined}
+                autoFocus={autoFocus}
+                className={className}
+                width={width}
+                maxWidth={maxWidth}
+            >
                 {title && <Dialog.Title>{title}</Dialog.Title>}
                 {topCloseButton && <Dialog.TopCloser />}
                 {content}
@@ -167,7 +119,7 @@ export const showImgPreview = (src: string) => {
             <img
                 src={src}
                 onClick={() => {
-                    closer?.(); 
+                    closer?.();
                 }}
             />
         ),
@@ -175,6 +127,15 @@ export const showImgPreview = (src: string) => {
     });
 };
 
+interface PromptOptions {
+    defaultValue?: string | number;
+    required?: boolean;
+    onSubmitPromise?: ((value: string) => Promise<unknown>) | null;
+    type?: string;
+    step?: string | number | null;
+    trimText?: boolean;
+    width?: string | null;
+}
 /**
  * 显示输入提示对话框
  */
@@ -187,19 +148,12 @@ export const prompt = (
         type = "text",
         step = null,
         trimText = false,
-        size = DIALOG_SIZE_SMALL,
-    }: {
-        defaultValue?: string | number;
-        required?: boolean;
-        onSubmitPromise?: ((value: string) => Promise<unknown>) | null;
-        type?: string;
-        step?: string | number | null;
-        trimText?: boolean;
-        size?: string;
-    },
+        width = DIALOG_SIZE_SMALL,
+    }: PromptOptions = {},
 ) => {
     return new Promise<string | void>((resolve, reject) => {
         let closer: (() => void) | null = null;
+
         function DialogWrap() {
             const formRef = useRef<HTMLFormElement>(null);
             const elRef = useRef<HTMLInputElement>(null);
@@ -245,7 +199,6 @@ export const prompt = (
                         return false;
                     }}
                 >
-                    <div className="pt-label">{label || t("common:pleaseEnterContent")}</div>
                     <div className="pt-inputs">
                         {makeElement({
                             type,
@@ -256,37 +209,19 @@ export const prompt = (
                             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value),
                         })}
                     </div>
-                    <Dialog.Actions>
-                        <button
-                            className="button"
-                            disabled={required && FormTextTypes.includes(type) && !String(inputValue).trim().length}
-                            onClick={() => {
-                                formRef.current!.requestSubmit();
-                            }}
-                        >
-                            {t("common:confirm")}
-                        </button>
-                        {!required && (
-                            <button
-                                className="button button-outlined"
-                                onClick={() => {
-                                    closer?.();
-                                    reject();
-                                }}
-                            >
-                                {t("common:cancel")}
-                            </button>
-                        )}
-                    </Dialog.Actions>
                 </form>
             );
         }
-        closer = showDialog({
-            content: <DialogWrap />,
+
+        closer = confirm(label, <DialogWrap />, {
             className: `${CSS_NS}-dialog-prompt`,
-            autoFocus: true,
-            topCloseButton: !required,
-            size,
+            width,
+            onPreConfirm: () => {
+                if (required && FormTextTypes.includes(type) && !String(inputValue).trim().length) {
+                    showWarning(t("common:pleaseEnterContent"));
+                    return false;
+                }
+            },
         });
     });
 };
@@ -403,13 +338,31 @@ export const showProgressDialog = ({
 
 /**
  * 显示确认对话框
+ * @param width 对话框宽度，默认为 DIALOG_SIZE_SMALL
+ * @param className 对话框的自定义 className
+ * @param confirmText 确认按钮文本，默认为 "确定"
+ * @param cancelText 取消按钮文本，默认为 "取消"
+ * @param onPreConfirm 确认按钮点击前的回调函数，返回 false 可阻止关闭对话框
+ * @param onPreCancel 取消按钮点击前的回调函数，返回 false 可阻止关闭对话框
+ * @returns Promise<void>，确认时 resolve，取消时 reject
  */
 export const confirm = (
     title: string = "",
-    message: string = "",
-    options: { confirmText?: string; cancelText?: string } = {
-        confirmText: "Confirm",
-        cancelText: "Cancel",
+    message: string | ReactNode = null,
+    options: {
+        width?: string | null;
+        className?: string;
+        confirmText?: string;
+        cancelText?: string;
+        onPreConfirm?: () => boolean | void;
+        onPreCancel?: () => boolean | void;
+    } = {
+        width: DIALOG_SIZE_SMALL,
+        className: "",
+        confirmText: "确定",
+        cancelText: "取消",
+        onPreConfirm: () => true,
+        onPreCancel: () => true,
     },
 ): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
@@ -421,6 +374,9 @@ export const confirm = (
                 <>
                     <button
                         onClick={() => {
+                            if (options.onPreConfirm?.() === false) {
+                                return;
+                            }
                             closerFn?.();
                             resolve();
                         }}
@@ -429,6 +385,9 @@ export const confirm = (
                     </button>
                     <button
                         onClick={() => {
+                            if (options.onPreCancel?.() === false) {
+                                return;
+                            }
                             closerFn?.();
                             reject();
                         }}
@@ -437,9 +396,9 @@ export const confirm = (
                     </button>
                 </>
             ),
-            className: `${CSS_NS}-dialog-confirm`,
+            className: `${CSS_NS}-dialog-confirm ${options.className || ""}`,
             topCloseButton: false,
-            size: DIALOG_SIZE_SMALL,
+            width: options.width || DIALOG_SIZE_SMALL,
         });
     });
 };
@@ -450,10 +409,10 @@ export const confirm = (
 export const alert = (
     title = "",
     message: ReactNode = "",
-    option: { closeButtonTitle?: string; size?: string; maxSize?: string | null } = {
+    option: { closeButtonTitle?: string; size?: string; maxWidth?: string | null } = {
         closeButtonTitle: "OK",
         size: DIALOG_SIZE_SMALL,
-        maxSize: null,
+        maxWidth: null,
     },
 ) => {
     return new Promise<void>((resolve) => {
@@ -473,8 +432,8 @@ export const alert = (
             className: `${CSS_NS}-dialog-alert`,
             autoFocus: true,
             topCloseButton: false,
-            size: option.size,
-            maxSize: option.maxSize,
+            width: option.size,
+            maxWidth: option.maxWidth,
         });
     });
 };

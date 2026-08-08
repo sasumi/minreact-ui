@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./DemoApp.scss";
 
 // Import all demo pages
@@ -32,8 +32,30 @@ const components = [
   { name: "Novice", label: "新手引导", component: NoviceDemo, category: "交互组件" },
 ];
 
+const DEFAULT_COMPONENT = "Button";
+
+/** Read the current component name from the URL hash, e.g. `#/Dialog` → `"Dialog"`. */
+function getComponentFromHash(): string {
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  if (hash && components.some((c) => c.name === hash)) {
+    return hash;
+  }
+  return DEFAULT_COMPONENT;
+}
+
 function DemoApp() {
-  const [activeComponent, setActiveComponent] = useState("Button");
+  const [activeComponent, setActiveComponent] = useState(getComponentFromHash);
+
+  // Sync hash ↔ state on mount and when the user presses back/forward
+  useEffect(() => {
+    const onHashChange = () => setActiveComponent(getComponentFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  const navigateTo = useCallback((name: string) => {
+    window.location.hash = `#/${name}`;
+  }, []);
 
   const ActiveDemo = components.find((c) => c.name === activeComponent)?.component || ButtonDemo;
 
@@ -62,7 +84,7 @@ function DemoApp() {
                   <li key={item.name}>
                     <button
                       className={`demo-nav-item ${activeComponent === item.name ? "active" : ""}`}
-                      onClick={() => setActiveComponent(item.name)}
+                      onClick={() => navigateTo(item.name)}
                     >
                       {item.label}
                     </button>

@@ -1,5 +1,5 @@
 import { Dialog, DIALOG_SIZE_SMALL, DIALOG_SIZE_NORMAL, DIALOG_SIZE_LARGE } from "@/components/Dialog";
-import { alert, confirm, showCustomDialog, showImgPreview } from "@/components/DialogExt";
+import { alert, confirm, prompt, showDialog, showImgPreview } from "@/components/DialogExt";
 import { PrimaryButton, NormalButton } from "@/components/Button";
 import { useState } from "react";
 
@@ -9,15 +9,15 @@ function DialogDemo() {
     const [open3, setOpen3] = useState(false);
 
     const showCustom = () => {
-        showCustomDialog({
+        showDialog({
             title: "自定义对话框",
-            contentNode: (
+            content: (
                 <div style={{ padding: "1rem" }}>
-                    <p>这是通过 showCustomDialog 函数创建的对话框</p>
+                    <p>这是通过 showDialog 函数创建的对话框</p>
                     <p>可以在任何地方调用，不需要管理 state</p>
                 </div>
             ),
-            size: DIALOG_SIZE_NORMAL,
+            width: DIALOG_SIZE_NORMAL,
         });
     };
 
@@ -28,6 +28,10 @@ function DialogDemo() {
     const showAlert = () => {
         alert("提示", "这是一个提示对话框");
     };
+
+    const showPrompt = ()=>{
+        prompt("请输入您的姓名");
+    }
 
     return (
         <div className="demo-page">
@@ -59,17 +63,17 @@ function DialogDemo() {
                     <div className="demo-row">
                         <PrimaryButton
                             onClick={() =>
-                                showCustomDialog({ title: "小尺寸", contentNode: <div style={{ padding: "1rem" }}>小尺寸对话框</div>, size: DIALOG_SIZE_SMALL })
+                                showDialog({ title: "小尺寸", content: <div style={{ padding: "1rem" }}>小尺寸对话框</div>, width: DIALOG_SIZE_SMALL })
                             }
                         >
                             小尺寸 (24em)
                         </PrimaryButton>
                         <PrimaryButton
                             onClick={() =>
-                                showCustomDialog({
+                                showDialog({
                                     title: "普通尺寸",
-                                    contentNode: <div style={{ padding: "1rem" }}>普通尺寸对话框</div>,
-                                    size: DIALOG_SIZE_NORMAL,
+                                    content: <div style={{ padding: "1rem" }}>普通尺寸对话框</div>,
+                                    width: DIALOG_SIZE_NORMAL,
                                 })
                             }
                         >
@@ -77,7 +81,7 @@ function DialogDemo() {
                         </PrimaryButton>
                         <PrimaryButton
                             onClick={() =>
-                                showCustomDialog({ title: "大尺寸", contentNode: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, size: DIALOG_SIZE_LARGE })
+                                showDialog({ title: "大尺寸", content: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, width: DIALOG_SIZE_LARGE })
                             }
                         >
                             大尺寸 (60em)
@@ -87,13 +91,14 @@ function DialogDemo() {
             </div>
 
             <div className="demo-section">
-                <h3 className="demo-section-title">showCustomDialog 函数</h3>
+                <h3 className="demo-section-title">showDialog 函数</h3>
                 <p className="demo-section-description">通过函数式调用快速创建对话框</p>
                 <div className="demo-example">
                     <div className="demo-row">
                         <PrimaryButton onClick={showCustom}>普通对话框</PrimaryButton>
                         <PrimaryButton onClick={showConfirm}>确认对话框</PrimaryButton>
                         <PrimaryButton onClick={showAlert}>提示对话框</PrimaryButton>
+                        <PrimaryButton onClick={showPrompt}>输入对话框</PrimaryButton>
                     </div>
                 </div>
             </div>
@@ -140,9 +145,9 @@ function DialogDemo() {
                 <div className="demo-example">
                     <PrimaryButton
                         onClick={() =>
-                            showCustomDialog({
+                            showDialog({
                                 title: "编辑信息",
-                                contentNode: (
+                                content: (
                                     <div style={{ padding: "1rem" }}>
                                         <form
                                             onSubmit={(e) => {
@@ -167,7 +172,7 @@ function DialogDemo() {
                                         </form>
                                     </div>
                                 ),
-                                size: DIALOG_SIZE_NORMAL,
+                                width: DIALOG_SIZE_NORMAL,
                             })
                         }
                     >

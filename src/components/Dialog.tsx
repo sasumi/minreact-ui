@@ -28,13 +28,13 @@ interface DialogProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     ref?: RefObject<HTMLDialogElement | null> | null;
+    modal?: boolean;
+
     className?: string;
     maxHeight?: string | number | null;
     maxWidth?: string | number | null;
+    width?: string | null;
     autoFocus?: boolean;
-    size?: string | null;
-    maxSize?: string | null;
-    modal?: boolean;
 
     Title?: ReactNode;
     TopCloser?: ReactNode;
@@ -108,8 +108,7 @@ export const Dialog = ({
     maxHeight = null,
     maxWidth = null,
     autoFocus = false,
-    size = null,
-    maxSize = null,
+    width = null,
     modal = true,
 }: DialogProps) => {
     const dlgRef = useRef<HTMLDialogElement | null>(null);
@@ -185,7 +184,7 @@ export const Dialog = ({
             <div className={`${CSS_NS}-dialog-masker`}></div>
             <dialog
                 className={`${CSS_NS}-dialog ${className}`}
-                style={{ width: size ?? undefined, maxWidth: maxSize ?? undefined }}
+                style={{ width: width ?? undefined, maxWidth: maxWidth ?? undefined }}
                 ref={handleDialogRef}
                 onClose={() => {
                     setOpen(false);

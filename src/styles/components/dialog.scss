@@ -9,6 +9,7 @@
 	max-width: calc(100vw - 1em); //预留一些缝隙
 	position: fixed;
 	z-index: var(--dialog-z-index);
+	margin: auto;
 	inset: 0;
 	border: none;
 	padding: 0;
@@ -59,7 +60,8 @@
 	}
 
 	&-alert,
-	&-confirm {
+	&-confirm,
+	&-prompt  {
 		min-width: 15em;
 		max-width: min(30em, calc(100vw - 2em));
 
@@ -74,32 +76,32 @@
 		}
 	}
 
-	&-prompt {
-		--element-width: 16em;
+	// &-prompt {
+	// 	--element-width: 16em;
 
-		.#{$namespace}-dialog-content {
-			padding: 2em 2em 1.5em 2em;
-		}
+	// 	.#{$namespace}-dialog-content {
+	// 		padding: 2em 2em 1.5em 2em;
+	// 	}
 
-		.pt-inputs {
-			padding: 0.75em 0 0.5em;
+	// 	.pt-inputs {
+	// 		padding: 0.75em 0 0.5em;
 
-			input[type="text"],
-			input[type="number"],
-			input[type="password"],
-			input[type="password"],
-			textarea {
-				width: 100%;
-				text-align: left;
-			}
+	// 		input[type="text"],
+	// 		input[type="number"],
+	// 		input[type="password"],
+	// 		input[type="password"],
+	// 		textarea {
+	// 			width: 100%;
+	// 			text-align: left;
+	// 		}
 
-			textarea {
-				height: 10em;
-				min-height: 8em;
-				resize: vertical;
-			}
-		}
-	}
+	// 		textarea {
+	// 			height: 10em;
+	// 			min-height: 8em;
+	// 			resize: vertical;
+	// 		}
+	// 	}
+	// }
 
 	&-iframe {
 		.#{$namespace}-dialog-content {
