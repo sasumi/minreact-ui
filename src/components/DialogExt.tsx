@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { NormalButton } from "@/components/Button";
 import { FormTextTypes, makeElement } from "@/components/Form";
-import { useMinuiTranslate } from "@/locale/i18n";
+import { useMinuiTranslate, type TranslateFn } from "@/locale/i18n";
 import styleDefines from "@/styles/common.module.scss";
 import { mountReactNode } from "@/utils/Dom";
 import { prettyTimeDuration } from "@/utils/Time";
@@ -127,15 +127,6 @@ export const showImgPreview = (src: string) => {
     });
 };
 
-interface PromptOptions {
-    defaultValue?: string | number;
-    required?: boolean;
-    onSubmitPromise?: ((value: string) => Promise<unknown>) | null;
-    type?: string;
-    step?: string | number | null;
-    trimText?: boolean;
-    width?: string | null;
-}
 /**
  * 显示输入提示对话框
  */
@@ -149,16 +140,32 @@ export const prompt = (
         step = null,
         trimText = false,
         width = DIALOG_SIZE_SMALL,
-    }: PromptOptions = {},
+    }: {
+        defaultValue?: string | number;
+        required?: boolean;
+        onSubmitPromise?: ((value: string) => Promise<unknown>) | null;
+        type?: string;
+        step?: string | number | null;
+        trimText?: boolean;
+        width?: string | null;
+    } = {},
 ) => {
-    return new Promise<string | void>((resolve, reject) => {
-        let closer: (() => void) | null = null;
+    return new Promise<string | void>((resolve) => {
+        const closerRef: { current: (() => void) | null } = { current: null };
+        const valueRef: { current: string | number } = { current: defaultValue };
+        const tRef: { current: TranslateFn | null } = { current: null };
 
         function DialogWrap() {
             const formRef = useRef<HTMLFormElement>(null);
             const elRef = useRef<HTMLInputElement>(null);
             const t = useMinuiTranslate();
             const [inputValue, setInputValue] = useState(defaultValue);
+
+            useEffect(() => {
+                valueRef.current = inputValue;
+                tRef.current = t;
+            });
+
             const doSubmit = () => {
                 let val = elRef.current!.value;
 
@@ -176,13 +183,13 @@ export const prompt = (
                             onSubmitPromise(val)
                                 .then(() => {
                                     resolve(val);
-                                    closer?.();
+                                    closerRef.current?.();
                                 })
                                 .finally(reset);
                         });
                 } else {
                     resolve(val);
-                    closer?.();
+                    closerRef.current?.();
                 }
             };
             useEffect(() => {
@@ -213,12 +220,13 @@ export const prompt = (
             );
         }
 
-        closer = confirm(label, <DialogWrap />, {
+        confirm(label, <DialogWrap />, {
             className: `${CSS_NS}-dialog-prompt`,
             width,
+            closerRef,
             onPreConfirm: () => {
-                if (required && FormTextTypes.includes(type) && !String(inputValue).trim().length) {
-                    showWarning(t("common:pleaseEnterContent"));
+                if (required && FormTextTypes.includes(type) && !String(valueRef.current).trim().length) {
+                    showWarning(tRef.current?.("common:pleaseEnterContent") || "");
                     return false;
                 }
             },
@@ -349,24 +357,29 @@ export const showProgressDialog = ({
 export const confirm = (
     title: string = "",
     message: string | ReactNode = null,
-    options: {
+    {
+        width = DIALOG_SIZE_SMALL,
+        className = "",
+        confirmText = "确定",
+        cancelText = "取消",
+        onPreConfirm = () => true,
+        onPreCancel = () => true,
+        closerRef = undefined,
+    }: {
         width?: string | null;
         className?: string;
         confirmText?: string;
         cancelText?: string;
         onPreConfirm?: () => boolean | void;
         onPreCancel?: () => boolean | void;
-    } = {
-        width: DIALOG_SIZE_SMALL,
-        className: "",
-        confirmText: "确定",
-        cancelText: "取消",
-        onPreConfirm: () => true,
-        onPreCancel: () => true,
-    },
+        closerRef?: { current: (() => void) | null };
+    } = {},
 ): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         let closerFn: (() => void) | null = null;
+        if (closerRef) {
+            closerRef.current = () => closerFn?.();
+        }
         closerFn = showDialog({
             title,
             content: message,
@@ -374,31 +387,31 @@ export const confirm = (
                 <>
                     <button
                         onClick={() => {
-                            if (options.onPreConfirm?.() === false) {
+                            if (onPreConfirm?.() === false) {
                                 return;
                             }
                             closerFn?.();
                             resolve();
                         }}
                     >
-                        {options.confirmText}
+                        {confirmText}
                     </button>
                     <button
                         onClick={() => {
-                            if (options.onPreCancel?.() === false) {
+                            if (onPreCancel?.() === false) {
                                 return;
                             }
                             closerFn?.();
                             reject();
                         }}
                     >
-                        {options.cancelText}
+                        {cancelText}
                     </button>
                 </>
             ),
-            className: `${CSS_NS}-dialog-confirm ${options.className || ""}`,
+            className: `${CSS_NS}-dialog-confirm ${className || ""}`,
             topCloseButton: false,
-            width: options.width || DIALOG_SIZE_SMALL,
+            width,
         });
     });
 };
@@ -409,11 +422,15 @@ export const confirm = (
 export const alert = (
     title = "",
     message: ReactNode = "",
-    option: { closeButtonTitle?: string; size?: string; maxWidth?: string | null } = {
-        closeButtonTitle: "OK",
-        size: DIALOG_SIZE_SMALL,
-        maxWidth: null,
-    },
+    {
+        closeButtonTitle = "确定",
+        width = DIALOG_SIZE_SMALL,
+        maxWidth = null,
+    }: {
+        closeButtonTitle?: string;
+        width?: string;
+        maxWidth?: string | null;
+    } = {},
 ) => {
     return new Promise<void>((resolve) => {
         const closer = showDialog({
@@ -426,14 +443,14 @@ export const alert = (
                         resolve();
                     }}
                 >
-                    {option.closeButtonTitle}
+                    {closeButtonTitle}
                 </NormalButton>
             ),
             className: `${CSS_NS}-dialog-alert`,
             autoFocus: true,
             topCloseButton: false,
-            width: option.size,
-            maxWidth: option.maxWidth,
+            width: width,
+            maxWidth: maxWidth,
         });
     });
 };

@@ -29,9 +29,19 @@ function DialogDemo() {
         alert("提示", "这是一个提示对话框");
     };
 
-    const showPrompt = ()=>{
-        prompt("请输入您的姓名");
-    }
+    const showPrompt = () => {
+        prompt("请输入您的姓名")
+            .then((value) => {
+                if (value !== undefined) {
+                    alert("您输入的姓名是：" + value);
+                } else {
+                    alert("您取消了输入");
+                }
+            })
+            .catch((err) => {
+                console.error("Prompt error:", err);
+            });
+    };
 
     return (
         <div className="demo-page">
