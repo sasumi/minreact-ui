@@ -30,7 +30,7 @@ function DialogDemo() {
     };
 
     const showPrompt = () => {
-        prompt("请输入您的姓名")
+        prompt({ title: "请输入您的姓名" })
             .then((value) => {
                 if (value !== undefined) {
                     alert("您输入的姓名是：" + value);
@@ -57,7 +57,6 @@ function DialogDemo() {
                     <PrimaryButton onClick={() => setOpen1(true)}>打开对话框</PrimaryButton>
                     <Dialog open={open1} setOpen={setOpen1}>
                         <Dialog.Title>基础对话框</Dialog.Title>
-                        <Dialog.TopCloser />
                         <div style={{ padding: "1rem" }}>
                             <p>这是一个基础的对话框内容</p>
                             <p>可以包含任何 React 组件</p>
@@ -115,9 +114,6 @@ function DialogDemo() {
 
             <div className="demo-section">
                 <h3 className="demo-section-title">不显示关闭按钮</h3>
-                <p className="demo-section-description">
-                    通过 <Dialog.TopCloser /> 组件控制右上角关闭按钮的显示与隐藏
-                </p>
                 <div className="demo-example">
                     <PrimaryButton onClick={() => setOpen2(true)}>打开对话框</PrimaryButton>
                     <Dialog open={open2} setOpen={setOpen2}>
@@ -126,9 +122,9 @@ function DialogDemo() {
                             <p>此对话框没有右上角的关闭按钮</p>
                             <p>需要通过点击遮罩层或自定义按钮关闭</p>
                         </div>
-                        <Dialog.Actions>
+                        <Dialog.Action>
                             <NormalButton onClick={() => setOpen2(false)}>关闭</NormalButton>
-                        </Dialog.Actions>
+                        </Dialog.Action>
                     </Dialog>
                 </div>
             </div>

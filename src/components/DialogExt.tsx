@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { NormalButton } from "@/components/Button";
-import { FormTextTypes, makeElement } from "@/components/Form";
-import { useMinuiTranslate, type TranslateFn } from "@/locale/i18n";
+import type { DialogProps } from "./Dialog";
 import styleDefines from "@/styles/common.module.scss";
 import { mountReactNode } from "@/utils/Dom";
 import { prettyTimeDuration } from "@/utils/Time";
@@ -10,66 +9,15 @@ import type { ComponentType, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
-import { Dialog, DIALOG_SIZE_SMALL } from "./Dialog";
-import { showWarning } from "./Toast";
+import { Dialog, DIALOG_SIZE_NORMAL, DIALOG_SIZE_SMALL } from "./Dialog";
+import { makeElement } from "./Form";
 
 const CSS_NS = styleDefines.namespace;
 
 /**
- * 显示 React 组件作为对话框
- */
-export const showDialogComponent = <P extends object>(
-    DialogComponent: ComponentType<P & { open: boolean; setOpen: (open: boolean) => void }>,
-    props: P = {} as P,
-) => {
-    const unmountRef: { current: (() => void) | null } = { current: null };
-
-    const DialogWrapper = () => {
-        const [open, setOpen] = useState(true);
-
-        useEffect(() => {
-            if (!open) {
-                setTimeout(() => {
-                    if (unmountRef.current) {
-                        unmountRef.current();
-                    }
-                }, 0);
-            }
-        }, [open]);
-
-        return <DialogComponent open={open} setOpen={setOpen} {...props} />;
-    };
-
-    unmountRef.current = mountReactNode(<DialogWrapper />);
-    return unmountRef.current;
-};
-
-/**
  * 简单对话框
  */
-export const showDialog = ({
-    title = undefined,
-    content,
-    actions = undefined,
-    className = "",
-    maxHeight = null,
-    width = null,
-    maxWidth = null,
-    topCloseButton = true,
-    onClose = undefined,
-    autoFocus = false,
-}: {
-    title?: ReactNode;
-    content?: ReactNode | string;
-    actions?: ReactNode;
-    className?: string;
-    maxHeight?: string | number | null;
-    width?: string | null;
-    maxWidth?: string | null;
-    topCloseButton?: boolean;
-    onClose?: (() => void) | undefined;
-    autoFocus?: boolean;
-}) => {
+export const showDialog = ({ content, onClose, ...dlgProps }: Partial<DialogProps> & { content: ReactNode | string; onClose?: () => boolean | void }) => {
     const div = document.createElement("div");
     document.body.appendChild(div);
     const root = createRoot(div);
@@ -87,25 +35,60 @@ export const showDialog = ({
         }, [open]);
 
         return (
-            <Dialog
-                open={open}
-                setOpen={setOpen}
-                maxHeight={maxHeight ?? undefined}
-                autoFocus={autoFocus}
-                className={className}
-                width={width}
-                maxWidth={maxWidth}
-            >
-                {title && <Dialog.Title>{title}</Dialog.Title>}
-                {topCloseButton && <Dialog.TopCloser />}
+            <Dialog {...dlgProps} open={open} setOpen={setOpen}>
                 {content}
-                {actions && <Dialog.Actions>{actions}</Dialog.Actions>}
             </Dialog>
         );
     }
 
     root.render(<DialogWrapper />);
     return destroy;
+};
+
+/**
+ * 显示 React 组件作为对话框
+ */
+export const showDialogComponent = <P extends object>(
+    DialogComponent: ComponentType<P & { open: boolean; setOpen: (open: boolean) => void }>,
+    props: P = {} as P,
+) => {
+    const unmountRef: { current: (() => void) | null } = { current: null };
+    const DialogWrapper = () => {
+        const [open, setOpen] = useState(true);
+        useEffect(() => {
+            if (!open) {
+                setTimeout(() => {
+                    if (unmountRef.current) {
+                        unmountRef.current();
+                    }
+                }, 0);
+            }
+        }, [open]);
+
+        return <DialogComponent open={open} setOpen={setOpen} {...props} />;
+    };
+
+    unmountRef.current = mountReactNode(<DialogWrapper />);
+    return unmountRef.current;
+};
+
+export const showIframeDialog = ({
+    title = "",
+    url,
+    width = DIALOG_SIZE_NORMAL,
+    height = null,
+}: {
+    title?: string;
+    url: string;
+    width?: string;
+    height?: string | null;
+}) => {
+    return showDialog({
+        title,
+        content: <iframe src={url} style={{ width: "100%", height: height ?? "400px", border: "none" }} />,
+        width,
+        wrapContent: false,
+    });
 };
 
 /**
@@ -130,57 +113,37 @@ export const showImgPreview = (src: string) => {
 /**
  * 显示输入提示对话框
  */
-export const prompt = (
-    label = "",
-    {
-        defaultValue = "" as string | number,
-        required = false,
-        onSubmitPromise = null,
-        type = "text",
-        step = null,
-        trimText = false,
-        width = DIALOG_SIZE_SMALL,
-    }: {
-        defaultValue?: string | number;
-        required?: boolean;
-        onSubmitPromise?: ((value: string) => Promise<unknown>) | null;
-        type?: string;
-        step?: string | number | null;
-        trimText?: boolean;
-        width?: string | null;
-    } = {},
-) => {
+export const prompt = ({
+    title = "",
+    defaultValue = "" as string | number,
+    onSubmit = null,
+    type = "text",
+    step = null,
+    width = DIALOG_SIZE_SMALL,
+    showTopCloser = true,
+}: {
+    title?: string;
+    defaultValue?: string | number;
+    onSubmit?: ((value: string) => Promise<unknown>) | null;
+    type?: string;
+    step?: string | number | null;
+    width?: string | null;
+    showTopCloser?: boolean;
+} = {}) => {
     return new Promise<string | void>((resolve) => {
         const closerRef: { current: (() => void) | null } = { current: null };
-        const valueRef: { current: string | number } = { current: defaultValue };
-        const tRef: { current: TranslateFn | null } = { current: null };
 
         function DialogWrap() {
             const formRef = useRef<HTMLFormElement>(null);
             const elRef = useRef<HTMLInputElement>(null);
-            const t = useMinuiTranslate();
             const [inputValue, setInputValue] = useState(defaultValue);
-
-            useEffect(() => {
-                valueRef.current = inputValue;
-                tRef.current = t;
-            });
 
             const doSubmit = () => {
                 let val = elRef.current!.value;
-
-                if (FormTextTypes.includes(type) && trimText) {
-                    val = val.trim();
-                    if (required && !val) {
-                        showWarning(t("common:pleaseEnterContent"));
-                        elRef.current!.focus();
-                        return;
-                    }
-                }
-                if (onSubmitPromise) {
+                if (onSubmit) {
                     formRef.current &&
                         lockElementInteraction(formRef.current, (reset) => {
-                            onSubmitPromise(val)
+                            onSubmit(val)
                                 .then(() => {
                                     resolve(val);
                                     closerRef.current?.();
@@ -198,39 +161,62 @@ export const prompt = (
                 }
             }, []);
             return (
-                <form
-                    ref={formRef}
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        doSubmit();
-                        return false;
-                    }}
+                <Dialog
+                    showTopCloser={showTopCloser}
+                    open={true}
+                    setOpen={(open) => !open && closerRef.current?.()}
+                    className={`${CSS_NS}-dialog-prompt`}
+                    width={width}
+                    wrapContent={false}
                 >
-                    <div className="pt-inputs">
-                        {makeElement({
-                            type,
-                            defaultValue,
-                            step,
-                            required,
-                            ref: elRef,
-                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value),
-                        })}
-                    </div>
-                </form>
+                    <form
+                        ref={formRef}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            doSubmit();
+                            return false;
+                        }}
+                    >
+                        <Dialog.Title>{title}</Dialog.Title>
+                        <Dialog.Content>
+                            <div className="pt-inputs">
+                                {makeElement({
+                                    type,
+                                    defaultValue,
+                                    step,
+                                    ref: elRef,
+                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value),
+                                })}
+                            </div>
+                        </Dialog.Content>
+                        <Dialog.Action>
+                            <NormalButton
+                                type="submit"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    doSubmit();
+                                }}
+                            >
+                                确认
+                            </NormalButton>
+                            <NormalButton
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    closerRef.current?.();
+                                }}
+                            >
+                                取消
+                            </NormalButton>
+                        </Dialog.Action>
+                    </form>
+                </Dialog>
             );
         }
 
-        confirm(label, <DialogWrap />, {
-            className: `${CSS_NS}-dialog-prompt`,
-            width,
-            closerRef,
-            onPreConfirm: () => {
-                if (required && FormTextTypes.includes(type) && !String(valueRef.current).trim().length) {
-                    showWarning(tRef.current?.("common:pleaseEnterContent") || "");
-                    return false;
-                }
-            },
-        });
+        let closer: (() => void) | null = null;
+        closer = showDialogComponent(DialogWrap);
+        closerRef.current = closer;
     });
 };
 
@@ -306,22 +292,11 @@ export const showProgressDialog = ({
                         closer?.();
                     }
                 }}
+                showTopCloser={canAbort}
+                title={title}
                 className={`${CSS_NS}-dialog-progress`}
                 autoFocus={false}
             >
-                {canAbort && (
-                    <Dialog.TopCloser
-                        onPreClick={() => {
-                            if (window.confirm(abortText || t("common:confirmAbort"))) {
-                                abortControllerRef.current.abort();
-                                setAborted(true);
-                                closer?.();
-                                onAbort?.();
-                            }
-                        }}
-                    />
-                )}
-                {title && <Dialog.Title>{title}</Dialog.Title>}
                 {!!message && <div className="pd-message" dangerouslySetInnerHTML={{ __html: message }} />}
                 <progress value={progressValue} max={totalValue} className="progress" />
                 <div className="pd-status">
@@ -354,36 +329,31 @@ export const showProgressDialog = ({
  * @param onPreCancel 取消按钮点击前的回调函数，返回 false 可阻止关闭对话框
  * @returns Promise<void>，确认时 resolve，取消时 reject
  */
-export const confirm = (
-    title: string = "",
-    message: string | ReactNode = null,
-    {
-        width = DIALOG_SIZE_SMALL,
-        className = "",
-        confirmText = "确定",
-        cancelText = "取消",
-        onPreConfirm = () => true,
-        onPreCancel = () => true,
-        closerRef = undefined,
-    }: {
-        width?: string | null;
-        className?: string;
-        confirmText?: string;
-        cancelText?: string;
-        onPreConfirm?: () => boolean | void;
-        onPreCancel?: () => boolean | void;
-        closerRef?: { current: (() => void) | null };
-    } = {},
-): Promise<void> => {
+export const confirm = ({
+    title = null,
+    message = null,
+    width = DIALOG_SIZE_SMALL,
+    className = "",
+    confirmText = "确定",
+    cancelText = "取消",
+    onPreConfirm = () => true,
+    onPreCancel = () => true,
+}: {
+    title?: string | null;
+    message?: string | ReactNode | null;
+    width?: string | null;
+    className?: string;
+    confirmText?: string;
+    cancelText?: string;
+    onPreConfirm?: () => boolean | void;
+    onPreCancel?: () => boolean | void;
+}): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         let closerFn: (() => void) | null = null;
-        if (closerRef) {
-            closerRef.current = () => closerFn?.();
-        }
         closerFn = showDialog({
             title,
             content: message,
-            actions: (
+            action: (
                 <>
                     <button
                         onClick={() => {
@@ -410,7 +380,7 @@ export const confirm = (
                 </>
             ),
             className: `${CSS_NS}-dialog-confirm ${className || ""}`,
-            topCloseButton: false,
+            showTopCloser: false,
             width,
         });
     });
@@ -436,7 +406,7 @@ export const alert = (
         const closer = showDialog({
             title,
             content: message,
-            actions: (
+            action: (
                 <NormalButton
                     onClick={() => {
                         closer?.();
@@ -448,7 +418,7 @@ export const alert = (
             ),
             className: `${CSS_NS}-dialog-alert`,
             autoFocus: true,
-            topCloseButton: false,
+            showTopCloser: false,
             width: width,
             maxWidth: maxWidth,
         });

@@ -61,7 +61,7 @@
 
 	&-alert,
 	&-confirm,
-	&-prompt  {
+	&-prompt {
 		min-width: 15em;
 		max-width: min(30em, calc(100vw - 2em));
 
@@ -76,32 +76,24 @@
 		}
 	}
 
-	// &-prompt {
-	// 	--element-width: 16em;
+	&-prompt {
+		.#{$namespace}-dialog-content {
+			padding: 1rem 1.2rem;
+		}
 
-	// 	.#{$namespace}-dialog-content {
-	// 		padding: 2em 2em 1.5em 2em;
-	// 	}
+		.#{$namespace}-dialog-title {
+			padding-top: 1.5em;
+			font-size: 1rem;
+		}
 
-	// 	.pt-inputs {
-	// 		padding: 0.75em 0 0.5em;
-
-	// 		input[type="text"],
-	// 		input[type="number"],
-	// 		input[type="password"],
-	// 		input[type="password"],
-	// 		textarea {
-	// 			width: 100%;
-	// 			text-align: left;
-	// 		}
-
-	// 		textarea {
-	// 			height: 10em;
-	// 			min-height: 8em;
-	// 			resize: vertical;
-	// 		}
-	// 	}
-	// }
+		input[type="text"],
+		input[type="password"],
+		input[type="number"],
+		textarea {
+			width: 100%;
+			box-sizing: border-box;
+		}
+	}
 
 	&-iframe {
 		.#{$namespace}-dialog-content {
