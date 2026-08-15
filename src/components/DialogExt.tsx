@@ -7,7 +7,6 @@ import { prettyTimeDuration } from "@/utils/Time";
 import { calcRemainingMSecs, lockElementInteraction } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
 import { Dialog, DIALOG_SIZE_NORMAL, DIALOG_SIZE_SMALL } from "./Dialog";
 import { makeElement } from "./Form";
@@ -15,33 +14,48 @@ import { makeElement } from "./Form";
 const CSS_NS = styleDefines.namespace;
 
 /**
- * 简单对话框
+ * 显示自定义对话框
+ * @param content - 对话框内容，可以是 ReactNode 或字符串
+ * @param onClose - 对话框关闭时的回调函数，返回 false 可阻止关闭
+ * @param dlgProps - 其他 Dialog 组件的属性
+ * @returns 卸载函数
  */
-export const showDialog = ({ content, onClose, ...dlgProps }: Partial<DialogProps> & { content: ReactNode | string; onClose?: () => boolean | void }) => {
-    const div = document.createElement("div");
-    document.body.appendChild(div);
-    const root = createRoot(div);
-
-    function destroy() {
-        root.unmount();
-        div.remove();
-        onClose?.();
-    }
-
+export const showDialog = ({
+    title,
+    action,
+    content,
+    children,
+    onClose,
+    ...dlgProps
+}: Partial<DialogProps> & {
+    title?: ReactNode | string;
+    children?: ReactNode | string;
+    action?: ReactNode | string;
+    content?: ReactNode | string;
+    onClose?: () => boolean | void;
+}) => {
+    let destroy: (() => void) | null = null;
     function DialogWrapper() {
         const [open, setOpen] = useState(true);
+        const handleSetOpen = (newOpen: boolean) => {
+            if (!newOpen && onClose && onClose() === false) {
+                return;
+            }
+            setOpen(newOpen);
+        };
         useEffect(() => {
-            !open && setTimeout(destroy, 0);
+            !open && setTimeout(() => destroy?.(), 0);
         }, [open]);
-
         return (
-            <Dialog {...dlgProps} open={open} setOpen={setOpen}>
-                {content}
+            <Dialog {...dlgProps} open={open} setOpen={handleSetOpen}>
+                {title && <Dialog.Title>{title}</Dialog.Title>}
+                {content && <Dialog.Content>{content}</Dialog.Content>}
+                {action && <Dialog.Action>{action}</Dialog.Action>}
+                {children}
             </Dialog>
         );
     }
-
-    root.render(<DialogWrapper />);
+    destroy = mountReactNode(<DialogWrapper />);
     return destroy;
 };
 
@@ -162,13 +176,13 @@ export const prompt = ({
             }, []);
             return (
                 <Dialog
-                    showTopCloser={showTopCloser}
                     open={true}
                     setOpen={(open) => !open && closerRef.current?.()}
                     className={`${CSS_NS}-dialog-prompt`}
                     width={width}
-                    wrapContent={false}
+                    showTopCloser={showTopCloser}
                 >
+                    <Dialog.Title>{title}</Dialog.Title>
                     <form
                         ref={formRef}
                         onSubmit={(e) => {
@@ -177,7 +191,6 @@ export const prompt = ({
                             return false;
                         }}
                     >
-                        <Dialog.Title>{title}</Dialog.Title>
                         <Dialog.Content>
                             <div className="pt-inputs">
                                 {makeElement({
@@ -293,10 +306,10 @@ export const showProgressDialog = ({
                     }
                 }}
                 showTopCloser={canAbort}
-                title={title}
                 className={`${CSS_NS}-dialog-progress`}
                 autoFocus={false}
             >
+                <Dialog.Title>{title}</Dialog.Title>
                 {!!message && <div className="pd-message" dangerouslySetInnerHTML={{ __html: message }} />}
                 <progress value={progressValue} max={totalValue} className="progress" />
                 <div className="pd-status">

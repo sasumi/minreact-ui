@@ -3,7 +3,7 @@
 $namespace: minui;
 
 @font-face {
-	font-family: 'minui-font';
+	font-family: '#{namespace}-icon';
 	src: url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff2?t=1785839311028') format('woff2'),
 		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff?t=1785839311028') format('woff'),
 		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.ttf?t=1785839311028') format('truetype');

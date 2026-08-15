@@ -1,11 +1,13 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
 @use "./../common.module.scss" as *;
 
 .#{$namespace}-dialog {
 	@include com.panel();
 	--max-height: calc(100vh - 2em);
 	--content-max-height: calc(var(--max-height) - 8em);
+	--inner-padding: .75em;
 	max-width: calc(100vw - 1em); //预留一些缝隙
 	position: fixed;
 	z-index: var(--dialog-z-index);
@@ -16,7 +18,8 @@
 
 	.#{$namespace}-dialog-title {
 		color: var(--color-secondary);
-		padding: 1em 0 0 1em;
+		line-height: 1;
+		padding: var(--inner-padding) 0 0 var(--inner-padding);
 	}
 
 	.#{$namespace}-dialog-content {
@@ -28,11 +31,12 @@
 
 	.#{$namespace}-dialog-close-btn {
 		font-size: 1em;
-		width: 1.5em;
-		height: 1.5em;
+		width: 1em;
+		height: 1em;
 		position: absolute;
-		right: 0.5em;
-		top: 0.5em;
+		right: var(--inner-padding);
+		top: var(--inner-padding);
+		@include icon.icon-button;
 
 		&:before {
 			content: "\e625";
@@ -41,8 +45,8 @@
 
 	.#{$namespace}-dialog-buttons {
 		display: flex;
-		padding: 1em 1em;
-		gap: var(--gap, 0.5em);
+		padding: var(--inner-padding);
+		gap: var(--gap, var(--inner-padding));
 		justify-content: var(--align, "right");
 	}
 
@@ -66,24 +70,21 @@
 		max-width: min(30em, calc(100vw - 2em));
 
 		.#{$namespace}-dialog-content {
-			padding: .5rem 1.2rem;
+			padding: .5em var(--inner-padding);
 			max-height: calc(100vh - 20em);
 			overflow: auto;
 		}
-
-		.#{$namespace}-dialog-title {
-			font-size: 1.2rem;
-		}
+		.#{$namespace}-dialog-title {}
 	}
 
 	&-prompt {
 		.#{$namespace}-dialog-content {
-			padding: 1rem 1.2rem;
+			padding: 1em var(--inner-padding);
 		}
 
 		.#{$namespace}-dialog-title {
 			padding-top: 1.5em;
-			font-size: 1rem;
+			font-size: 1em;
 		}
 
 		input[type="text"],
@@ -142,6 +143,8 @@
 			right: -1em;
 			opacity: 0.5;
 			transition: all 0.1s ease-in-out;
+
+			@include icon.icon-button;
 
 			&:hover {
 				opacity: 1;

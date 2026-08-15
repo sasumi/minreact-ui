@@ -1,17 +1,16 @@
-/* eslint-disable react-refresh/only-export-components */
 import { SpanButton } from "@/components/Button";
 import styleDefines from "@/styles/common.module.scss";
 import "@/styles/components/dialog.scss";
 import { focusFirstElement } from "@/utils/Dom";
-import { bindClick, bindNodeMove } from "minutool";
-import type { ReactNode, RefObject } from "react";
-import { createContext, useEffect, useRef } from "react";
+import { bindClick, bindNodeMove, findOne } from "minutool";
+import type { ReactNode } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import ReactDOM from "react-dom";
 
 const CSS_NS = styleDefines.namespace;
-const titleClassName = `${CSS_NS}-dialog-title`;
-const topCloserClassName = `${CSS_NS}-dialog-close-btn`;
-const contentClassName = `${CSS_NS}-dialog-content`;
+const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;
+const TOP_CLOSER_CLASS_NAME = `${CSS_NS}-dialog-close-btn`;
+const CONTENT_CLASS_NAME = `${CSS_NS}-dialog-content`;
 
 /**
  * 对话框大小
@@ -30,7 +29,6 @@ export interface DialogProps {
     children?: ReactNode | string;
     open: boolean;
     setOpen: (open: boolean) => void;
-    ref?: RefObject<HTMLDialogElement | null> | null;
     modal?: boolean;
 
     className?: string;
@@ -40,9 +38,7 @@ export interface DialogProps {
     autoFocus?: boolean;
     moveable?: boolean;
 
-    title?: ReactNode | string;
     showTopCloser?: boolean;
-    action?: ReactNode;
     wrapContent?: boolean;
 }
 
@@ -79,99 +75,87 @@ interface DialogActionProps {
  * @param modal - 是否为模态对话框
  * @param wrapContent - 是否包裹内容
  */
-export const Dialog = ({
-    children,
-    open,
-    setOpen,
-    ref = null,
-    title,
-    moveable = false,
-    action = null,
-    showTopCloser = true,
-    className = "",
-    maxHeight = null,
-    maxWidth = null,
-    autoFocus = false,
-    width = null,
-    modal = true,
-    wrapContent = true,
-}: DialogProps) => {
+const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
+    {
+        children,
+        open,
+        setOpen,
+        moveable = false,
+        showTopCloser = true,
+        className = "",
+        maxHeight = null,
+        maxWidth = null,
+        autoFocus = false,
+        width = null,
+        modal = true,
+    },
+    ref,
+) {
     const dlgRef = useRef<HTMLDialogElement | null>(null);
+
+    useImperativeHandle(ref, () => dlgRef.current!, []);
+
+    useEffect(() => {
+        if (!open || !dlgRef.current) return;
+        const dlg = dlgRef.current;
+        dlg.show();
+        const cleanup: (() => void)[] = [];
+        if (autoFocus) {
+            focusFirstElement(dlgRef.current);
+        }
+        if (moveable && findOne(`.${TITLE_CLASS_NAME}`, dlg)) {
+            cleanup.push(bindNodeMove(dlg, `.${TITLE_CLASS_NAME}`));
+        }
+        if (showTopCloser) {
+            cleanup.push(
+                bindClick(`.${TOP_CLOSER_CLASS_NAME}`, () => {
+                    setOpen(false);
+                }),
+            );
+        }
+
+        return () => {
+            cleanup.forEach((fn) => fn());
+        };
+    });
 
     if (!open) {
         return null;
     }
 
-    useEffect(() => {
-        if (ref) {
-            ref.current = dlgRef.current;
-        }
-        if (dlgRef.current) {
-            const dlg = dlgRef.current;
-            dlg[open ? "show" : "close"]();
-            const cleanup: (() => void)[] = [];
-            if (open && autoFocus) {
-                focusFirstElement(dlgRef.current);
-            }
-
-            if (title !== null && moveable) {
-                cleanup.push(bindNodeMove(dlg, `.${titleClassName}`));
-            }
-
-            if (showTopCloser) {
-                cleanup.push(
-                    bindClick(`.${topCloserClassName}`, () => {
-                        setOpen(false);
-                    }),
-                );
-            }
-
-            return () => {
-                cleanup.forEach((fn) => fn());
-            };
-        }
-    }, [dlgRef, open]);
-
     return ReactDOM.createPortal(
-            <div className={`${CSS_NS}-dialog-wrap`} data-modal={modal}>
-                <div className={`${CSS_NS}-dialog-masker`}></div>
-                <dialog
-                    className={`${CSS_NS}-dialog ${className}`}
-                    style={{ width: width ?? undefined, maxWidth: maxWidth ?? undefined }}
-                    ref={dlgRef}
-                    onClose={() => {
-                        setOpen(false);
-                    }}
-                >
-                    {showTopCloser && (
-                        <SpanButton
-                            onClick={(e) => {
-                                setOpen(false);
-                            }}
-                            className={topCloserClassName}
-                        ></SpanButton>
-                    )}
-                    {title && <Dialog.Title>{title}</Dialog.Title>}
-                    {wrapContent && (
-                        <Dialog.Content maxHeight={maxHeight} maxWidth={maxWidth}>
-                            {children}
-                        </Dialog.Content>
-                    )}
-                    {!wrapContent && children}
-                    {action && <Dialog.Action>{action}</Dialog.Action>}
-                </dialog>
-            </div>
+        <div className={`${CSS_NS}-dialog-wrap`} data-modal={modal}>
+            <div className={`${CSS_NS}-dialog-masker`}></div>
+            <dialog
+                className={`${CSS_NS}-dialog ${className}`}
+                style={{ width: width ?? undefined, maxWidth: maxWidth ?? undefined }}
+                ref={dlgRef}
+                onClose={() => {
+                    setOpen(false);
+                }}
+            >
+                {showTopCloser && (
+                    <SpanButton
+                        onClick={(e) => {
+                            setOpen(false);
+                        }}
+                        className={TOP_CLOSER_CLASS_NAME}
+                    ></SpanButton>
+                )}
+                {children}
+            </dialog>
+        </div>,
         document.body,
     );
-};
+});
 
 /**
  * 标题子组件
  * 可以通过 moveable 属性设置标题是否可拖动
  */
-Dialog.Title = Object.assign(
+const Title = Object.assign(
     ({ children, className }: DialogTitleProps) => {
-        return <div className={`${titleClassName} ${className || ""}`}>{children}</div>;
+        return <div className={`${TITLE_CLASS_NAME} ${className || ""}`}>{children}</div>;
     },
     { _type: DialogTitleSymbol },
 );
@@ -180,10 +164,10 @@ Dialog.Title = Object.assign(
  * 内容子组件
  * 可以通过 maxHeight 属性限制内容高度
  */
-Dialog.Content = Object.assign(
+const Content = Object.assign(
     ({ children, className, maxHeight = null, maxWidth = null }: DialogContentProps) => {
         return (
-            <div className={`${contentClassName} ${className || ""}`} style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
+            <div className={`${CONTENT_CLASS_NAME} ${className || ""}`} style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
                 {children}
             </div>
         );
@@ -194,7 +178,7 @@ Dialog.Content = Object.assign(
 /**
  * 操作按钮区域子组件
  */
-Dialog.Action = Object.assign(
+const Action = Object.assign(
     ({ children, className, align = "right", gap = ".5em" }: DialogActionProps) => {
         return (
             <div className={`${CSS_NS}-dialog-buttons ${className || ""}`} style={{ "--align": align, "--gap": gap } as React.CSSProperties}>
@@ -204,3 +188,8 @@ Dialog.Action = Object.assign(
     },
     { _type: DialogActionSymbol },
 );
+
+/**
+ * 对话框主组件导出（含子组件）
+ */
+export const Dialog = Object.assign(DialogImpl, { Title, Content, Action });

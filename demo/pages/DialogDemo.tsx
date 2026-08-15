@@ -12,7 +12,7 @@ function DialogDemo() {
         showDialog({
             title: "自定义对话框",
             content: (
-                <div style={{ padding: "1rem" }}>
+                <div>
                     <p>这是通过 showDialog 函数创建的对话框</p>
                     <p>可以在任何地方调用，不需要管理 state</p>
                 </div>
@@ -22,7 +22,10 @@ function DialogDemo() {
     };
 
     const showConfirm = () => {
-        confirm("确认操作", "您确定要执行此操作吗？");
+        confirm({
+            title: "确认操作",
+            message: "您确定要执行此操作吗？",
+        });
     };
 
     const showAlert = () => {
@@ -116,8 +119,7 @@ function DialogDemo() {
                 <h3 className="demo-section-title">不显示关闭按钮</h3>
                 <div className="demo-example">
                     <PrimaryButton onClick={() => setOpen2(true)}>打开对话框</PrimaryButton>
-                    <Dialog open={open2} setOpen={setOpen2}>
-                        <Dialog.Title>无关闭按钮对话框</Dialog.Title>
+                    <Dialog open={open2} setOpen={setOpen2} showTopCloser={false} wrapContent={false}>
                         <div style={{ padding: "1rem" }}>
                             <p>此对话框没有右上角的关闭按钮</p>
                             <p>需要通过点击遮罩层或自定义按钮关闭</p>
@@ -135,7 +137,7 @@ function DialogDemo() {
                 <div className="demo-example">
                     <PrimaryButton onClick={() => setOpen3(true)}>打开对话框</PrimaryButton>
                     <Dialog open={open3} setOpen={setOpen3} maxHeight="400px">
-                        <Dialog.Title>长内容对话框</Dialog.Title>
+                        <Dialog.Title>自定义最大高度</Dialog.Title>
                         <div style={{ padding: "1rem" }}>
                             {Array.from({ length: 20 }, (_, i) => (
                                 <p key={i}>这是第 {i + 1} 段内容，用于演示滚动效果。</p>
@@ -152,31 +154,40 @@ function DialogDemo() {
                     <PrimaryButton
                         onClick={() =>
                             showDialog({
-                                title: "编辑信息",
-                                content: (
-                                    <div style={{ padding: "1rem" }}>
-                                        <form
-                                            onSubmit={(e) => {
-                                                e.preventDefault();
-                                                alert("表单提交！");
-                                            }}
-                                        >
-                                            <div style={{ marginBottom: "1rem" }}>
-                                                <label style={{ display: "block", marginBottom: "0.5rem" }}>用户名</label>
-                                                <input type="text" style={{ width: "100%", padding: "0.5rem" }} />
+                                children: (
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            alert("表单提交！");
+                                        }}
+                                        className="demo-form"
+                                    >
+                                        <Dialog.Title>编辑信息</Dialog.Title>
+                                        <Dialog.Content>
+                                            <div>
+                                                <label>用户名</label>
+                                                <input type="text" />
                                             </div>
-                                            <div style={{ marginBottom: "1rem" }}>
-                                                <label style={{ display: "block", marginBottom: "0.5rem" }}>邮箱</label>
-                                                <input type="email" style={{ width: "100%", padding: "0.5rem" }} />
+                                            <div>
+                                                <label>用户名</label>
+                                                <input type="text" />
                                             </div>
-                                            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
-                                                <NormalButton>取消</NormalButton>
-                                                <PrimaryButton tag="button" type="submit">
-                                                    保存
-                                                </PrimaryButton>
+                                            <div>
+                                                <label>用户名</label>
+                                                <input type="text" />
                                             </div>
-                                        </form>
-                                    </div>
+                                            <div>
+                                                <label>邮箱</label>
+                                                <input type="email" />
+                                            </div>
+                                        </Dialog.Content>
+                                        <Dialog.Action>
+                                            <NormalButton>取消</NormalButton>
+                                            <PrimaryButton tag="button" type="submit">
+                                                保存
+                                            </PrimaryButton>
+                                        </Dialog.Action>
+                                    </form>
                                 ),
                                 width: DIALOG_SIZE_NORMAL,
                             })

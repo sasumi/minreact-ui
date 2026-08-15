@@ -1,4 +1,4 @@
-import { PrimaryButton, NormalButton, SpanButton, SubmitButton, Checker } from "@/components/Button";
+import { PrimaryButton, NormalButton, SpanButton, SubmitButton } from "@/components/Button";
 import { useState } from "react";
 
 function ButtonDemo() {
@@ -59,24 +59,6 @@ function ButtonDemo() {
               <SubmitButton disabled>禁用状态</SubmitButton>
             </div>
           </form>
-        </div>
-      </div>
-
-      <div className="demo-section">
-        <h3 className="demo-section-title">Checker 复选按钮</h3>
-        <p className="demo-section-description">具有选中/未选中状态的按钮</p>
-        <div className="demo-example">
-          <div className="demo-row">
-            <Checker checked={checked} onChange={(v) => setChecked(v)}>
-              {checked ? "已选中" : "未选中"}
-            </Checker>
-            <Checker checked={true} disabled>
-              禁用已选中
-            </Checker>
-            <Checker checked={false} disabled>
-              禁用未选中
-            </Checker>
-          </div>
         </div>
       </div>
 
