@@ -2,9 +2,11 @@ import { SpanButton } from "@/components/Button";
 import "@/styles/components/novice.scss";
 import "@/styles/common.module.scss";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Popover, PopoverAnchor, PopoverContent } from "./Popover";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+
+import styleDefines from "@/styles/common.module.scss";
+const CSS_NS = styleDefines.namespace;
 
 const getOffset = (element: HTMLElement | string | null) => {
     if (typeof element === "string") {
@@ -19,8 +21,19 @@ const getOffset = (element: HTMLElement | string | null) => {
     return { top: rect.top + scrollTop, left: rect.left + scrollLeft, width: rect.width, height: rect.height };
 };
 
-function Novice({ stepInfos, onClose = () => {} }: { stepInfos: [HTMLElement | string | null, string][]; onClose?: () => void }) {
-    const { t } = useTranslation(["novice", "common"]);
+function Novice({
+    stepInfos,
+    onClose = () => {},
+    nextButtonTitle = "下一项",
+    prevButtonTitle = "上一项",
+    closeButtonTitle = "关闭",
+}: {
+    stepInfos: [HTMLElement | string | null, string][];
+    onClose?: () => void;
+    nextButtonTitle?: string;
+    prevButtonTitle?: string;
+    closeButtonTitle?: string;
+}) {
     const [open, setOpen] = useState(true);
     const [noviceIndex, setNoviceIndex] = useState(0);
     const [targetOffset, setTargetOffset] = useState(getOffset(stepInfos[noviceIndex][0]));
@@ -40,30 +53,34 @@ function Novice({ stepInfos, onClose = () => {} }: { stepInfos: [HTMLElement | s
 
     return (
         open && (
-            <Popover open={true} className="paper-novice-popover">
-                <div className="paper-novice-masker"></div>
+            <Popover open={true} className={CSS_NS + "-novice-popover"}>
+                <div className={CSS_NS + "-novice-masker"}></div>
                 <PopoverAnchor asChild>
-                    <div className="paper-novice-highlight" style={targetOffset}></div>
+                    <div className={CSS_NS + "-novice-highlight"} style={targetOffset}></div>
                 </PopoverAnchor>
                 <PopoverContent
-                    className="paper-novice-content-wrap"
+                    className={CSS_NS + "-novice-content-wrap"}
                     side="bottom"
                     sideOffset={8}
                     onCloseBy={() => false}
                     style={{ zIndex: "calc(var(--novice-zindex) + 1)" }}
                 >
-                    <div className="paper-novice-content" dangerouslySetInnerHTML={{ __html: stepInfos[noviceIndex][1] }}></div>
-                    <div className="paper-novice-buttons">
+                    <div className={CSS_NS + "-novice-content"} dangerouslySetInnerHTML={{ __html: stepInfos[noviceIndex][1] }}></div>
+                    <div className={CSS_NS + "-novice-buttons"}>
                         {noviceIndex > 0 && (
-                            <SpanButton className="novice-previous-btn" onClick={() => switchNovice(noviceIndex - 1)}>
-                                {t("novice:previous")}
+                            <SpanButton className={CSS_NS + "-novice-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
+                                {prevButtonTitle}
                             </SpanButton>
                         )}
-                        <SpanButton className="novice-next-btn" disabled={noviceIndex == stepInfos.length - 1} onClick={() => switchNovice(noviceIndex + 1)}>
-                            {t("novice:next")}
+                        <SpanButton
+                            className={CSS_NS + "-novice-next-btn"}
+                            disabled={noviceIndex == stepInfos.length - 1}
+                            onClick={() => switchNovice(noviceIndex + 1)}
+                        >
+                            {nextButtonTitle}
                         </SpanButton>
-                        <SpanButton className="novice-close-btn" onClick={() => closeHandle()}>
-                            {t("common:close")}
+                        <SpanButton className={CSS_NS + "-novice-close-btn"} onClick={() => closeHandle()}>
+                            {closeButtonTitle}
                         </SpanButton>
                     </div>
                 </PopoverContent>

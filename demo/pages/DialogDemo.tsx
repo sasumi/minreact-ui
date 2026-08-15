@@ -1,5 +1,5 @@
 import { Dialog, DIALOG_SIZE_SMALL, DIALOG_SIZE_NORMAL, DIALOG_SIZE_LARGE } from "@/components/Dialog";
-import { alert, confirm, prompt, showDialog, showImgPreview } from "@/components/DialogExt";
+import { alert, confirm, prompt, showDialog, showImgPreview } from "@/components/Dialog";
 import { PrimaryButton, NormalButton } from "@/components/Button";
 import { useState } from "react";
 

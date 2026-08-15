@@ -1,8 +1,8 @@
-import { memo, useEffect, useState } from "react";
 import "@/styles/common.module.scss";
-import { Spinner } from "./Spinner";
 import { lockElementInteraction } from "minutool";
+import { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Spinner } from "./Spinner";
 
 const BUTTON_DEBOUNCE_TIME = 200;
 
@@ -45,8 +45,6 @@ export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonPro
 });
 
 export const NormalButton = memo(function ({ children, ...props }: AnyButtonProps) {
-    props = { ...props };
-    props.className = "button-outlined " + (props.className || "");
     return (
         <AnyButton tag="button" {...props}>
             {children}

@@ -1,5 +1,6 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
+@use "./../common.module.scss" as *;
 
 :root {
 	--novice-zindex: var(--novice-z-index);
@@ -8,9 +9,9 @@
 	--novice-arrow-size: 1em;
 }
 
-.paper-novice {
+.#{$namespace}-novice {
 	&-highlight {
-		position: absolute;
+		position: fixed;
 		z-index: var(--novice-zindex);
 		border-radius: var(--panel-radius);
 		box-shadow: 0 0 10px 20000px #00000057;
@@ -22,7 +23,7 @@
 	&-masker {
 		width: 100%;
 		height: 100%;
-		position: absolute;
+		position: fixed;
 		left: 0;
 		top: 0;
 		z-index: var(--novice-zindex);
@@ -36,16 +37,17 @@
 		min-width: 10em;
 		max-width: 35em;
 
-		.paper-novice-content {
-			padding: 0.5em 0 1em;
+		.#{$namespace}-novice-content {
+			padding: 0.5em 1em;
 		}
 
-		.paper-novice-buttons {
+		.#{$namespace}-novice-buttons {
 			display: flex;
 			gap: 1em;
+			padding: .5em 1em;
 			justify-content: end;
 
-			.novice-next-btn {
+			.#{$namespace}-novice-next-btn {
 				margin-left: auto;
 				;
 			}
