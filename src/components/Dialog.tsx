@@ -1,13 +1,12 @@
 import { NormalButton, SpanButton } from "@/components/Button";
 import styleDefines from "@/styles/common.module.scss";
 import "@/styles/components/dialog.scss";
-import { focusFirstElement, mountReactNode, prettyTimeDuration } from "@/utils";
+import { focusFirstElement, makeElement, mountReactNode, prettyTimeDuration } from "@/utils.tsx";
 import { bindClick, bindNodeMove, calcRemainingMSecs, findOne, lockElementInteraction } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
-import { makeElement } from "./Form";
 
 const CSS_NS = styleDefines.namespace;
 const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;

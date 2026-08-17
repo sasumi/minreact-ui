@@ -1,42 +1,52 @@
 import { SpanButton } from "@/components/Button";
 import "@/styles/components/novice.scss";
 import "@/styles/common.module.scss";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Popover, PopoverAnchor, PopoverContent } from "./Popover";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 import styleDefines from "@/styles/common.module.scss";
-const CSS_NS = styleDefines.namespace;
+import { findOne } from "minutool";
+const CSS_NS = styleDefines.namespace + "-novice";
 
-const getOffset = (element: HTMLElement | string | null) => {
-    if (typeof element === "string") {
-        element = document.querySelector(element);
-    }
-    if (!element) {
+const getOffset = (element: string) => {
+    const el = findOne(element);
+    if (!el) {
         return { top: 0, left: 0, width: 0, height: 0 };
     }
-    const rect = element.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     return { top: rect.top + scrollTop, left: rect.left + scrollLeft, width: rect.width, height: rect.height };
 };
 
-function Novice({
-    stepInfos,
-    onClose = () => {},
-    nextButtonTitle = "下一项",
-    prevButtonTitle = "上一项",
-    closeButtonTitle = "关闭",
-}: {
-    stepInfos: [HTMLElement | string | null, string][];
+interface NoviceProps {
+    /**
+     * 新手引导步骤信息数组，每个步骤包含目标元素选择器和内容
+     * target: 目标元素的 CSS 选择器
+     * content: 新手引导内容，可以是 ReactNode 或字符串
+     */
+    stepInfos: {
+        target: string;
+        content: ReactNode | string;
+    }[];
+
+    /**
+     * 关闭新手引导的回调函数
+     */
     onClose?: () => void;
     nextButtonTitle?: string;
     prevButtonTitle?: string;
     closeButtonTitle?: string;
-}) {
+}
+
+/**
+ * Novice 新手引导组件，基于 Popover 实现
+ */
+function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", prevButtonTitle = "上一项", closeButtonTitle = "关闭" }: NoviceProps) {
     const [open, setOpen] = useState(true);
     const [noviceIndex, setNoviceIndex] = useState(0);
-    const [targetOffset, setTargetOffset] = useState(getOffset(stepInfos[noviceIndex][0]));
+    const [targetOffset, setTargetOffset] = useState(getOffset(stepInfos[noviceIndex].target));
 
     const switchNovice = (index: number) => {
         setNoviceIndex(index);
@@ -48,38 +58,38 @@ function Novice({
     };
 
     useUpdateEffect(() => {
-        setTargetOffset(getOffset(stepInfos[noviceIndex][0]));
+        setTargetOffset(getOffset(stepInfos[noviceIndex].target));
     }, [noviceIndex]);
 
     return (
         open && (
-            <Popover open={true} className={CSS_NS + "-novice-popover"}>
-                <div className={CSS_NS + "-novice-masker"}></div>
+            <Popover open={true} className={CSS_NS + "-popover"}>
+                <div className={CSS_NS + "-masker"}></div>
                 <PopoverAnchor asChild>
-                    <div className={CSS_NS + "-novice-highlight"} style={targetOffset}></div>
+                    <div className={CSS_NS + "-highlight"} style={targetOffset}></div>
                 </PopoverAnchor>
                 <PopoverContent
-                    className={CSS_NS + "-novice-content-wrap"}
+                    className={CSS_NS + "-content-wrap"}
                     side="bottom"
                     sideOffset={8}
                     onCloseBy={() => false}
-                    style={{ zIndex: "calc(var(--novice-zindex) + 1)" }}
+                    style={{ zIndex: "calc(var(--zindex) + 1)" }}
                 >
-                    <div className={CSS_NS + "-novice-content"} dangerouslySetInnerHTML={{ __html: stepInfos[noviceIndex][1] }}></div>
-                    <div className={CSS_NS + "-novice-buttons"}>
+                    <div className={CSS_NS + "-content"}>{stepInfos[noviceIndex].content}</div>
+                    <div className={CSS_NS + "-buttons"}>
                         {noviceIndex > 0 && (
-                            <SpanButton className={CSS_NS + "-novice-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
+                            <SpanButton className={CSS_NS + "-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
                                 {prevButtonTitle}
                             </SpanButton>
                         )}
                         <SpanButton
-                            className={CSS_NS + "-novice-next-btn"}
+                            className={CSS_NS + "-next-btn"}
                             disabled={noviceIndex == stepInfos.length - 1}
                             onClick={() => switchNovice(noviceIndex + 1)}
                         >
                             {nextButtonTitle}
                         </SpanButton>
-                        <SpanButton className={CSS_NS + "-novice-close-btn"} onClick={() => closeHandle()}>
+                        <SpanButton className={CSS_NS + "-close-btn"} onClick={() => closeHandle()}>
                             {closeButtonTitle}
                         </SpanButton>
                     </div>

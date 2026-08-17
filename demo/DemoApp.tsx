@@ -6,7 +6,6 @@ import ButtonDemo from "./pages/ButtonDemo";
 import SpinnerDemo from "./pages/SpinnerDemo";
 import CounterDemo from "./pages/CounterDemo";
 import DialogDemo from "./pages/DialogDemo";
-import FormDemo from "./pages/FormDemo";
 import StepInputDemo from "./pages/StepInputDemo";
 import RangeInputDemo from "./pages/RangeInputDemo";
 import PaginationDemo from "./pages/PaginationDemo";
@@ -21,7 +20,6 @@ const components = [
   { name: "Spinner", label: "加载器", description: "旋转加载动画组件", component: SpinnerDemo, category: "基础组件" },
   { name: "Counter", label: "字符计数器", description: "显示输入框字符数量的计数器组件", component: CounterDemo, category: "基础组件" },
   { name: "Dialog", label: "对话框", description: "可配置的模态对话框组件", component: DialogDemo, category: "交互组件" },
-  { name: "Form", label: "表单", description: "完整的表单组件，包含表单项、表单分组等", component: FormDemo, category: "表单组件" },
   { name: "StepInput", label: "步进输入", description: "带加减按钮的数字输入组件", component: StepInputDemo, category: "表单组件" },
   { name: "RangeInput", label: "范围输入", description: "滑块式范围选择器", component: RangeInputDemo, category: "表单组件" },
   { name: "Pagination", label: "分页", description: "数据分页组件", component: PaginationDemo, category: "数据组件" },

@@ -3,7 +3,7 @@ import { detectedPrecision, round } from "minutool";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import styleDefines from "@/styles/common.module.scss";
-import { textTranslate } from "@/utils";
+import { textTranslate } from "@/utils.tsx";
 
 const CSS_NS = styleDefines.namespace;
 let changeTm: ReturnType<typeof setTimeout> | null = null;
@@ -48,7 +48,7 @@ function RangeInput({
             }
         }, 100);
     }, [val]);
- 
+
     const promptVal = useCallback(() => {
         let vStr = window.prompt(inputPromptTitle, String(val));
         if (vStr === null) {

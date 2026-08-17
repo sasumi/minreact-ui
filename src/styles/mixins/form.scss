@@ -29,37 +29,6 @@
 	@include ElementBase();
 }
 
-@mixin RectBorderIcon {
-	@include RectElement();
-	cursor: pointer;
-
-	&.popover-trigger {
-		padding-left: 4px;
-
-		&:after {
-			content: "\e839";
-			font-size: 0.7em;
-			font-family: var(--font-icon);
-			margin-left: 0.25em;
-		}
-	}
-
-	&.popover-trigger[data-state="open"] {
-		border: var(--element-border-active);
-	}
-
-	&.active {
-		color: black;
-		background-color: var(--color-element-border-active);
-		border: var(--element-border);
-	}
-
-	&:hover,
-	&:focus {
-		border: var(--element-border-active);
-	}
-}
-
 @mixin Button($type: "primary") {
 	@include RectElement();
 	cursor: pointer;

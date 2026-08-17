@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import type { ReactNode } from "react";
-import { findOne } from "minutool";
+import { detectedPrecision, findOne, precisionToStep } from "minutool";
 
 /**
  * 将ReactNode挂载到body上，并返回一个卸载函数
@@ -59,4 +59,32 @@ export const textTranslate = (text: string, translations: Record<string, number 
         text = text.replace(new RegExp(`{${key}}`, "g"), String(value));
     }
     return text;
+};
+
+
+//文本类型的表单元素
+export const FormTextTypes = ["text", "search", "email", "tel", "url", "color", "date", "datetime-local", "time", "week", "password"];
+
+//<input>类型表单元素
+export const FormInputTypes = [...FormTextTypes, "number", "range", "month", "checkbox", "radio"];
+
+/**
+ * 构建表单元素
+ * @param param0
+ * @returns
+ */
+export const makeElement = ({ type, ...props }: { type: string; [key: string]: any }) => {
+    if (FormInputTypes.includes(type)) {
+        if (type === "number" && !props.step && props.defaultValue) {
+            props.step = precisionToStep(detectedPrecision(props.defaultValue));
+        }
+        return <input type={type} {...props} />;
+    }
+    if (type === "select") {
+        return <select {...props} />;
+    }
+    if (type === "textarea") {
+        return <textarea {...props} />;
+    }
+    throw "type not support";
 };
