@@ -56,6 +56,4 @@ $namespace: minui;
 	cursor: pointer;
 }
 
-:export {
-	namespace: $namespace;
-}
+// namespace 值请同步更新 src/styles/namespace.ts

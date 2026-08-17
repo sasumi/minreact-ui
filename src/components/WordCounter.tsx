@@ -1,9 +1,10 @@
-import styleDefines from "@/styles/common.module.scss";
+import "@/styles/common.module.scss";
 import "@/styles/components/wordcounter.scss";
+import { namespace } from "@/styles/namespace";
 import { bindDomEvent } from "minutool";
 import { useEffect, useState } from "react";
 
-const CSS_NS = styleDefines.namespace + "-wordcounter";
+const CSS_NS = namespace + "-wordcounter";
 
 interface WordCounterProps {
     input: HTMLInputElement | HTMLTextAreaElement | null;

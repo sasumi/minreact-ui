@@ -2,10 +2,11 @@ import "@/styles/components/range.scss";
 import { detectedPrecision, round } from "minutool";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import styleDefines from "@/styles/common.module.scss";
+import "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
 import { textTranslate } from "@/utils.tsx";
 
-const CSS_NS = styleDefines.namespace;
+const CSS_NS = namespace;
 let changeTm: ReturnType<typeof setTimeout> | null = null;
 
 interface RangeInputProps {

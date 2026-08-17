@@ -1,10 +1,11 @@
 import "@/styles/components/popover.scss";
 import * as ReactPopover from "@radix-ui/react-popover";
-import styleDefines from "@/styles/common.module.scss";
+import "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
 import { createContext, forwardRef, useContext, useRef, useState, useEffect } from "react";
 import { AnyButton, SpanButton } from "./Button";
 
-const CSS_NS = styleDefines.namespace;
+const CSS_NS = namespace;
 
 // 用于在 Popover 树内共享 trigger 的 DOM ref
 const PopoverTriggerRefContext = createContext<React.MutableRefObject<any> | null>(null);

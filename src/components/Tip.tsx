@@ -1,9 +1,10 @@
 import { forwardRef, useRef } from "react";
 import * as ReactPopover from "@radix-ui/react-popover";
 import "@/styles/components/popover.scss";
-import styleDefines from "@/styles/common.module.scss";
+import "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
 
-const CSS_NS = styleDefines.namespace;
+const CSS_NS = namespace;
 
 /**
  * Tip 气泡提示组件，基于 react-popover 实现

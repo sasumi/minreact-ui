@@ -92,7 +92,7 @@ function ToastDemo() {
           <div className="demo-row">
             <PrimaryButton
               onClick={() => {
-                const toastId = showInfo("这条消息不会自动关闭", null, false);
+                const toastId = showInfo("这条消息不会自动关闭");
                 setTimeout(() => {
                   hideToast(toastId);
                 }, 3000);

@@ -5,9 +5,9 @@ import { ReactNode, useState } from "react";
 import { Popover, PopoverAnchor, PopoverContent } from "./Popover";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
-import styleDefines from "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
 import { findOne } from "minutool";
-const CSS_NS = styleDefines.namespace + "-novice";
+const CSS_NS = namespace + "-novice";
 
 const getOffset = (element: string) => {
     const el = findOne(element);

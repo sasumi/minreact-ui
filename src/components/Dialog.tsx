@@ -1,5 +1,6 @@
 import { NormalButton, SpanButton } from "@/components/Button";
-import styleDefines from "@/styles/common.module.scss";
+import "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
 import "@/styles/components/dialog.scss";
 import { focusFirstElement, makeElement, mountReactNode, prettyTimeDuration } from "@/utils.tsx";
 import { bindClick, bindNodeMove, calcRemainingMSecs, findOne, lockElementInteraction } from "minutool";
@@ -8,7 +9,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 
-const CSS_NS = styleDefines.namespace;
+const CSS_NS = namespace;
 const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;
 const TOP_CLOSER_CLASS_NAME = `${CSS_NS}-dialog-close-btn`;
 const CONTENT_CLASS_NAME = `${CSS_NS}-dialog-content`;

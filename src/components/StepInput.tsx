@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { SpanButton } from "./Button";
 import "@/styles/components/stepinput.scss";
-import styleDefines from "@/styles/common.module.scss";
-const CSS_NS = styleDefines.namespace;
+import "@/styles/common.module.scss";
+import { namespace } from "@/styles/namespace";
+const CSS_NS = namespace;
 
 export const StepInput = ({
     value,
