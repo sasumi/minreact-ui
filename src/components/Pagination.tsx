@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SpanButton } from "@/components/Button";
 import "@/styles/components/pagination.scss";
-import { useTranslation } from "react-i18next";
 import { textTranslate } from "@/utils.tsx";
 import styleDefines from "@/styles/common.module.scss";
 const CSS_NS = styleDefines.namespace + "-pagination";
@@ -33,7 +32,6 @@ export function Pagination({
     totalItemsText = " 共 {num} 条",
     onChange = () => {},
 }: PaginationProps) {
-    const { t } = useTranslation(["component"]);
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const [p, setP] = useState(page);
     const isFirstRender = useRef(true);

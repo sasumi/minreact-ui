@@ -1,8 +1,8 @@
 import "@/styles/common.module.scss";
 import { lockElementInteraction } from "minutool";
 import { memo, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Spinner } from "./Spinner";
+import { textTranslate } from "@/utils";
 
 const BUTTON_DEBOUNCE_TIME = 200;
 
@@ -84,16 +84,43 @@ export const AnyButton = memo(function ({ tag: Tag, children, ...props }: AnyBut
     );
 });
 
-export const ReloadButton = ({ payload, className, resultKeepTime }: { payload: () => Promise<any>; className?: string; resultKeepTime?: number }) => {
-    const { t } = useTranslation(["component"]);
-    const [runing, setRunning] = useState(false);
+interface ReloadButtonProps {
+    payload: () => Promise<any>;
+    className?: string;
+    resultKeepTime?: number;
+    refreshDataText?: string;
+    refreshingDataText?: string;
+    refreshDataSuccessText?: string;
+    refreshDataFailedText?: string;
+}
+
+/**
+ * ReloadButton 重新加载按钮组件，点击后执行 payload 函数，并显示加载状态、成功或失败状态
+ * @param payload 点击按钮后执行的函数，返回一个 Promise
+ * @param className 按钮的自定义 className
+ * @param resultKeepTime 错误或成功状态保持时间，超过这个时间会自动恢复到初始状态
+ * @param refreshDataText 刷新数据按钮的文本
+ * @param refreshingDataText 刷新数据中按钮的文本
+ * @param refreshDataSuccessText 刷新数据成功按钮的文本
+ * @param refreshDataFailedText 刷新数据失败按钮的文本
+ */
+export const ReloadButton = ({
+    payload,
+    className,
+    resultKeepTime = 2000,
+    refreshDataText = "刷新数据",
+    refreshingDataText = "刷新数据中",
+    refreshDataSuccessText = "刷新数据成功",
+    refreshDataFailedText = "刷新数据失败({error})",
+}: ReloadButtonProps) => {
+    const [running, setRunning] = useState(false);
     const STATE_INIT = "INIT";
     const STATE_ERROR = "ERROR";
     const STATE_SUCCESS = "SUCCESS";
 
-    const RESULT_KEEP_TIME = resultKeepTime || 2000; //错误或成功状态保持时间，超过这个时间会自动恢复到初始状态
+    const RESULT_KEEP_TIME = resultKeepTime; //错误或成功状态保持时间，超过这个时间会自动恢复到初始状态
     const [state, setState] = useState<typeof STATE_INIT | typeof STATE_ERROR | typeof STATE_SUCCESS>(STATE_INIT);
-    const [title, setTitle] = useState(t("component:reloadButton.refreshData"));
+    const [title, setTitle] = useState(refreshDataText);
 
     return (
         <SpanButton
@@ -102,30 +129,30 @@ export const ReloadButton = ({ payload, className, resultKeepTime }: { payload: 
             onClick={(e) => {
                 lockElementInteraction(e.currentTarget, (reset) => {
                     setState(STATE_INIT);
-                    setTitle(t("component:reloadButton.refreshingData"));
+                    setTitle(refreshingDataText);
                     setRunning(true);
                     payload()
                         .then(() => {
                             setState(STATE_SUCCESS);
-                            setTitle(t("component:reloadButton.refreshDataSuccess"));
+                            setTitle(refreshDataSuccessText);
                         })
                         .catch((error) => {
                             reset();
                             setState(STATE_ERROR);
-                            setTitle(t("component:reloadButton.refreshDataFailed", { error }));
+                            setTitle(textTranslate(refreshDataFailedText, { error: error.message || error.toString() }));
                         })
                         .finally(() => {
                             setRunning(false);
                             setTimeout(() => {
                                 reset();
                                 setState(STATE_INIT);
-                                setTitle(t("component:reloadButton.refreshData"));
+                                setTitle(refreshDataText);
                             }, RESULT_KEEP_TIME);
                         });
                 });
             }}
         >
-            {state === STATE_INIT && <Spinner run={runing} />}
+            {state === STATE_INIT && <Spinner run={running} />}
             {state === STATE_ERROR && <span className="icon icon-warning"></span>}
             {state === STATE_SUCCESS && <span className="icon icon-check"></span>}
         </SpanButton>
