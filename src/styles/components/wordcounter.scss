@@ -7,10 +7,6 @@
     gap: 0.15em;
     opacity: 0.5;
 
-    &-slash {
-        display: inline-block;
-    }
-
     &--overload {
         opacity: 1;
 
@@ -18,9 +14,4 @@
             color: red;
         }
     }
-}
-
-textarea~.#{$namespace}-wordcounter {
-    float: right;
-    margin: -1.5em 0.5em 0 0;
 }
