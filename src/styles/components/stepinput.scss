@@ -1,7 +1,9 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
+@use "./../common.module.scss" as *;
+@use "./../mixins/icon.scss" as icon;
 
-.step-input-wrap {
+.#{$namespace}-step-input-wrap {
 	display: inline-flex;
 	cursor: default;
 	padding: 0;
@@ -13,8 +15,17 @@
 		border-radius: 0;
 	}
 
+	.si-minus:before {
+		content: "\e686";
+	}
+
+	.si-plus:before {
+		content: "\e631";
+	}
+
 	.si-minus,
 	.si-plus {
+		@include icon.icon;
 		height: var(--element-height);
 		width: 2em;
 		font-size: var(--font-small);

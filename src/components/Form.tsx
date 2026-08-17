@@ -3,6 +3,10 @@ import { showWarning } from "@/components/Toast";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import "@/styles/components/form.scss";
+import styleDefines from "@/styles/common.module.scss";
+const CSS_NS = styleDefines.namespace;
+
 //文本类型的表单元素
 export const FormTextTypes = ["text", "search", "email", "tel", "url", "color", "date", "datetime-local", "time", "week", "password"];
 
@@ -48,15 +52,17 @@ export const Form = ({ children, onChange, onSubmit, dir = FORM_DIR_AUTO }: Form
     return (
         <form
             ref={formRef}
-            className={"form form-dir-" + dir}
+            className={CSS_NS + "-form"}
+            data-dir={dir}
             onChange={onChange}
             autoComplete="off"
             onSubmit={(e) => {
                 e.preventDefault();
                 if (onSubmit) {
-                    formRef.current && lockElementInteraction(formRef.current, (reset) => {
-                        unlock = reset;
-                    });
+                    formRef.current &&
+                        lockElementInteraction(formRef.current, (reset) => {
+                            unlock = reset;
+                        });
                     onSubmit(e, Object.fromEntries(new FormData(formRef.current!)), unlock);
                 }
             }}
@@ -73,23 +79,23 @@ export const Form = ({ children, onChange, onSubmit, dir = FORM_DIR_AUTO }: Form
  */
 Form.Group = ({ title = "", children, className = "" }: { title?: string; children: React.ReactNode; className?: string }) => {
     return (
-        <div className={"form-group " + className}>
-            {title && <div className="form-group-title">{title}</div>}
-            <div className="form-group-content">{children}</div>
+        <div className={CSS_NS + "-form-group " + className}>
+            {title && <div className={CSS_NS + "-form-group-title"}>{title}</div>}
+            <div className={CSS_NS + "-form-group-content"}>{children}</div>
         </div>
     );
 };
 
 Form.Item = ({ label, children, className = "" }: { label?: string; children: React.ReactNode; className?: string }) => {
     return (
-        <div className={"form-item " + className}>
-            <div className="form-item-label">{label}</div>
-            <div className="form-item-content">{children}</div>
+        <div className={CSS_NS + "-form-item " + className}>
+            <div className={CSS_NS + "-form-item-label"}>{label}</div>
+            <div className={CSS_NS + "-form-item-content"}>{children}</div>
         </div>
     );
 };
 Form.Actions = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
-    return <div className={"form-actions " + className}>{children}</div>;
+    return <div className={CSS_NS + "-form-actions " + className}>{children}</div>;
 };
 
 export const FileInput = ({

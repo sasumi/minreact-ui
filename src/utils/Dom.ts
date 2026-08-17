@@ -26,7 +26,7 @@ export const focusFirstElement = (container: HTMLElement | null) => {
     if (!container) {
         return;
     }
-    const el = findOne('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement | null;
+    const el = findOne('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', container) as HTMLElement | null;
     if (el && typeof el.focus === "function") {
         el.focus();
     }

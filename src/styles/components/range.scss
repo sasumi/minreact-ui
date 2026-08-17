@@ -1,5 +1,33 @@
 @charset "UTF-8";
 
+.range-selector {
+	display: inline-flex;
+	align-content: center;
+	gap: .25em;
+	vertical-align: middle;
+
+	input {
+		width: 6em;
+	}
+
+	.rs-input {
+		border: 1px solid transparent;
+		margin-right: 0.1em;
+	}
+
+	&[disabled] {
+		color: gray;
+	}
+
+	&:not([disabled]) .rs-input:hover {
+		border-color: rgb(131, 49, 49);
+		cursor: pointer;
+		background-color: #fff
+	}
+}
+
+
+
 input[type="range"] {
 	-webkit-appearance: none;
 	--thumb-size: 18px;
