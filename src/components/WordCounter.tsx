@@ -58,7 +58,7 @@ export default function WordCounter({ input, max, onOverflowChange }: WordCounte
     const isOverload = max !== undefined && count > max;
 
     return (
-        <span className={`${CSS_NS} ${isOverload ? `${CSS_NS}--overload` : ""}`}>
+        <span className={`${CSS_NS} ${isOverload ? `${CSS_NS}--overload` : ""}`} data-count={count} data-max={max}>
             <span className={`${CSS_NS}-ct`}>{count}</span>
             {max !== undefined && (
                 <>

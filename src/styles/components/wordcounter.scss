@@ -7,6 +7,12 @@
     gap: 0.15em;
     opacity: 0.5;
 
+    //数量为0时默认隐藏
+    &[data-count="0"] {
+        opacity: 0;
+    }
+
+    //数量超过最大值时显示红色
     &--overload {
         opacity: 1;
 
