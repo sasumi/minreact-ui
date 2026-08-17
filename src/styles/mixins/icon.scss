@@ -5,6 +5,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+
     &:before {
         background-repeat: no-repeat;
         background-position: center;
@@ -24,28 +25,28 @@
 
 @mixin icon-button {
     @include icon;
+
     & {
         cursor: pointer;
-    }
-    &:hover {
-        color: var(--color-secondary);
     }
 }
 
 @mixin icon-text {
     @include icon;
+
     &:before {
         margin-right: 0.1em;
     }
 }
 
 @mixin icon-text-button {
-    @include icon-text;
     cursor: pointer;
+    @include icon-text;
 }
 
 @mixin icon-vtext-button {
     @include icon-button;
+
     & {
         display: inline-flex;
         gap: 0.5em;
