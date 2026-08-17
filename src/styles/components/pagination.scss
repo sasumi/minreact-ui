@@ -1,21 +1,25 @@
 @charset "UTF-8";
+@use "@/styles/common.module.scss" as *;
+@use "@/styles/mixins/icon.scss" as icon;
 
-.pagination {
-    padding: 0.5em 0 0 0;
+.#{$namespace}-pagination {
     display: flex;
     gap: 0.5em;
     align-items: center;
     justify-content: right;
 
-    .pg-page-jumper {
-        cursor: pointer;
-		margin-right: 0.5em;;
-        &:hover {
-            outline: 1px dotted gray;
+    &-icon-left {
+        @include icon.icon-button;
+        &:before {
+            content: "\e6106"
         }
     }
 
-    .button.icon {
-        --element-padding: 0.5em;
+    &-icon-right {
+        @include icon.icon-button;
+
+        &:before {
+            content: "\e6105"
+        }
     }
 }

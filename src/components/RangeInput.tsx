@@ -1,13 +1,26 @@
 import "@/styles/components/range.scss";
 import { detectedPrecision, round } from "minutool";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import styleDefines from "@/styles/common.module.scss";
+import { textTranslate } from "@/utils";
 
 const CSS_NS = styleDefines.namespace;
-
 let changeTm: ReturnType<typeof setTimeout> | null = null;
+
+interface RangeInputProps {
+    value: number;
+    min?: number;
+    max?: number;
+    precision?: number | null;
+    disabled?: boolean;
+    step?: number;
+    unit?: string;
+    inputPromptText?: string;
+    inputRangeAlertText?: string;
+    onInput?: (v: number) => void;
+}
+
 function RangeInput({
     value,
     min = 0,
@@ -16,23 +29,15 @@ function RangeInput({
     disabled = false,
     step = 1,
     unit = "",
+    inputPromptText: inputPromptTitle = "请输入数值",
+    inputRangeAlertText = "请输入范围在 {min} 到 {max} 之间的数值",
     onInput = () => {},
-}: {
-    value: number;
-    min?: number;
-    max?: number;
-    precision?: number | null;
-    disabled?: boolean;
-    step?: number;
-    unit?: string;
-    onInput?: (v: number) => void;
-}) {
+}: RangeInputProps) {
     min = Number(min);
     max = Number(max);
     const [val, setVal] = useState<number>(value);
     const stepV = Number(step);
     const rangeRef = useRef<HTMLInputElement>(null);
-    const { t } = useTranslation(["component"]);
     precision = precision === null ? detectedPrecision(min, max, step) : precision;
 
     useEffect(() => {
@@ -43,15 +48,15 @@ function RangeInput({
             }
         }, 100);
     }, [val]);
-
+ 
     const promptVal = useCallback(() => {
-        let vStr = window.prompt(t("component:range.inputPrompt"), String(val));
+        let vStr = window.prompt(inputPromptTitle, String(val));
         if (vStr === null) {
             return;
         }
         const v = parseFloat(vStr);
         if (v > max || v < min) {
-            alert(t("component:range.inputRangeAlert", { min, max }));
+            alert(textTranslate(inputRangeAlertText, { min, max }));
             return;
         }
         setVal(v);
@@ -70,7 +75,7 @@ function RangeInput({
                 }
             }
         },
-        [val, step, min, max, precision],
+        [val, stepV, min, max, precision],
     );
 
     useEffect(() => {
@@ -95,7 +100,7 @@ function RangeInput({
                         setVal(parseFloat(e.target.value));
                     }}
                 />
-                <span className="rs-input" onClick={promptVal}>
+                <span className="rs-input" role="button" tabIndex={0} onClick={promptVal}>
                     {val}
                 </span>
                 {unit}

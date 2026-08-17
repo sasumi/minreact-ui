@@ -1,5 +1,5 @@
 import WordCounter from "@/components/WordCounter";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 function CounterDemo() {
     const [inputRef0, setInputRef0] = useState<HTMLInputElement | null>(null);
@@ -29,9 +29,7 @@ function CounterDemo() {
                 <h3 className="demo-section-title">带最大长度限制</h3>
                 <p className="demo-section-description">设置 max 属性后，超出最大长度时会显示警告样式</p>
                 <div className="demo-example">
-                    <div style={{ marginBottom: "0.5rem" }}>
-                        <input ref={setInputRef3} type="text" placeholder="最多输入20个字符..." style={{ width: "100%", padding: "0.5rem" }} />
-                    </div>
+                    <input ref={setInputRef3} type="text" placeholder="最多输入20个字符..." style={{ width: "100%", padding: "0.5rem" }} />
                     <WordCounter input={inputRef3} max={20} />
                     <p style={{ marginTop: "0.5rem", color: "#666", fontSize: "0.9rem" }}>尝试输入超过20个字符，计数器会变红色提示</p>
                 </div>
@@ -41,13 +39,11 @@ function CounterDemo() {
                 <h3 className="demo-section-title">文本域计数</h3>
                 <p className="demo-section-description">支持 textarea 元素的字符计数</p>
                 <div className="demo-example">
-                    <div style={{ marginBottom: "0.5rem" }}>
-                        <textarea
-                            ref={setInputRef4}
-                            placeholder="请输入多行文字..."
-                            style={{ width: "100%", padding: "0.5rem", minHeight: "100px", resize: "vertical" }}
-                        />
-                    </div>
+                    <textarea
+                        ref={setInputRef4}
+                        placeholder="请输入多行文字..."
+                        style={{ width: "100%", padding: "0.5rem", minHeight: "100px", resize: "vertical" }}
+                    />
                     <WordCounter input={inputRef4} max={200} />
                 </div>
             </div>

@@ -58,14 +58,11 @@ $namespace: minui;
 	--panel-drop-shadow: drop-shadow(var(--panel-shadow-lite));
 }
 
+[role="button"]:not([disabled]),
+[role="button"]:not([aria-disabled="true"]) {
+	cursor: pointer;
+}
+
 :export {
 	namespace: $namespace;
-}
-
-.icon {
-	@include icon.icon;
-}
-
-.icon-button {
-	@include icon.icon-button;
 }

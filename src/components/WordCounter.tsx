@@ -3,7 +3,8 @@ import "@/styles/components/wordcounter.scss";
 import { bindDomEvent } from "minutool";
 import { useEffect, useState } from "react";
 
-const { namespace } = styleDefines;
+const CSS_NS = styleDefines.namespace + "-wordcounter";
+
 interface WordCounterProps {
     input: HTMLInputElement | HTMLTextAreaElement | null;
     max?: number;
@@ -57,12 +58,12 @@ export default function WordCounter({ input, max, onOverflowChange }: WordCounte
     const isOverload = max !== undefined && count > max;
 
     return (
-        <span className={`${namespace}-input-counter ${isOverload ? `${namespace}-input-counter--overload` : ""}`}>
-            <span className={`${namespace}-ct`}>{count}</span>
+        <span className={`${CSS_NS} ${isOverload ? `${CSS_NS}--overload` : ""}`}>
+            <span className={`${CSS_NS}-ct`}>{count}</span>
             {max !== undefined && (
                 <>
-                    <span className={`${namespace}-slash`}>/</span>
-                    <span className={`${namespace}-mx`}>{max}</span>
+                    <span className={`${CSS_NS}-slash`}>/</span>
+                    <span className={`${CSS_NS}-mx`}>{max}</span>
                 </>
             )}
         </span>

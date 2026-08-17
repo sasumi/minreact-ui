@@ -1,8 +1,7 @@
 import { NormalButton, SpanButton } from "@/components/Button";
 import styleDefines from "@/styles/common.module.scss";
 import "@/styles/components/dialog.scss";
-import { focusFirstElement, mountReactNode } from "@/utils/Dom";
-import { prettyTimeDuration } from "@/utils/Time";
+import { focusFirstElement, mountReactNode, prettyTimeDuration } from "@/utils";
 import { bindClick, bindNodeMove, calcRemainingMSecs, findOne, lockElementInteraction } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
