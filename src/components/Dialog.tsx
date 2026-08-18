@@ -2,8 +2,8 @@ import { NormalButton, SpanButton } from "@/components/Button";
 import "@/styles/common.module.scss";
 import "@/styles/components/dialog.scss";
 import { namespace } from "@/styles/namespace";
-import { focusFirstElement, makeElement, mountReactNode } from "@/utils.tsx";
-import { bindClick, bindNodeMove, calcRemainingMSecs, findOne, lockElementInteraction } from "minutool";
+import { mountReactNode } from "@/utils.tsx";
+import { bindClick, bindNodeMove, calcRemainingMSecs, detectedPrecision, findOne, lockElementInteraction, precisionToStep } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom";
@@ -627,4 +627,45 @@ export const alert = (
             maxWidth: maxWidth,
         });
     });
+};
+
+/**
+ * 将焦点设置到容器内的第一个可聚焦元素上
+ * @param {HTMLElement | null} container - 容器元素
+ */
+const focusFirstElement = (container: HTMLElement | null) => {
+    if (!container) {
+        return;
+    }
+    const el = findOne('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])', container) as HTMLElement | null;
+    if (el && typeof el.focus === "function") {
+        el.focus();
+    }
+};
+
+//文本类型的表单元素
+const FormTextTypes = ["text", "search", "email", "tel", "url", "color", "date", "datetime-local", "time", "week", "password"];
+
+//<input>类型表单元素
+const FormInputTypes = [...FormTextTypes, "number", "range", "month", "checkbox", "radio"];
+
+/**
+ * 构建表单元素
+ * @param param0
+ * @returns
+ */
+const makeElement = ({ type, ...props }: { type: string; [key: string]: any }) => {
+    if (FormInputTypes.includes(type)) {
+        if (type === "number" && !props.step && props.defaultValue) {
+            props.step = precisionToStep(detectedPrecision(props.defaultValue));
+        }
+        return <input type={type} {...props} />;
+    }
+    if (type === "select") {
+        return <select {...props} />;
+    }
+    if (type === "textarea") {
+        return <textarea {...props} />;
+    }
+    throw "type not support";
 };
