@@ -12,6 +12,8 @@ const CSS_NS = namespace;
 const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;
 const TOP_CLOSER_CLASS_NAME = `${CSS_NS}-dialog-close-btn`;
 const CONTENT_CLASS_NAME = `${CSS_NS}-dialog-content`;
+const ACTION_CLASS_NAME = `${CSS_NS}-dialog-actions`;
+const MASKER_CLASS_NAME = `${CSS_NS}-dialog-masker`;
 
 /**
  * 对话框大小
@@ -38,9 +40,8 @@ export interface DialogProps {
     width?: string | null;
     autoFocus?: boolean;
     moveable?: boolean;
-
+    clickMaskerToClose?: boolean;
     showTopCloser?: boolean;
-    wrapContent?: boolean;
 }
 
 interface DialogTitleProps {
@@ -74,7 +75,9 @@ interface DialogActionProps {
  * @param width - 对话框的宽度
  * @param autoFocus - 是否自动聚焦第一个可聚焦元素
  * @param modal - 是否为模态对话框
- * @param wrapContent - 是否包裹内容
+ * @param moveable - 是否允许拖动对话框
+ * @param clickMaskerToClose - 是否允许点击遮罩层关闭对话框
+ * @param showTopCloser - 是否显示右上角的关闭按钮
  */
 const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     {
@@ -89,6 +92,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         autoFocus = false,
         width = null,
         modal = true,
+        clickMaskerToClose = false,
     },
     ref,
 ) {
@@ -114,6 +118,13 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                 }),
             );
         }
+        if (clickMaskerToClose) {
+            cleanup.push(
+                bindClick(`.${MASKER_CLASS_NAME}`, () => {
+                    setOpen(false);
+                }),
+            );
+        }
 
         return () => {
             cleanup.forEach((fn) => fn());
@@ -126,10 +137,14 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
 
     return ReactDOM.createPortal(
         <div className={`${CSS_NS}-dialog-wrap`} data-modal={modal}>
-            <div className={`${CSS_NS}-dialog-masker`}></div>
+            <div className={MASKER_CLASS_NAME}></div>
             <dialog
                 className={`${CSS_NS}-dialog ${className}`}
-                style={{ width: width ?? undefined, maxWidth: maxWidth ?? undefined }}
+                style={{
+                    width: width ?? undefined,
+                    maxHeight: maxHeight ?? undefined,
+                    maxWidth: maxWidth ?? undefined,
+                }}
                 ref={dlgRef}
                 onClose={() => {
                     setOpen(false);
@@ -163,15 +178,10 @@ const Title = Object.assign(
 
 /**
  * 内容子组件
- * 可以通过 maxHeight 属性限制内容高度
  */
 const Content = Object.assign(
-    ({ children, className, maxHeight = null, maxWidth = null }: DialogContentProps) => {
-        return (
-            <div className={`${CONTENT_CLASS_NAME} ${className || ""}`} style={{ maxHeight: maxHeight ?? undefined, maxWidth: maxWidth ?? undefined }}>
-                {children}
-            </div>
-        );
+    ({ children, className }: DialogContentProps) => {
+        return <div className={`${CONTENT_CLASS_NAME} ${className || ""}`}>{children}</div>;
     },
     { _type: DialogContentSymbol },
 );
@@ -182,7 +192,7 @@ const Content = Object.assign(
 const Action = Object.assign(
     ({ children, className, align = "right", gap = ".5em" }: DialogActionProps) => {
         return (
-            <div className={`${CSS_NS}-dialog-buttons ${className || ""}`} style={{ "--align": align, "--gap": gap } as React.CSSProperties}>
+            <div className={`${ACTION_CLASS_NAME} ${className || ""}`} style={{ "--align": align, "--gap": gap } as React.CSSProperties}>
                 {children}
             </div>
         );
@@ -283,7 +293,6 @@ export const showIframeDialog = ({
         title,
         content: <iframe src={url} style={{ width: "100%", height: height ?? "400px", border: "none" }} />,
         width,
-        wrapContent: false,
     });
 };
 

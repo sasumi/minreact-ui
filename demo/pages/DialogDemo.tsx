@@ -119,7 +119,7 @@ function DialogDemo() {
                 <h3 className="demo-section-title">不显示关闭按钮</h3>
                 <div className="demo-example">
                     <PrimaryButton onClick={() => setOpen2(true)}>打开对话框</PrimaryButton>
-                    <Dialog open={open2} setOpen={setOpen2} showTopCloser={false} wrapContent={false}>
+                    <Dialog open={open2} setOpen={setOpen2} showTopCloser={false}>
                         <div style={{ padding: "1rem" }}>
                             <p>此对话框没有右上角的关闭按钮</p>
                             <p>需要通过点击遮罩层或自定义按钮关闭</p>
@@ -136,13 +136,15 @@ function DialogDemo() {
                 <p className="demo-section-description">通过 maxHeight 属性限制对话框内容高度</p>
                 <div className="demo-example">
                     <PrimaryButton onClick={() => setOpen3(true)}>打开对话框</PrimaryButton>
-                    <Dialog open={open3} setOpen={setOpen3} maxHeight="400px">
+                    <Dialog open={open3} setOpen={setOpen3} maxHeight="20em">
                         <Dialog.Title>自定义最大高度</Dialog.Title>
-                        <div style={{ padding: "1rem" }}>
-                            {Array.from({ length: 20 }, (_, i) => (
-                                <p key={i}>这是第 {i + 1} 段内容，用于演示滚动效果。</p>
-                            ))}
-                        </div>
+                        <Dialog.Content>
+                            <div style={{ padding: "1rem" }}>
+                                {Array.from({ length: 20 }, (_, i) => (
+                                    <p key={i}>这是第 {i + 1} 段内容，用于演示滚动效果。</p>
+                                ))}
+                            </div>
+                        </Dialog.Content>
                     </Dialog>
                 </div>
             </div>

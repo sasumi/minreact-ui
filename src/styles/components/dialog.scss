@@ -5,32 +5,37 @@
 
 :root {
 	--#{$ns}-dialog-inner-padding: 1em;
+	--#{$ns}-dialog-max-height: calc(100vh - 2em);
+	--#{$ns}-dialog-max-width: calc(100vw - 2em);
 	--#{$ns}-dialog-content-max-height: calc(100vh - 20em);
 	--#{$ns}-dialog-masker-background: rgba(0, 0, 0, 0.4);
 }
 
 .#{$ns}-dialog {
 	@include com.panel();
-	--max-height: calc(100vh - 2em);
-	max-width: calc(100vw - 1em); //预留一些缝隙
+	max-height: var(--#{$ns}-dialog-max-height);
+	max-width: var(--#{$ns}-dialog-max-width);
 	position: fixed;
 	z-index: var(--#{$ns}-dialog-zindex);
 	margin: auto;
 	inset: 0;
 	border: none;
 	padding: 0;
+	display: flex;
+	flex-direction: column;
 
 	.#{$ns}-dialog-title {
+		flex-shrink: 0;
 		opacity: 0.8;
 		line-height: 1;
 		padding: var(--#{$ns}-dialog-inner-padding) 0 0 var(--#{$ns}-dialog-inner-padding);
 	}
 
 	.#{$ns}-dialog-content {
+		flex: 1;
 		padding: 1em;
 		overflow: auto;
 		max-width: calc(100vw - 2em);
-		max-height: var(--#{$ns}-dialog-content-max-height);
 	}
 
 	.#{$ns}-dialog-close-btn {
@@ -48,14 +53,15 @@
 		}
 	}
 
-	.#{$ns}-dialog-buttons {
+	.#{$ns}-dialog-actions {
+		flex-shrink: 0;
 		display: flex;
 		padding: var(--#{$ns}-dialog-inner-padding);
 		gap: var(--gap, var(--#{$ns}-dialog-inner-padding));
 		justify-content: var(--align, var(--#{$ns}-dialog-inner-padding));
 	}
 
-	.form-portrait .#{$ns}-dialog-buttons {
+	.form-portrait .#{$ns}-dialog-actions {
 		padding: 0;
 	}
 
@@ -70,10 +76,10 @@
 	&-prompt {
 		min-width: 15em;
 		max-width: min(30em, calc(100vw - 2em));
+		max-height: calc(100vh - 20em);
 
 		.#{$ns}-dialog-content {
 			padding: .5em var(--#{$ns}-dialog-inner-padding);
-			max-height: calc(100vh - 20em);
 			overflow: auto;
 		}
 	}

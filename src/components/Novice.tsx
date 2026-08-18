@@ -76,7 +76,7 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
                     style={{ zIndex: "calc(var(--zindex) + 1)" }}
                 >
                     <div className={CSS_NS + "-content"}>{stepInfos[noviceIndex].content}</div>
-                    <div className={CSS_NS + "-buttons"}>
+                    <div className={CSS_NS + "-actions"}>
                         {noviceIndex > 0 && (
                             <SpanButton className={CSS_NS + "-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
                                 {prevButtonTitle}
