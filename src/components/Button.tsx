@@ -72,13 +72,18 @@ export const AnyButton = memo(function ({ tag: Tag, children, ...props }: AnyBut
     };
 
     const TagEl = (Tag || "span") as any;
+
+    // aria-disabled 属性用于无障碍访问，表示元素是否可交互
+    if (props.disabled) {
+        props["aria-disabled"] = true;
+    }
     let attrs: Record<string, any> = { ...props };
     attrs.style = { ...attrs.style };
 
     delete attrs.onClick;
     delete attrs.debounce;
     return (
-        <TagEl {...attrs} role="button" tabIndex={0} onClick={callback} onKeyDown={callback}>
+        <TagEl {...attrs} role="button" tabIndex={props.disabled ? -1 : 0} onClick={callback} onKeyDown={callback}>
             {children}
         </TagEl>
     );

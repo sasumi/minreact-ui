@@ -40,7 +40,16 @@
 	--#{$ns}-panel-drop-shadow: drop-shadow(var(--#{$ns}-panel-shadow-lite));
 }
 
+[role="button"] {
+	user-select: none;
+}
+
 [role="button"]:not([disabled]),
 [role="button"]:not([aria-disabled="true"]) {
 	cursor: pointer;
+}
+
+[role="button"][disabled],
+[role="button"][aria-disabled="true"] {
+	pointer-events: none;
 }

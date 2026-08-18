@@ -1,7 +1,7 @@
 import { SpanButton } from "@/components/Button";
 import "@/styles/components/novice.scss";
 import "@/styles/common.module.scss";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Popover, PopoverAnchor, PopoverContent } from "./Popover";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
@@ -57,8 +57,11 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
         setOpen(false);
     };
 
-    useUpdateEffect(() => {
-        setTargetOffset(getOffset(stepInfos[noviceIndex].target));
+    useEffect(() => {
+        const tag = stepInfos[noviceIndex].target;
+        setTargetOffset(getOffset(tag));
+        console.log("Scrolling to target:", findOne(tag));
+        findOne(tag)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, [noviceIndex]);
 
     return (

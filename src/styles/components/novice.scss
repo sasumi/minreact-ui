@@ -47,9 +47,12 @@
 			padding: .5em 1em;
 			justify-content: end;
 
+
+			[role="button"][aria-disabled="true"] {
+				opacity: 0.5;
+			}
 			.#{$ns}-novice-next-btn {
 				margin-left: auto;
-				;
 			}
 		}
 	}
