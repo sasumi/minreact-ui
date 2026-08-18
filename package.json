@@ -3,9 +3,27 @@
     "private": false,
     "version": "0.0.2",
     "type": "module",
+    "main": "./dist/minuui.umd.cjs",
+    "module": "./dist/minuui.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/minuui.js",
+            "require": "./dist/minuui.umd.cjs"
+        },
+        "./dist/minuui.css": "./dist/minuui.css"
+    },
+    "files": [
+        "dist"
+    ],
+    "sideEffects": [
+        "**/*.scss",
+        "**/*.css"
+    ],
     "scripts": {
         "dev": "vite demo --config vite.config.ts",
-        "build": "tsc && vite build",
+        "build": "tsc && vite build && tsc -p tsconfig.build.json",
         "prebuild": "npm run generate:index",
         "prepublishOnly": "npm run build",
         "generate:index": "node scripts/generate-index.js",
