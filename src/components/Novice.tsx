@@ -1,9 +1,8 @@
 import { SpanButton } from "@/components/Button";
-import "@/styles/components/novice.scss";
 import "@/styles/common.module.scss";
+import "@/styles/components/novice.scss";
 import { ReactNode, useEffect, useState } from "react";
-import { Popover, PopoverAnchor, PopoverContent } from "./Popover";
-import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+import { Popover } from "./Popover";
 
 import { namespace } from "@/styles/namespace";
 import { findOne } from "minutool";
@@ -68,10 +67,10 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
         open && (
             <Popover open={true} className={CSS_NS + "-popover"}>
                 <div className={CSS_NS + "-masker"}></div>
-                <PopoverAnchor asChild>
+                <Popover.Anchor asChild>
                     <div className={CSS_NS + "-highlight"} style={targetOffset}></div>
-                </PopoverAnchor>
-                <PopoverContent
+                </Popover.Anchor>
+                <Popover.Content
                     className={CSS_NS + "-content-wrap"}
                     side="bottom"
                     sideOffset={8}
@@ -96,7 +95,7 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
                             {closeButtonTitle}
                         </SpanButton>
                     </div>
-                </PopoverContent>
+                </Popover.Content>
             </Popover>
         )
     );

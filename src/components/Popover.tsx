@@ -17,24 +17,13 @@ type PopoverProps = React.ComponentProps<typeof ReactPopover.Root> & {
     className?: string;
 };
 
-export const Popover = ({ children, className, ...rest }: PopoverProps) => {
-    const triggerRef = useRef<any>(null);
-    return (
-        <PopoverTriggerRefContext.Provider value={triggerRef}>
-            <PopoverWrapperClassContext.Provider value={className}>
-                <ReactPopover.Root {...rest}>{children}</ReactPopover.Root>
-            </PopoverWrapperClassContext.Provider>
-        </PopoverTriggerRefContext.Provider>
-    );
-};
+const PopoverAnchor = ReactPopover.Anchor;
 
 /**
  * PopoverTrigger 组件，作为 Popover 的触发元素，必须放在 Popover 内部
  * 使用 forwardRef 转发 ref，并将 trigger 的 DOM 元素 ref 存入 context，供 PopoverContent 使用
  */
-export const PopoverAnchor = ReactPopover.Anchor;
-
-export const PopoverTrigger = forwardRef<HTMLElement, React.ComponentProps<typeof ReactPopover.Trigger>>(({ children, className = "", ...rest }, ref) => {
+const PopoverTrigger = forwardRef<HTMLElement, React.ComponentProps<typeof ReactPopover.Trigger>>(({ children, className = "", ...rest }, ref) => {
     const triggerRef = useContext(PopoverTriggerRefContext);
     return (
         <ReactPopover.Trigger
@@ -57,7 +46,7 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
     onCloseBy?: (target: HTMLElement) => boolean;
 };
 
-export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, ...rest }, ref) => {
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, ...rest }, ref) => {
     const triggerRef = useContext(PopoverTriggerRefContext);
     const wrapperClassName = useContext(PopoverWrapperClassContext);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -116,6 +105,24 @@ export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({
     );
 });
 
+export const Popover = Object.assign(
+    ({ children, className, ...rest }: PopoverProps) => {
+        const triggerRef = useRef<any>(null);
+        return (
+            <PopoverTriggerRefContext.Provider value={triggerRef}>
+                <PopoverWrapperClassContext.Provider value={className}>
+                    <ReactPopover.Root {...rest}>{children}</ReactPopover.Root>
+                </PopoverWrapperClassContext.Provider>
+            </PopoverTriggerRefContext.Provider>
+        );
+    },
+    {
+        Anchor: PopoverAnchor,
+        Trigger: PopoverTrigger,
+        Content: PopoverContent,
+    }
+);
+
 interface SelectProps {
     name?: string;
     items: Array<{ label: string; value: any }>;
@@ -157,13 +164,13 @@ export const Select = ({
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
+            <Popover.Trigger asChild>
                 <SpanButton className={"element select-ui" + (lite ? " select-ui-lite" : "")} disabled={disabled} aria-label={name}>
                     <span className="txt">{current?.label || ""}</span>
                     {name && <input type="hidden" name={name} value={current?.value} />}
                 </SpanButton>
-            </PopoverTrigger>
-            <PopoverContent>
+            </Popover.Trigger>
+            <Popover.Content>
                 <ul className="menu">
                     {items.map((item, index) => (
                         <AnyButton
@@ -181,7 +188,7 @@ export const Select = ({
                         </AnyButton>
                     ))}
                 </ul>
-            </PopoverContent>
+            </Popover.Content>
         </Popover>
     );
 };

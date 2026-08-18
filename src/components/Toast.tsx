@@ -22,7 +22,7 @@ type ToastId = string | number;
 
 const MSG_ELAPSED_OFFSET = 200;
 
-export const showError = (message: string, callback: (() => void) | null = null, duration = 4000): ToastId => {
+const showError = (message: string, callback: (() => void) | null = null, duration = 4000): ToastId => {
     const toastId = toast.error(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -30,7 +30,7 @@ export const showError = (message: string, callback: (() => void) | null = null,
     return toastId;
 };
 
-export const showInfo = (message: string, callback: (() => void) | null = null, duration = 2000): ToastId => {
+const showInfo = (message: string, callback: (() => void) | null = null, duration = 2000): ToastId => {
     const toastId = toast.info(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -38,7 +38,7 @@ export const showInfo = (message: string, callback: (() => void) | null = null, 
     return toastId;
 };
 
-export const showSuccess = (message: string, callback: ((...args: any[]) => void) | null = null, duration = 1500): ToastId => {
+const showSuccess = (message: string, callback: ((...args: any[]) => void) | null = null, duration = 1500): ToastId => {
     const toastId = toast.success(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -46,7 +46,7 @@ export const showSuccess = (message: string, callback: ((...args: any[]) => void
     return toastId;
 };
 
-export const showWarning = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
+const showWarning = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
     const toastId = toast.warn(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -54,7 +54,7 @@ export const showWarning = (message: string, callback: (() => void) | null = nul
     return toastId;
 };
 
-export const showLoading = (message: string, callback: (() => void) | null = null, duration = 200000): ToastId => {
+const showLoading = (message: string, callback: (() => void) | null = null, duration = 200000): ToastId => {
     const tsc = tsConfig(duration);
     const toastId = toast.loading(message, tsc);
     if (callback && duration) {
@@ -63,7 +63,7 @@ export const showLoading = (message: string, callback: (() => void) | null = nul
     return toastId;
 };
 
-export const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, message: string, duration = 200000) => {
+const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, message: string, duration = 200000) => {
     return (...args: any[]) => {
         const tsc = tsConfig(duration);
         const toastId = toast.loading(message, tsc);
@@ -73,6 +73,16 @@ export const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, messa
     };
 };
 
-export const hideToast = (toastId: ToastId) => {
+const hideToast = (toastId: ToastId) => {
     toast.dismiss(toastId);
+};
+
+export const Toast = {
+    showError,
+    showInfo,
+    showSuccess,
+    showWarning,
+    showLoading,
+    bindLoading,
+    hideToast,
 };

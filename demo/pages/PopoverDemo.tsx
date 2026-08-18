@@ -1,4 +1,4 @@
-import { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from "@/components/Popover";
+import { Popover } from "@/components/Popover";
 import { PrimaryButton, NormalButton } from "@/components/Button";
 import { useState } from "react";
 
@@ -18,15 +18,15 @@ function PopoverDemo() {
         <p className="demo-section-description">通过 open 和 onOpenChange 控制 Popover 的显示</p>
         <div className="demo-example">
           <Popover open={open1} onOpenChange={setOpen1}>
-            <PopoverTrigger>
+            <Popover.Trigger>
               <PrimaryButton>点击打开 Popover</PrimaryButton>
-            </PopoverTrigger>
-            <PopoverContent>
+            </Popover.Trigger>
+            <Popover.Content>
               <div style={{ padding: "1rem" }}>
                 <h4 style={{ margin: "0 0 0.5rem" }}>Popover 标题</h4>
                 <p style={{ margin: 0 }}>这是 Popover 的内容</p>
               </div>
-            </PopoverContent>
+            </Popover.Content>
           </Popover>
         </div>
       </div>
@@ -38,45 +38,45 @@ function PopoverDemo() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem", padding: "3rem" }}>
             <div style={{ textAlign: "center" }}>
               <Popover>
-                <PopoverTrigger>
+                <Popover.Trigger>
                   <NormalButton>上方</NormalButton>
-                </PopoverTrigger>
-                <PopoverContent side="top">
+                </Popover.Trigger>
+                <Popover.Content side="top">
                   <div style={{ padding: "0.5rem 1rem" }}>向上弹出</div>
-                </PopoverContent>
+                </Popover.Content>
               </Popover>
             </div>
 
             <div style={{ textAlign: "center" }}>
               <Popover>
-                <PopoverTrigger>
+                <Popover.Trigger>
                   <NormalButton>下方</NormalButton>
-                </PopoverTrigger>
-                <PopoverContent side="bottom">
+                </Popover.Trigger>
+                <Popover.Content side="bottom">
                   <div style={{ padding: "0.5rem 1rem" }}>向下弹出</div>
-                </PopoverContent>
+                </Popover.Content>
               </Popover>
             </div>
 
             <div style={{ textAlign: "center" }}>
               <Popover>
-                <PopoverTrigger>
+                <Popover.Trigger>
                   <NormalButton>左侧</NormalButton>
-                </PopoverTrigger>
-                <PopoverContent side="left">
+                </Popover.Trigger>
+                <Popover.Content side="left">
                   <div style={{ padding: "0.5rem 1rem" }}>向左弹出</div>
-                </PopoverContent>
+                </Popover.Content>
               </Popover>
             </div>
 
             <div style={{ textAlign: "center" }}>
               <Popover>
-                <PopoverTrigger>
+                <Popover.Trigger>
                   <NormalButton>右侧</NormalButton>
-                </PopoverTrigger>
-                <PopoverContent side="right">
+                </Popover.Trigger>
+                <Popover.Content side="right">
                   <div style={{ padding: "0.5rem 1rem" }}>向右弹出</div>
-                </PopoverContent>
+                </Popover.Content>
               </Popover>
             </div>
           </div>
@@ -89,30 +89,30 @@ function PopoverDemo() {
         <div className="demo-example">
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
             <Popover>
-              <PopoverTrigger>
+              <Popover.Trigger>
                 <NormalButton>偏移 4px</NormalButton>
-              </PopoverTrigger>
-              <PopoverContent sideOffset={4}>
+              </Popover.Trigger>
+              <Popover.Content sideOffset={4}>
                 <div style={{ padding: "0.5rem 1rem" }}>sideOffset = 4</div>
-              </PopoverContent>
+              </Popover.Content>
             </Popover>
 
             <Popover>
-              <PopoverTrigger>
+              <Popover.Trigger>
                 <NormalButton>偏移 12px</NormalButton>
-              </PopoverTrigger>
-              <PopoverContent sideOffset={12}>
+              </Popover.Trigger>
+              <Popover.Content sideOffset={12}>
                 <div style={{ padding: "0.5rem 1rem" }}>sideOffset = 12</div>
-              </PopoverContent>
+              </Popover.Content>
             </Popover>
 
             <Popover>
-              <PopoverTrigger>
+              <Popover.Trigger>
                 <NormalButton>偏移 24px</NormalButton>
-              </PopoverTrigger>
-              <PopoverContent sideOffset={24}>
+              </Popover.Trigger>
+              <Popover.Content sideOffset={24}>
                 <div style={{ padding: "0.5rem 1rem" }}>sideOffset = 24</div>
-              </PopoverContent>
+              </Popover.Content>
             </Popover>
           </div>
         </div>
@@ -123,10 +123,10 @@ function PopoverDemo() {
         <p className="demo-section-description">Popover 中可以包含任意内容</p>
         <div className="demo-example">
           <Popover open={open2} onOpenChange={setOpen2}>
-            <PopoverTrigger>
+            <Popover.Trigger>
               <PrimaryButton>打开表单 Popover</PrimaryButton>
-            </PopoverTrigger>
-            <PopoverContent side="bottom" sideOffset={8}>
+            </Popover.Trigger>
+            <Popover.Content side="bottom" sideOffset={8}>
               <div style={{ padding: "1rem", minWidth: "300px" }}>
                 <h4 style={{ margin: "0 0 1rem" }}>快速编辑</h4>
                 <form
@@ -152,7 +152,7 @@ function PopoverDemo() {
                   </div>
                 </form>
               </div>
-            </PopoverContent>
+            </Popover.Content>
           </Popover>
         </div>
       </div>
@@ -162,10 +162,10 @@ function PopoverDemo() {
         <p className="demo-section-description">使用 Popover 创建下拉菜单</p>
         <div className="demo-example">
           <Popover>
-            <PopoverTrigger>
+            <Popover.Trigger>
               <NormalButton>操作菜单</NormalButton>
-            </PopoverTrigger>
-            <PopoverContent side="bottom" align="start" sideOffset={4}>
+            </Popover.Trigger>
+            <Popover.Content side="bottom" align="start" sideOffset={4}>
               <div style={{ minWidth: "150px" }}>
                 <button
                   style={{
@@ -217,21 +217,21 @@ function PopoverDemo() {
                   🗑️ 删除
                 </button>
               </div>
-            </PopoverContent>
+            </Popover.Content>
           </Popover>
         </div>
       </div>
 
       <div className="demo-section">
-        <h3 className="demo-section-title">PopoverAnchor 定位锚点</h3>
-        <p className="demo-section-description">使用 PopoverAnchor 将 Popover 定位到任意元素</p>
+        <h3 className="demo-section-title">Popover.Anchor 定位锚点</h3>
+        <p className="demo-section-description">使用 Popover.Anchor 将 Popover 定位到任意元素</p>
         <div className="demo-example">
           <Popover>
             <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-              <PopoverTrigger>
+              <Popover.Trigger>
                 <NormalButton>打开 Popover</NormalButton>
-              </PopoverTrigger>
-              <PopoverAnchor asChild>
+              </Popover.Trigger>
+              <Popover.Anchor asChild>
                 <div
                   style={{
                     padding: "0.5rem 1rem",
@@ -242,11 +242,11 @@ function PopoverDemo() {
                 >
                   定位锚点
                 </div>
-              </PopoverAnchor>
+              </Popover.Anchor>
             </div>
-            <PopoverContent side="bottom">
+            <Popover.Content side="bottom">
               <div style={{ padding: "0.5rem 1rem" }}>Popover 定位到蓝色框</div>
-            </PopoverContent>
+            </Popover.Content>
           </Popover>
         </div>
       </div>

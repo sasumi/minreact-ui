@@ -201,18 +201,13 @@ const Action = Object.assign(
 );
 
 /**
- * 对话框主组件导出（含子组件）
- */
-export const Dialog = Object.assign(DialogImpl, { Title, Content, Action });
-
-/**
  * 显示自定义对话框
  * @param content - 对话框内容，可以是 ReactNode 或字符串
  * @param onClose - 对话框关闭时的回调函数，返回 false 可阻止关闭
  * @param dlgProps - 其他 Dialog 组件的属性
  * @returns 卸载函数
  */
-export const showDialog = ({
+const showDialog = ({
     title,
     action,
     content,
@@ -254,7 +249,7 @@ export const showDialog = ({
 /**
  * 显示 React 组件作为对话框
  */
-export const showDialogComponent = <P extends object>(
+const showDialogComponent = <P extends object>(
     DialogComponent: ComponentType<P & { open: boolean; setOpen: (open: boolean) => void }>,
     props: P = {} as P,
 ) => {
@@ -278,7 +273,7 @@ export const showDialogComponent = <P extends object>(
     return unmountRef.current;
 };
 
-export const showIframeDialog = ({
+const showIframeDialog = ({
     title = "",
     url,
     width = DIALOG_SIZE_NORMAL,
@@ -299,7 +294,7 @@ export const showIframeDialog = ({
 /**
  * 图片预览
  */
-export const showImgPreview = (src: string) => {
+const showImgPreview = (src: string) => {
     let closer: (() => void) | null = null;
     closer = showDialog({
         title: "",
@@ -318,7 +313,7 @@ export const showImgPreview = (src: string) => {
 /**
  * 显示输入提示对话框
  */
-export const prompt = ({
+const prompt = ({
     title = "",
     defaultValue = "" as string | number,
     onSubmit = null,
@@ -441,7 +436,7 @@ interface ProgressDialogRet {
 /**
  * 显示进度对话框
  */
-export const showProgressDialog = ({
+const showProgressDialog = ({
     title,
     message,
     canAbort = true,
@@ -533,7 +528,7 @@ export const showProgressDialog = ({
  * @param onPreCancel 取消按钮点击前的回调函数，返回 false 可阻止关闭对话框
  * @returns Promise<void>，确认时 resolve，取消时 reject
  */
-export const confirm = ({
+const confirm = ({
     title = null,
     message = null,
     width = DIALOG_SIZE_SMALL,
@@ -593,7 +588,7 @@ export const confirm = ({
 /**
  * 显示提示对话框
  */
-export const alert = (
+const alert = (
     title = "",
     message?: ReactNode,
     {
@@ -628,6 +623,23 @@ export const alert = (
         });
     });
 };
+
+/**
+ * 对话框主组件导出（含子组件及函数式调用方法）
+ */
+export const Dialog = Object.assign(DialogImpl, {
+    Title,
+    Content,
+    Action,
+    show: showDialog,
+    showCompoent: showDialogComponent,
+    showIframe: showIframeDialog,
+    showImg: showImgPreview,
+    prompt,
+    showProgress: showProgressDialog,
+    confirm,
+    alert,
+});
 
 /**
  * 将焦点设置到容器内的第一个可聚焦元素上

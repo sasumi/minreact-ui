@@ -30,15 +30,7 @@ export {
   DIALOG_SIZE_NORMAL,
   DIALOG_SIZE_SMALL,
   DIALOG_SIZE_XLARGE,
-  Dialog,
-  alert,
-  confirm,
-  prompt,
-  showDialog,
-  showDialogComponent,
-  showIframeDialog,
-  showImgPreview,
-  showProgressDialog
+  Dialog
 } from './components/Dialog'
 
 // Novice utilities
@@ -53,9 +45,6 @@ export {
 // Popover utilities
 export {
   Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverTrigger,
   Select
 } from './components/Popover'
 
@@ -86,13 +75,7 @@ export {
 
 // Toast utilities
 export {
-  bindLoading,
-  hideToast,
-  showError,
-  showInfo,
-  showLoading,
-  showSuccess,
-  showWarning
+  Toast
 } from './components/Toast'
 
 // WordCounter utilities

@@ -1,5 +1,4 @@
 import { Dialog, DIALOG_SIZE_SMALL, DIALOG_SIZE_NORMAL, DIALOG_SIZE_LARGE } from "@/components/Dialog";
-import { alert, confirm, prompt, showDialog, showImgPreview } from "@/components/Dialog";
 import { PrimaryButton, NormalButton } from "@/components/Button";
 import { useState } from "react";
 
@@ -9,11 +8,11 @@ function DialogDemo() {
     const [open3, setOpen3] = useState(false);
 
     const showCustom = () => {
-        showDialog({
+        Dialog.show({
             title: "自定义对话框",
             content: (
                 <div>
-                    <p>这是通过 showDialog 函数创建的对话框</p>
+                    <p>这是通过 Dialog.show 函数创建的对话框</p>
                     <p>可以在任何地方调用，不需要管理 state</p>
                 </div>
             ),
@@ -22,23 +21,23 @@ function DialogDemo() {
     };
 
     const showConfirm = () => {
-        confirm({
+        Dialog.confirm({
             title: "确认操作",
             message: "您确定要执行此操作吗？",
         });
     };
 
     const showAlert = () => {
-        alert("提示", "这是一个提示对话框");
+        Dialog.alert("提示", "这是一个提示对话框");
     };
 
     const showPrompt = () => {
-        prompt({ title: "请输入您的姓名" })
+        Dialog.prompt({ title: "请输入您的姓名" })
             .then((value) => {
                 if (value !== undefined) {
-                    alert("您输入的姓名是：" + value);
+                    Dialog.alert("您输入的姓名是：" + value);
                 } else {
-                    alert("您取消了输入");
+                    Dialog.alert("您取消了输入");
                 }
             })
             .catch((err) => {
@@ -75,14 +74,14 @@ function DialogDemo() {
                     <div className="demo-row">
                         <PrimaryButton
                             onClick={() =>
-                                showDialog({ title: "小尺寸", content: <div style={{ padding: "1rem" }}>小尺寸对话框</div>, width: DIALOG_SIZE_SMALL })
+                                Dialog.show({ title: "小尺寸", content: <div style={{ padding: "1rem" }}>小尺寸对话框</div>, width: DIALOG_SIZE_SMALL })
                             }
                         >
                             小尺寸 (24em)
                         </PrimaryButton>
                         <PrimaryButton
                             onClick={() =>
-                                showDialog({
+                                Dialog.show({
                                     title: "普通尺寸",
                                     content: <div style={{ padding: "1rem" }}>普通尺寸对话框</div>,
                                     width: DIALOG_SIZE_NORMAL,
@@ -93,7 +92,7 @@ function DialogDemo() {
                         </PrimaryButton>
                         <PrimaryButton
                             onClick={() =>
-                                showDialog({ title: "大尺寸", content: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, width: DIALOG_SIZE_LARGE })
+                                Dialog.show({ title: "大尺寸", content: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, width: DIALOG_SIZE_LARGE })
                             }
                         >
                             大尺寸 (60em)
@@ -103,7 +102,7 @@ function DialogDemo() {
             </div>
 
             <div className="demo-section">
-                <h3 className="demo-section-title">showDialog 函数</h3>
+                <h3 className="demo-section-title">Dialog.show 函数</h3>
                 <p className="demo-section-description">通过函数式调用快速创建对话框</p>
                 <div className="demo-example">
                     <div className="demo-row">
@@ -155,12 +154,12 @@ function DialogDemo() {
                 <div className="demo-example">
                     <PrimaryButton
                         onClick={() =>
-                            showDialog({
+                            Dialog.show({
                                 children: (
                                     <form
                                         onSubmit={(e) => {
                                             e.preventDefault();
-                                            alert("表单提交！");
+                                            Dialog.alert("表单提交！");
                                         }}
                                         className="demo-form"
                                     >
@@ -206,7 +205,7 @@ function DialogDemo() {
                 <div className="demo-example">
                     <PrimaryButton
                         onClick={() => {
-                            showImgPreview("https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA1SxPL9.img?w=768&h=723&m=6&x=311&y=270&s=324&d=324");
+                            Dialog.showImg("https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA1SxPL9.img?w=768&h=723&m=6&x=311&y=270&s=324&d=324");
                         }}
                     >
                         打开图片预览

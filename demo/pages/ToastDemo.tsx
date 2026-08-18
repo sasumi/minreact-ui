@@ -1,14 +1,14 @@
-import { showSuccess, showInfo, showWarning, showError, showLoading, hideToast } from "@/components/Toast";
+import { Toast } from "@/components/Toast";
 import { PrimaryButton, NormalButton } from "@/components/Button";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function ToastDemo() {
   const handleShowLoading = () => {
-    const toastId = showLoading("处理中，请稍候...", null, 3000);
+    const toastId = Toast.showLoading("处理中，请稍候...", null, 3000);
     setTimeout(() => {
-      hideToast(toastId);
-      showSuccess("处理完成！");
+      Toast.hideToast(toastId);
+      Toast.showSuccess("处理完成！");
     }, 2000);
   };
 
@@ -26,10 +26,10 @@ function ToastDemo() {
         <p className="demo-section-description">四种基础消息类型</p>
         <div className="demo-example">
           <div className="demo-row">
-            <PrimaryButton onClick={() => showSuccess("操作成功！")}>成功提示</PrimaryButton>
-            <PrimaryButton onClick={() => showInfo("这是一条信息")}>信息提示</PrimaryButton>
-            <PrimaryButton onClick={() => showWarning("请注意！")}>警告提示</PrimaryButton>
-            <PrimaryButton onClick={() => showError("操作失败！")}>错误提示</PrimaryButton>
+            <PrimaryButton onClick={() => Toast.showSuccess("操作成功！")}>成功提示</PrimaryButton>
+            <PrimaryButton onClick={() => Toast.showInfo("这是一条信息")}>信息提示</PrimaryButton>
+            <PrimaryButton onClick={() => Toast.showWarning("请注意！")}>警告提示</PrimaryButton>
+            <PrimaryButton onClick={() => Toast.showError("操作失败！")}>错误提示</PrimaryButton>
           </div>
         </div>
       </div>
@@ -39,7 +39,7 @@ function ToastDemo() {
         <p className="demo-section-description">显示长时间操作的加载状态</p>
         <div className="demo-example">
           <div className="demo-row">
-            <PrimaryButton onClick={() => showLoading("加载中...", null, 2000)}>显示加载（2秒后自动关闭）</PrimaryButton>
+            <PrimaryButton onClick={() => Toast.showLoading("加载中...", null, 2000)}>显示加载（2秒后自动关闭）</PrimaryButton>
             <PrimaryButton onClick={handleShowLoading}>模拟异步操作</PrimaryButton>
           </div>
         </div>
@@ -50,9 +50,9 @@ function ToastDemo() {
         <p className="demo-section-description">可以传入任意文本作为消息内容</p>
         <div className="demo-example">
           <div className="demo-row">
-            <NormalButton onClick={() => showSuccess("✅ 文件上传成功！")}>带 Emoji</NormalButton>
-            <NormalButton onClick={() => showInfo("这是一条很长的消息提示，用于测试文本换行效果，看看在实际使用中的表现如何。")}>长文本</NormalButton>
-            <NormalButton onClick={() => showWarning("网络连接不稳定，请检查您的网络设置")}>多行提示</NormalButton>
+            <NormalButton onClick={() => Toast.showSuccess("✅ 文件上传成功！")}>带 Emoji</NormalButton>
+            <NormalButton onClick={() => Toast.showInfo("这是一条很长的消息提示，用于测试文本换行效果，看看在实际使用中的表现如何。")}>长文本</NormalButton>
+            <NormalButton onClick={() => Toast.showWarning("网络连接不稳定，请检查您的网络设置")}>多行提示</NormalButton>
           </div>
         </div>
       </div>
@@ -62,9 +62,9 @@ function ToastDemo() {
         <p className="demo-section-description">通过 duration 参数控制显示时长（毫秒）</p>
         <div className="demo-example">
           <div className="demo-row">
-            <NormalButton onClick={() => showInfo("1秒后关闭", null, 1000)}>1秒</NormalButton>
-            <NormalButton onClick={() => showInfo("3秒后关闭", null, 3000)}>3秒</NormalButton>
-            <NormalButton onClick={() => showInfo("5秒后关闭", null, 5000)}>5秒</NormalButton>
+            <NormalButton onClick={() => Toast.showInfo("1秒后关闭", null, 1000)}>1秒</NormalButton>
+            <NormalButton onClick={() => Toast.showInfo("3秒后关闭", null, 3000)}>3秒</NormalButton>
+            <NormalButton onClick={() => Toast.showInfo("5秒后关闭", null, 5000)}>5秒</NormalButton>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ function ToastDemo() {
         <div className="demo-example">
           <PrimaryButton
             onClick={() =>
-              showSuccess("保存成功！", () => {
+              Toast.showSuccess("保存成功！", () => {
                 alert("回调函数执行了");
               })
             }
@@ -87,14 +87,14 @@ function ToastDemo() {
 
       <div className="demo-section">
         <h3 className="demo-section-title">手动关闭</h3>
-        <p className="demo-section-description">使用 hideToast 手动关闭指定的提示</p>
+        <p className="demo-section-description">使用 Toast.hideToast 手动关闭指定的提示</p>
         <div className="demo-example">
           <div className="demo-row">
             <PrimaryButton
               onClick={() => {
-                const toastId = showInfo("这条消息不会自动关闭");
+                const toastId = Toast.showInfo("这条消息不会自动关闭");
                 setTimeout(() => {
-                  hideToast(toastId);
+                  Toast.hideToast(toastId);
                 }, 3000);
               }}
             >
@@ -113,10 +113,10 @@ function ToastDemo() {
               <h4 style={{ margin: "0 0 0.5rem" }}>表单提交</h4>
               <PrimaryButton
                 onClick={() => {
-                  const toastId = showLoading("正在保存...");
+                  const toastId = Toast.showLoading("正在保存...");
                   setTimeout(() => {
-                    hideToast(toastId);
-                    showSuccess("保存成功！");
+                    Toast.hideToast(toastId);
+                    Toast.showSuccess("保存成功！");
                   }, 1500);
                 }}
               >
@@ -128,10 +128,10 @@ function ToastDemo() {
               <h4 style={{ margin: "0 0 0.5rem" }}>文件上传</h4>
               <PrimaryButton
                 onClick={() => {
-                  const toastId = showLoading("正在上传...");
+                  const toastId = Toast.showLoading("正在上传...");
                   setTimeout(() => {
-                    hideToast(toastId);
-                    showSuccess("上传完成！");
+                    Toast.hideToast(toastId);
+                    Toast.showSuccess("上传完成！");
                   }, 2000);
                 }}
               >
@@ -144,9 +144,9 @@ function ToastDemo() {
               <PrimaryButton
                 onClick={() => {
                   if (confirm("确定要删除吗？")) {
-                    showSuccess("删除成功！");
+                    Toast.showSuccess("删除成功！");
                   } else {
-                    showInfo("已取消删除");
+                    Toast.showInfo("已取消删除");
                   }
                 }}
               >
@@ -158,7 +158,7 @@ function ToastDemo() {
               <h4 style={{ margin: "0 0 0.5rem" }}>网络错误</h4>
               <PrimaryButton
                 onClick={() => {
-                  showError("网络请求失败，请稍后重试");
+                  Toast.showError("网络请求失败，请稍后重试");
                 }}
               >
                 模拟网络错误
@@ -175,22 +175,22 @@ function ToastDemo() {
             <h4 style={{ margin: "0 0 0.5rem" }}>可用函数：</h4>
             <ul style={{ margin: "0.5rem 0", paddingLeft: "1.5rem" }}>
               <li>
-                <code>showSuccess(message, callback?, duration?)</code> - 成功提示（默认1.5秒）
+                <code>Toast.showSuccess(message, callback?, duration?)</code> - 成功提示（默认1.5秒）
               </li>
               <li>
-                <code>showInfo(message, callback?, duration?)</code> - 信息提示（默认2秒）
+                <code>Toast.showInfo(message, callback?, duration?)</code> - 信息提示（默认2秒）
               </li>
               <li>
-                <code>showWarning(message, callback?, duration?)</code> - 警告提示（默认3秒）
+                <code>Toast.showWarning(message, callback?, duration?)</code> - 警告提示（默认3秒）
               </li>
               <li>
-                <code>showError(message, callback?, duration?)</code> - 错误提示（默认4秒）
+                <code>Toast.showError(message, callback?, duration?)</code> - 错误提示（默认4秒）
               </li>
               <li>
-                <code>showLoading(message, callback?, duration?)</code> - 加载提示（默认200秒）
+                <code>Toast.showLoading(message, callback?, duration?)</code> - 加载提示（默认200秒）
               </li>
               <li>
-                <code>hideToast(toastId)</code> - 手动关闭指定提示
+                <code>Toast.hideToast(toastId)</code> - 手动关闭指定提示
               </li>
             </ul>
             <h4 style={{ margin: "1rem 0 0.5rem" }}>注意：</h4>
