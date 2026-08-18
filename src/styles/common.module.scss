@@ -1,6 +1,6 @@
+@use "./namespace" as *;
+@forward "./namespace";
 @use "./mixins/icon.scss" as icon;
-
-$ns: minui;
 
 @font-face {
 	font-family: '#{$ns}-icon';
@@ -10,7 +10,11 @@ $ns: minui;
 }
 
 :root {
-	--#{$ns}-font-icon: "#{$ns}-icon", sans-serif;
+	--#{$ns}-font-icon: "#{$ns}-icon",
+	sans-serif;
+
+	--#{$ns}-color-background: #fff;
+	--#{$ns}-color-background: canvas;
 
 	--#{$ns}-color-danger: #ef4444;
 	--#{$ns}-color-warning: #f59e0b;
@@ -21,7 +25,6 @@ $ns: minui;
 	--#{$ns}-color-element-border-secondary: #aaa;
 	--#{$ns}-color-element-border-active: #bbb;
 
-	--#{$ns}-color-background: #fff;
 
 	--#{$ns}-element-height: 2em;
 	--#{$ns}-element-padding: 0.25em;
@@ -35,12 +38,9 @@ $ns: minui;
 	--#{$ns}-panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 	--#{$ns}-panel-shadow-lite: 1px 1px 5px #cbcbcb7d;
 	--#{$ns}-panel-drop-shadow: drop-shadow(var(--#{$ns}-panel-shadow-lite));
-
 }
 
 [role="button"]:not([disabled]),
 [role="button"]:not([aria-disabled="true"]) {
 	cursor: pointer;
 }
-
-// ns 值请同步更新 src/styles/ns.ts

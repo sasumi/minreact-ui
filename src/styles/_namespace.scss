@@ -1,0 +1,5 @@
+@charset "UTF-8";
+
+// 组件类名前缀，供各样式文件通过 `@use "./namespace" as *;` 引入。
+// 注意：必须与 src/styles/namespace.ts 中的 namespace 保持一致。
+$ns: minui;
