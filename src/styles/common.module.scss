@@ -1,54 +1,41 @@
 @use "./mixins/icon.scss" as icon;
 
-$namespace: minui;
+$ns: minui;
 
 @font-face {
-	font-family: '#{namespace}-icon';
+	font-family: '#{$ns}-icon';
 	src: url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff2?t=1785839311028') format('woff2'),
 		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff?t=1785839311028') format('woff'),
 		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.ttf?t=1785839311028') format('truetype');
 }
 
 :root {
-	--font-icon: "minui-font", sans-serif;
+	--#{$ns}-font-icon: "#{$ns}-icon", sans-serif;
 
-	--color: #333;
+	--#{$ns}-color-danger: #ef4444;
+	--#{$ns}-color-warning: #f59e0b;
+	--#{$ns}-color-info: #3b82f6;
+	--#{$ns}-color-success: #10b981;
 
-	--color-danger: #ef4444;
-	--color-warning: #f59e0b;
-	--color-info: #3b82f6;
-	--color-success: #10b981;
+	--#{$ns}-color-element-border: #ddd;
+	--#{$ns}-color-element-border-secondary: #aaa;
+	--#{$ns}-color-element-border-active: #bbb;
 
-	--color-element-border: #ddd;
-	--color-element-border-secondary: #aaa;
-	--color-element-border-active: #bbb;
+	--#{$ns}-color-background: #fff;
 
-	--color-background: #fff;
-	--color-background-secondary: #f1f1f1;
-	--color-background-hover: #e5efff;
-	--color-background-lite: #fafafa;
+	--#{$ns}-element-height: 2em;
+	--#{$ns}-element-padding: 0.25em;
+	--#{$ns}-element-radius: 4px;
 
-	--color-link: #3b82f6;
-	--color-link-hover: #2563eb;
+	--#{$ns}-dialog-zindex: 1000;
+	--#{$ns}-toast-zindex: calc(var(--#{$ns}-dialog-zindex) + 2);
+	--#{$ns}-overlay-zindex: var(--#{$ns}-dialog-zindex);
 
-	--element-height: 2em;
-	--element-padding: 0.25em;
-	--element-border: 1px solid var(--color-element-border);
-	--element-border-active: 1px solid var(--color-element-border-active);
-	--element-radius: 4px;
-	--input-min-width: 10em;
+	--#{$ns}-panel-radius: 0.5em;
+	--#{$ns}-panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+	--#{$ns}-panel-shadow-lite: 1px 1px 5px #cbcbcb7d;
+	--#{$ns}-panel-drop-shadow: drop-shadow(var(--#{$ns}-panel-shadow-lite));
 
-	--color-selector-size: 1.25em;
-
-	--dialog-z-index: 1000;
-	--toast-z-index: calc(var(--dialog-z-index) + 2);
-	--overlay-z-index: var(--dialog-z-index);
-	--novice-z-index: calc(var(--dialog-z-index) + 1);
-
-	--panel-radius: 0.5em;
-	--panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-	--panel-shadow-lite: 1px 1px 5px #cbcbcb7d;
-	--panel-drop-shadow: drop-shadow(var(--panel-shadow-lite));
 }
 
 [role="button"]:not([disabled]),
@@ -56,4 +43,4 @@ $namespace: minui;
 	cursor: pointer;
 }
 
-// namespace 值请同步更新 src/styles/namespace.ts
+// ns 值请同步更新 src/styles/ns.ts

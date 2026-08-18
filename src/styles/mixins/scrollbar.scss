@@ -28,12 +28,6 @@
     &::-webkit-scrollbar {
         width: 15px;
     }
-
-    &::-webkit-scrollbar-track {
-    }
-
-    &::-webkit-scrollbar-thumb {
-    }
 }
 
 @mixin scrollbar-hide {

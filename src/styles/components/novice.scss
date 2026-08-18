@@ -3,21 +3,21 @@
 @use "./../common.module.scss" as *;
 
 :root {
-	--novice-zindex: var(--novice-z-index);
-	--novice-arrow-offset: 2em; //箭头偏移边际余量
-	--novice-highlight-padding: 5px;
-	--novice-arrow-size: 1em;
+	--#{$ns}-novice-arrow-offset: 2em; //箭头偏移边际余量
+	--#{$ns}-novice-highlight-padding: 5px;
+	--#{$ns}-novice-arrow-size: 1em;
+	--#{$ns}-novice-zindex: calc(var(--#{$ns}-dialog-zindex) + 1);
 }
 
-.#{$namespace}-novice {
+.#{$ns}-novice {
 	&-highlight {
 		position: fixed;
-		z-index: var(--novice-zindex);
-		border-radius: var(--panel-radius);
+		z-index: var(--#{$ns}-novice-zindex);
+		border-radius: var(--#{$ns}-panel-radius);
 		box-shadow: 0 0 10px 20000px #00000057;
-		padding: var(--novice-highlight-padding);
+		padding: var(--#{$ns}-novice-highlight-padding);
 		transition: all 0.3s ease;
-		margin: calc(var(--novice-highlight-padding) * -1) 0 0 calc(var(--novice-highlight-padding) * -1);
+		margin: calc(var(--#{$ns}-novice-highlight-padding) * -1) 0 0 calc(var(--#{$ns}-novice-highlight-padding) * -1);
 	}
 
 	&-masker {
@@ -26,28 +26,28 @@
 		position: fixed;
 		left: 0;
 		top: 0;
-		z-index: var(--novice-zindex);
+		z-index: var(--#{$ns}-novice-zindex);
 	}
 
 	&-popover {
-		z-index: calc(var(--novice-zindex) + 1) !important;
+		z-index: calc(var(--#{$ns}-novice-zindex) + 1) !important;
 	}
 
 	&-content-wrap {
 		min-width: 10em;
 		max-width: 35em;
 
-		.#{$namespace}-novice-content {
+		.#{$ns}-novice-content {
 			padding: 0.5em 1em;
 		}
 
-		.#{$namespace}-novice-buttons {
+		.#{$ns}-novice-buttons {
 			display: flex;
 			gap: 1em;
 			padding: .5em 1em;
 			justify-content: end;
 
-			.#{$namespace}-novice-next-btn {
+			.#{$ns}-novice-next-btn {
 				margin-left: auto;
 				;
 			}

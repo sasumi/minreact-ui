@@ -1,7 +1,11 @@
 @charset "UTF-8";
 @use "./../common.module.scss" as *;
 
-.#{$namespace}-wordcounter {
+:root {
+    --#{$ns}-wordcounter-overload-color: var(--#{$ns}-color-danger);
+}
+
+.#{$ns}-wordcounter {
     pointer-events: none;
     display: inline-flex;
     gap: 0.15em;
@@ -16,8 +20,8 @@
     &--overload {
         opacity: 1;
 
-        .#{$namespace}-wordcounter-ct {
-            color: red;
+        .#{$ns}-wordcounter-ct {
+            color: var(--#{$ns}-wordcounter-overload-color);
         }
     }
 }

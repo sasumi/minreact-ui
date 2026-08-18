@@ -1,15 +1,4 @@
 import { Spinner } from "@/components/Spinner";
-import { useTranslation } from "react-i18next";
-
-export const PageLoading = () => {
-    const { t } = useTranslation("seo");
-    return (
-        <div className="page-loading">
-            <span className="icon icon-logo"></span>
-            <div>{t("seo:SITE_NAME")}</div>
-        </div>
-    );
-};
 
 export const DataLoading = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
     const className = ["loading", props.className].filter(Boolean).join(" ");

@@ -1,41 +1,45 @@
 @charset "UTF-8";
+@use "./../common.module.scss" as *;
 @use "./../mixins/misc.scss" as com;
 @use "./../mixins/icon.scss" as icon;
-@use "./../common.module.scss" as *;
 
-.#{$namespace}-dialog {
+:root {
+	--#{$ns}-dialog-inner-padding: 1em;
+	--#{$ns}-dialog-content-max-height: calc(100vh - 20em);
+	--#{$ns}-dialog-masker-background: rgba(0, 0, 0, 0.4);
+}
+
+.#{$ns}-dialog {
 	@include com.panel();
 	--max-height: calc(100vh - 2em);
-	--content-max-height: calc(var(--max-height) - 8em);
-	--inner-padding: .75em;
 	max-width: calc(100vw - 1em); //预留一些缝隙
 	position: fixed;
-	z-index: var(--dialog-z-index);
+	z-index: var(--#{$ns}-dialog-zindex);
 	margin: auto;
 	inset: 0;
 	border: none;
 	padding: 0;
 
-	.#{$namespace}-dialog-title {
+	.#{$ns}-dialog-title {
 		opacity: 0.8;
 		line-height: 1;
-		padding: var(--inner-padding) 0 0 var(--inner-padding);
+		padding: var(--#{$ns}-dialog-inner-padding) 0 0 var(--#{$ns}-dialog-inner-padding);
 	}
 
-	.#{$namespace}-dialog-content {
+	.#{$ns}-dialog-content {
 		padding: 1em;
 		overflow: auto;
 		max-width: calc(100vw - 2em);
-		max-height: var(--content-max-height);
+		max-height: var(--#{$ns}-dialog-content-max-height);
 	}
 
-	.#{$namespace}-dialog-close-btn {
+	.#{$ns}-dialog-close-btn {
 		font-size: 1em;
 		width: 1em;
 		height: 1em;
 		position: absolute;
-		right: var(--inner-padding);
-		top: var(--inner-padding);
+		right: var(--#{$ns}-dialog-inner-padding);
+		top: var(--#{$ns}-dialog-inner-padding);
 		z-index: 1;
 		@include icon.icon-button;
 
@@ -44,24 +48,21 @@
 		}
 	}
 
-	.#{$namespace}-dialog-buttons {
+	.#{$ns}-dialog-buttons {
 		display: flex;
-		padding: var(--inner-padding);
-		gap: var(--gap, var(--inner-padding));
-		justify-content: var(--align, "right");
+		padding: var(--#{$ns}-dialog-inner-padding);
+		gap: var(--gap, var(--#{$ns}-dialog-inner-padding));
+		justify-content: var(--align, var(--#{$ns}-dialog-inner-padding));
 	}
 
-	.form-portrait .#{$namespace}-dialog-buttons {
+	.form-portrait .#{$ns}-dialog-buttons {
 		padding: 0;
 	}
 
 	&::backdrop {
-		background-color: rgba(0, 0, 0, 0.5);
-		/* 半透明黑色背景 */
+		background-color: var(--#{$ns}-dialog-masker-background);
 		box-shadow: 1px 1px 10px #ccc;
-		/* 添加阴影 */
 		backdrop-filter: blur(3px);
-		/* 添加模糊效果 */
 	}
 
 	&-alert,
@@ -70,21 +71,19 @@
 		min-width: 15em;
 		max-width: min(30em, calc(100vw - 2em));
 
-		.#{$namespace}-dialog-content {
-			padding: .5em var(--inner-padding);
+		.#{$ns}-dialog-content {
+			padding: .5em var(--#{$ns}-dialog-inner-padding);
 			max-height: calc(100vh - 20em);
 			overflow: auto;
 		}
-
-		.#{$namespace}-dialog-title {}
 	}
 
 	&-prompt {
-		.#{$namespace}-dialog-content {
-			padding: 1em var(--inner-padding);
+		.#{$ns}-dialog-content {
+			padding: 1em var(--#{$ns}-dialog-inner-padding);
 		}
 
-		.#{$namespace}-dialog-title {
+		.#{$ns}-dialog-title {
 			padding-top: 1.5em;
 			font-size: 1em;
 		}
@@ -99,7 +98,7 @@
 	}
 
 	&-iframe {
-		.#{$namespace}-dialog-content {
+		.#{$ns}-dialog-content {
 			padding: 0 !important;
 		}
 
@@ -109,12 +108,12 @@
 			height: var(--init-height, var(--content-height, var(--default-height, 10em)));
 			border: none;
 			max-width: 100vw;
-			max-height: var(--content-max-height);
+			max-height: var(--#{$ns}-dialog-content-max-height);
 		}
 	}
 
 	&-iframe-loading {
-		.#{$namespace}-dialog-content {
+		.#{$ns}-dialog-content {
 			background: url("/assets/loading.gif") no-repeat center center;
 		}
 
@@ -124,7 +123,7 @@
 	}
 
 	&-img-preview {
-		.#{$namespace}-dialog-content {
+		.#{$ns}-dialog-content {
 			padding: 0;
 
 			img {
@@ -136,8 +135,8 @@
 			}
 		}
 
-		.#{$namespace}-dialog-close-btn {
-			background-color: var(--color-background);
+		.#{$ns}-dialog-close-btn {
+			background-color: var(--#{$ns}-color-background);
 			border-radius: 50%;
 			width: 2.5em;
 			height: 2.5em;
@@ -155,7 +154,7 @@
 	}
 
 	&-progress {
-		.#{$namespace}-dialog-content {
+		.#{$ns}-dialog-content {
 			padding: 1.5em;
 		}
 
@@ -179,22 +178,22 @@
 	}
 }
 
-.#{$namespace}-dialog-wrap {
-	.#{$namespace}-dialog-masker {
+.#{$ns}-dialog-wrap {
+	.#{$ns}-dialog-masker {
 		position: absolute;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.4);
+		background: var(--#{$ns}-dialog-masker-background);
 		backdrop-filter: blur(3px);
-		z-index: var(--dialog-z-index)
+		z-index: var(--#{$ns}-dialog-zindex);
 	}
 
 	&[data-modal="false"] {
-		.#{$namespace}-dialog-masker {
+		.#{$ns}-dialog-masker {
 			display: none;
 		}
 
-		.#{$namespace}-dialog {
-			border: 1px solid var(--color-element-border);
+		.#{$ns}-dialog {
+			border: 1px solid var(--#{$ns}-color-element-border);
 		}
 	}
 }

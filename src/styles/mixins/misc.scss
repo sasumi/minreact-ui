@@ -1,11 +1,11 @@
 @charset "UTF-8";
+@use "./../common.module.scss" as *;
 
 @mixin panel {
-	border-radius: var(--panel-radius);
-	box-shadow: var(--panel-shadow);
+	border-radius: var(--#{$ns}-panel-radius);
+	box-shadow: var(--#{$ns}-panel-shadow);
 	background-color: var(--color-background);
 	border: 1px solid var(--color-element-border);
-	color: var(--color);
 }
 
 @mixin disabled {

@@ -5,19 +5,19 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    line-height: 1;
 
     &:before {
         background-repeat: no-repeat;
         background-position: center;
         background-size: contain;
-        font-family: '#{namespace}-icon';
+        font-family: var(--#{$ns}-font-icon);
         font-size: 1.25em;
         font-style: normal;
         font-weight: normal;
         text-decoration: inherit;
         text-align: center;
         text-transform: none;
-        line-height: 1em;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }

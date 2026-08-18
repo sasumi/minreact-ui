@@ -2,7 +2,7 @@
 @use "@/styles/common.module.scss" as *;
 @use "@/styles/mixins/icon.scss" as icon;
 
-.#{$namespace}-pagination {
+.#{$ns}-pagination {
     display: flex;
     gap: 0.5em;
     align-items: center;

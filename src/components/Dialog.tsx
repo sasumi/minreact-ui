@@ -1,13 +1,12 @@
 import { NormalButton, SpanButton } from "@/components/Button";
 import "@/styles/common.module.scss";
-import { namespace } from "@/styles/namespace";
 import "@/styles/components/dialog.scss";
-import { focusFirstElement, makeElement, mountReactNode, prettyTimeDuration } from "@/utils.tsx";
+import { namespace } from "@/styles/namespace";
+import { focusFirstElement, makeElement, mountReactNode } from "@/utils.tsx";
 import { bindClick, bindNodeMove, calcRemainingMSecs, findOne, lockElementInteraction } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { useTranslation } from "react-i18next";
 
 const CSS_NS = namespace;
 const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;
@@ -416,6 +415,20 @@ export const prompt = ({
     });
 };
 
+interface ProgressDialogProps {
+    title: string;
+    message?: string;
+    canAbort?: boolean;
+    remainTimesText?: string;
+    autoClose?: boolean;
+}
+
+interface ProgressDialogRet {
+    updater: (p: number, totalValue?: number) => void;
+    isAborted: () => boolean;
+    close: () => void;
+}
+
 /**
  * 显示进度对话框
  */
@@ -423,21 +436,9 @@ export const showProgressDialog = ({
     title,
     message,
     canAbort = true,
-    abortText = "",
-    onAbort = null,
     autoClose = true,
-}: {
-    title: string;
-    message?: string;
-    canAbort?: boolean;
-    abortText?: string;
-    onAbort?: (() => void) | null;
-    autoClose?: boolean;
-}): {
-    update: (p: number, totalValue?: number) => void;
-    isAborted: () => boolean;
-    close: () => void;
-} => {
+    remainTimesText = "剩余时间 {timeStr}",
+}: ProgressDialogProps): ProgressDialogRet => {
     let closer: (() => void) | null = null;
     const apiRef = {
         updater: null as ((p: number, totalValue?: number) => void) | null,
@@ -445,7 +446,6 @@ export const showProgressDialog = ({
     };
 
     const ProgressDialog = () => {
-        const { t } = useTranslation(["common"]);
         const [aborted, setAborted] = useState(false);
         const abortControllerRef = useRef(new AbortController());
         const [progressValue, setProgressValue] = useState(0);
@@ -468,7 +468,6 @@ export const showProgressDialog = ({
         useEffect(() => {
             apiRef.updater = updater;
             apiRef.isAborted = isAborted;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, []);
 
         useEffect(() => {
@@ -478,7 +477,7 @@ export const showProgressDialog = ({
         }, [progressValue, totalValue]);
 
         const remainSecs = Math.floor(calcRemainingMSecs(progressValue, totalValue, startTime) / 1000);
-        const remainSecsStr = remainSecs === Infinity ? "" : t("common:remainTimes", { timeStr: prettyTimeDuration(remainSecs) });
+        const remainSecsStr = remainSecs === Infinity ? "" : remainTimesText;
 
         return (
             <Dialog
@@ -509,7 +508,7 @@ export const showProgressDialog = ({
     closer = showDialogComponent(ProgressDialog);
 
     return {
-        update: (p, totalValue) => apiRef.updater?.(p, totalValue),
+        updater: (p, totalValue) => apiRef.updater?.(p, totalValue),
         isAborted: () => apiRef.isAborted?.() ?? false,
         close: () => closer?.(),
     };
@@ -587,7 +586,7 @@ export const confirm = ({
  */
 export const alert = (
     title = "",
-    message: ReactNode = "",
+    message?: ReactNode,
     {
         closeButtonTitle = "确定",
         width = DIALOG_SIZE_SMALL,

@@ -3,17 +3,22 @@
 @use "./../mixins/animate.scss" as *;
 @use "./../common.module.scss" as *;
 
-.#{$namespace}-popover-content-wrap {
+:root {
+	--#{$ns}-popover-arrow-size: 0.5em;
+	--#{$ns}-popover-zindex: calc(var(--#{$ns}-dialog-zindex) + 1);
+}
+
+.#{$ns}-popover-content-wrap {
 	animation-duration: 0.6s;
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 	filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.2));
-	z-index: var(--dialog-z-index) !important;
-	--popover-background-color: var(--color-background-lite);
+	z-index: var(--#{$ns}-popover-zindex) !important;
+	--popover-background-color: var(--#{$ns}-color-background);
 
-	.#{$namespace}-popover-content {
+	.#{$ns}-popover-content {
 		background-color: var(--popover-background-color);
-		border-radius: var(--element-radius);
-		clip-path: inset(0 round var(--element-radius));
+		border-radius: var(--#{$ns}-element-radius);
+		clip-path: inset(0 round var(--#{$ns}-element-radius));
 		max-width: min(30em, 100vw);
 		width: max-content; // 避免被父容器收缩，仍受 max-width 限制
 		text-align: left;
@@ -30,28 +35,28 @@
 	}
 
 	&[data-side="bottom"] {
-		.#{$namespace}-popover-arrow {
+		.#{$ns}-popover-arrow {
 			margin-top: -1px;
 		}
 
 		animation-name: slideDown;
 	}
 
-	.#{$namespace}-popover-arrow polygon {
+	.#{$ns}-popover-arrow polygon {
 		fill: var(--popover-background-color);
 	}
 }
 
 // Tip 提示组件
-.#{$namespace}-tip-content-wrap {
+.#{$ns}-tip-content-wrap {
 	animation-duration: 0.3s;
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 	filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
 	z-index: 9999;
 
-	.#{$namespace}-tip-content {
-		background-color: var(--color-background-secondary);
-		color: var(--color-background);
+	.#{$ns}-tip-content {
+		background-color: var(--#{$ns}-color-background);
+		color: var(--#{$ns}-color-background);
 		border-radius: 4px;
 		padding: 0.4em 0.7em;
 		font-size: 0.85em;
