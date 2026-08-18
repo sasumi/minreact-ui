@@ -25,10 +25,30 @@ export default defineConfig({
         },
         rollupOptions: {
             // 确保外部化处理那些你不想打包进库的依赖
-            external: [],
+            external: [
+                "react",
+                "react-dom",
+                "react/jsx-runtime",
+                "react/jsx-dev-runtime",
+                "@radix-ui/react-popover",
+                "i18next",
+                "react-i18next",
+                "react-toastify",
+                "minutool",
+            ],
             output: {
                 // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
-                globals: {},
+                globals: {
+                    react: "React",
+                    "react-dom": "ReactDOM",
+                    "react/jsx-runtime": "ReactJSXRuntime",
+                    "react/jsx-dev-runtime": "ReactJSXDevRuntime",
+                    "@radix-ui/react-popover": "ReactPopover",
+                    i18next: "i18next",
+                    "react-i18next": "ReactI18next",
+                    "react-toastify": "ReactToastify",
+                    minutool: "minutool",
+                },
             },
         },
     },

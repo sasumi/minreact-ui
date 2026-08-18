@@ -17,12 +17,6 @@ importers:
       minutool:
         specifier: ^1.0.21
         version: 1.0.21
-      react:
-        specifier: ^19.2.7
-        version: 19.2.8
-      react-dom:
-        specifier: ^19.2.7
-        version: 19.2.8(react@19.2.8)
       react-i18next:
         specifier: ^17.0.11
         version: 17.0.11(i18next@26.3.6(typescript@6.0.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@6.0.3)
@@ -60,6 +54,12 @@ importers:
       globals:
         specifier: ^17.7.0
         version: 17.8.0
+      react:
+        specifier: ^19.2.7
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.2.7
+        version: 19.2.8(react@19.2.8)
       typescript:
         specifier: ~6.0.2
         version: 6.0.3

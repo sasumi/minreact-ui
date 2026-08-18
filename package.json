@@ -34,17 +34,21 @@
         "@radix-ui/react-popover": "^1.1.23",
         "i18next": "^26.3.6",
         "minutool": "^1.0.21",
-        "react": "^19.2.7",
-        "react-dom": "^19.2.7",
         "react-i18next": "^17.0.11",
         "react-toastify": "^11.1.0",
         "sass-embedded": "^1.100.0"
+    },
+    "peerDependencies": {
+        "react": ">=19.0.0",
+        "react-dom": ">=19.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/node": "^24.13.2",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
         "@vitejs/plugin-react": "^6.0.3",
         "eslint": "^10.6.0",
         "eslint-plugin-react-hooks": "^7.1.1",
