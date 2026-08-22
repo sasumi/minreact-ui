@@ -18,7 +18,7 @@ export interface MenuItemData {
     children?: React.ReactNode;
 }
 
-export interface MenuDivider { 
+export interface MenuDivider {
     type: typeof ENTRY_TYPE_DIVIDER;
     key?: string;
 }
