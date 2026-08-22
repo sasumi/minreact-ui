@@ -4,7 +4,7 @@
 @mixin panel {
 	border-radius: var(--#{$ns}-panel-radius);
 	box-shadow: var(--#{$ns}-panel-shadow);
-	background-color: var(--#{$ns}-color-background);
+	background-color: var(--#{$ns}-color-background); //需要主动加上背景色，避免类似菜单等组件在暗黑模式下没有背景色，导致看不清的问题
 	border: 1px solid var(--#{$ns}-color-element-border);
 }
 

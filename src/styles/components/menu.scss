@@ -1,0 +1,70 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
+
+:root {
+	--#{$ns}-menu-max-height: 20em;
+}
+
+.#{$ns}-menu {
+	@include com.panel();
+	overflow: auto;
+	padding: .5em 0;
+	max-height: var(--#{$ns}-menu-max-height);
+	max-width: fit-content;
+}
+
+.#{$ns}-menu-divider {
+	border-top: 1px solid;
+	margin: .25em .5em;
+	opacity: 0.15;
+}
+
+.#{$ns}-menu-item {
+	padding: 0.15em 1em;
+	display: flex;
+	gap: 0.35em;
+
+	&[aria-disabled="true"] {
+		opacity: 0.3;
+	}
+
+	&-icon {
+		@include icon.icon;
+		width: 1.15em;
+		margin-left: -0.35em;
+		overflow: hidden;
+
+		&-checked::before {
+			zoom: 0.8;
+			content: "\e61e";
+		}
+	}
+
+	&:hover {
+		background-color: var(--#{$ns}-color-background-hover);
+	}
+}
+
+.#{$ns}-dropdown-menu {
+	overflow: auto;
+	padding: .5em 0;
+	max-height: var(--#{$ns}-menu-max-height);
+}
+
+.#{$ns}-combobox-menu-wrap {
+	.#{$ns}-combobox-menu-search {
+		padding: 0.5em .5em;
+		margin: 0.5em;
+		border-width: 0 0 1px 0;
+		outline: none;
+		// background-color: var(--#{$ns}-color-background-hover);
+	}
+
+	.#{$ns}-combobox-menu {
+		overflow: auto;
+		padding: 0 0 .5em 0;
+		max-height: var(--#{$ns}-menu-max-height);
+	}
+}

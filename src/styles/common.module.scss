@@ -4,9 +4,9 @@
 
 @font-face {
 	font-family: '#{$ns}-icon';
-	src: url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff2?t=1785839311028') format('woff2'),
-		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.woff?t=1785839311028') format('woff'),
-		url('//at.alicdn.com/t/c/font_5219456_yyz4mkk4q17.ttf?t=1785839311028') format('truetype');
+	src: url('//at.alicdn.com/t/c/font_5219456_4eq6tnu9xsc.woff2?t=1787376100513') format('woff2'),
+		url('//at.alicdn.com/t/c/font_5219456_4eq6tnu9xsc.woff?t=1787376100513') format('woff'),
+		url('//at.alicdn.com/t/c/font_5219456_4eq6tnu9xsc.ttf?t=1787376100513') format('truetype');
 }
 
 :root {
@@ -15,6 +15,8 @@
 
 	--#{$ns}-color-background: #fff;
 	--#{$ns}-color-background: canvas;
+
+	--#{$ns}-color-background-hover: #f5f5f5;
 
 	--#{$ns}-color-danger: #ef4444;
 	--#{$ns}-color-warning: #f59e0b;
