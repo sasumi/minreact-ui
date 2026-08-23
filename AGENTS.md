@@ -2,7 +2,7 @@
 
 ## Project Scope
 
-- `minuui` is a small Vite 8 + React 19 + TypeScript 6 UI codebase.
+- `minreactui` is a small Vite 8 + React 19 + TypeScript 6 UI codebase.
 - Prefer the code and config files over [README.md](README.md); the README is still the default Vite template and is not project-specific.
 - Use `pnpm` for dependency and script commands.
 

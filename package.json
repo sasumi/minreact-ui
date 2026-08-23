@@ -3,16 +3,16 @@
     "private": false,
     "version": "0.0.4",
     "type": "module",
-    "main": "./dist/minuui.umd.cjs",
-    "module": "./dist/minuui.js",
+    "main": "./dist/minreactui.umd.cjs",
+    "module": "./dist/minreactui.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/minuui.js",
-            "require": "./dist/minuui.umd.cjs"
+            "import": "./dist/minreactui.js",
+            "require": "./dist/minreactui.umd.cjs"
         },
-        "./dist/minuui.css": "./dist/minuui.css"
+        "./dist/minreactui.css": "./dist/minreactui.css"
     },
     "files": [
         "dist"

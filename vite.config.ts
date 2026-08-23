@@ -15,12 +15,12 @@ export default defineConfig({
         sourcemap: true,
         lib: {
             entry: resolve(__dirname, "src/index.ts"),
-            name: "minuui",
+            name: "minreactui",
             formats: ["es", "umd"],
             fileName: (format) => {
-                if (format === "es") return "minuui.js";
-                if (format === "umd") return "minuui.umd.cjs";
-                return `minuui.${format}.js`;
+                if (format === "es") return "minreactui.js";
+                if (format === "umd") return "minreactui.umd.cjs";
+                return `minreactui.${format}.js`;
             },
         },
         rollupOptions: {

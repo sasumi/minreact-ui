@@ -75,7 +75,7 @@ function DemoApp() {
         return (
             <div className="container">
                 <header>
-                    <h1>minuui 组件演示</h1>
+                    <h1>minreactui 组件演示</h1>
                     <p className="description">基于 Vite 8 + React 19 + TypeScript 6 的 UI 组件库</p>
                 </header>
                 <div className="components-grid">
@@ -119,7 +119,7 @@ function DemoApp() {
         <div className="demo-app">
             <aside className="demo-sidebar">
                 <div className="demo-header">
-                    <h1>minuui</h1>
+                    <h1>minreactui</h1>
                     <p className="demo-subtitle">组件演示</p>
                 </div>
                 <nav className="demo-nav">
