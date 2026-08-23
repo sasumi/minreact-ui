@@ -42,6 +42,11 @@
 		}
 	}
 
+	&-content {
+		flex: 1;
+		user-select: none;
+	}
+
 	&:hover {
 		background-color: var(--#{$ns}-color-background-hover);
 	}

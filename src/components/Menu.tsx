@@ -41,7 +41,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                     return index !== 0 && items[index - 1].type !== ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
                 } else {
                     return (
-                        <MenuItem 
+                        <MenuItem
                             key={item.value}
                             {...item}
                             checked={showChecker ? item.value === val : item.checked}
@@ -86,6 +86,7 @@ export const DropdownMenu = ({
     trigger,
     items,
     value,
+    disabled,
     onChange,
     showChecker,
     hideOnClick = true,
@@ -93,6 +94,7 @@ export const DropdownMenu = ({
     trigger: React.ReactNode;
     items: MenuEntry[];
     value?: string;
+    disabled?: boolean;
     showChecker?: boolean;
     hideOnClick?: boolean;
     onChange?: (val: string) => void;
@@ -100,7 +102,7 @@ export const DropdownMenu = ({
     const [open, setOpen] = useState(false);
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <Popover.Trigger className={namespace + "-dropdown-menu-trigger"}>{trigger}</Popover.Trigger>
+            <Popover.Trigger className={namespace + "-dropdown-menu-trigger"} aria-disabled={disabled}>{trigger}</Popover.Trigger>
             <Popover.Content className={namespace + "-dropdown-menu-content"}>
                 <MenuImpl
                     items={items}
@@ -123,6 +125,7 @@ export const ComboboxMenu = ({
     trigger,
     items,
     value,
+    disabled,
     showChecker = true,
     hideOnClick = true,
     onChange,
@@ -130,6 +133,7 @@ export const ComboboxMenu = ({
     trigger: React.ReactNode;
     items: MenuEntry[];
     value?: string;
+    disabled?: boolean;
     showChecker?: boolean;
     onChange?: (val: string) => void;
     hideOnClick?: boolean;
@@ -147,7 +151,7 @@ export const ComboboxMenu = ({
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <Popover.Trigger className={namespace + "-combobox-menu-trigger"}>{trigger}</Popover.Trigger>
+            <Popover.Trigger className={namespace + "-combobox-menu-trigger"} aria-disabled={disabled}>{trigger}</Popover.Trigger>
             <Popover.Content className={namespace + "-combobox-menu-content"}>
                 <div className={namespace + "-combobox-menu-wrap"}>
                     <input type="search" className={namespace + "-combobox-menu-search"} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
