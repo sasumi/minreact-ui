@@ -33,6 +33,19 @@ export {
   Dialog
 } from './components/Dialog'
 
+// Menu utilities
+export type {
+  MenuDivider,
+  MenuItemData
+} from './components/Menu'
+export {
+  ComboboxMenu,
+  DropdownMenu,
+  ENTRY_TYPE_DIVIDER,
+  ENTRY_TYPE_ITEM,
+  Menu
+} from './components/Menu'
+
 // Novice utilities
 export { default as Novice } from './components/Novice'
 

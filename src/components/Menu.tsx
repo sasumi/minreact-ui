@@ -2,7 +2,6 @@ import "@/styles/common.module.scss";
 import "@/styles/components/menu.scss";
 import { namespace } from "@/styles/namespace";
 import { Popover } from "./Popover";
-import { AnyButton } from "./Button";
 import { useState } from "react";
 
 export const ENTRY_TYPE_DIVIDER = "divider";
@@ -42,7 +41,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                     return index !== 0 && items[index - 1].type !== ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
                 } else {
                     return (
-                        <MenuItem
+                        <MenuItem 
                             key={item.value}
                             {...item}
                             checked={showChecker ? item.value === val : item.checked}
@@ -69,17 +68,17 @@ const MenuItemIcon = ({ className }: { className?: string }) => {
 
 const MenuItem = ({ value, disabled, title, checked = null, children, onClick }: MenuItemData & { onClick?: () => void }) => {
     return (
-        <AnyButton
-            tag="div"
+        <div
             className={namespace + "-menu-item"}
             key={value}
             title={title || (typeof children === "string" ? (children as string) : undefined)}
             aria-disabled={disabled}
             onClick={onClick}
+            tabIndex={disabled ? -1 : 0}
         >
             {checked !== null && <MenuItemIcon className={checked ? namespace + "-menu-item-icon-checked" : ""} />}
             <span className={namespace + "-menu-item-content"}>{children || title}</span>
-        </AnyButton>
+        </div>
     );
 };
 
