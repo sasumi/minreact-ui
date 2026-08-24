@@ -1,6 +1,6 @@
-import "@/styles/common.module.scss";
-import "@/styles/components/menu.scss";
-import { namespace } from "@/styles/namespace";
+import "./../styles/common.module.scss";
+import "./../styles/components/menu.scss";
+import { namespace } from "./../styles/namespace";
 import { Popover } from "./Popover";
 import { useState } from "react";
 

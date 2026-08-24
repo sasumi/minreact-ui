@@ -1,10 +1,10 @@
-import { SpanButton } from "@/components/Button";
-import "@/styles/common.module.scss";
-import "@/styles/components/novice.scss";
+import { SpanButton } from ".//Button";
+import "./../styles/common.module.scss";
+import "./../styles/components/novice.scss";
 import { ReactNode, useEffect, useState } from "react";
 import { Popover } from "./Popover";
 
-import { namespace } from "@/styles/namespace";
+import { namespace } from "./../styles/namespace";
 import { findOne } from "minutool";
 const CSS_NS = namespace + "-novice";
 

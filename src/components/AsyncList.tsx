@@ -1,4 +1,4 @@
-import { DataEmpty, DataLoading, RequestError } from "@/modules/StateWidget";
+import { DataEmpty, DataLoading, RequestError } from "./../modules/StateWidget";
 import type { AbortablePromise } from "minutool";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";

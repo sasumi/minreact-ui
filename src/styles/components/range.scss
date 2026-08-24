@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@use "@/styles/common.module.scss" as *;
+@use "./../common.module.scss" as *;
 
 :root {
 	--#{$ns}-thumb-size: 18px;

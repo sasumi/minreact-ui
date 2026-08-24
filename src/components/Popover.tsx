@@ -1,7 +1,7 @@
-import "@/styles/components/popover.scss";
+import "./../styles/components/popover.scss";
 import * as ReactPopover from "@radix-ui/react-popover";
-import "@/styles/common.module.scss";
-import { namespace } from "@/styles/namespace";
+import "./../styles/common.module.scss";
+import { namespace } from "./../styles/namespace";
 import { createContext, forwardRef, useContext, useRef, useState, useEffect } from "react";
 import { AnyButton, SpanButton } from "./Button";
 

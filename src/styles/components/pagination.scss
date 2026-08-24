@@ -1,6 +1,6 @@
 @charset "UTF-8";
-@use "@/styles/common.module.scss" as *;
-@use "@/styles/mixins/icon.scss" as icon;
+@use "./../common.module.scss" as *;
+@use "./../mixins/icon.scss" as icon;
 
 .#{$ns}-pagination {
     display: flex;

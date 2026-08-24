@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { SpanButton } from "@/components/Button";
-import "@/styles/components/pagination.scss";
-import { textTranslate } from "@/utils.tsx";
-import "@/styles/common.module.scss";
-import { namespace } from "@/styles/namespace";
+import { SpanButton } from "./Button";
+import "./../styles/components/pagination.scss";
+import { textTranslate } from "./../utils.tsx";
+import "./../styles/common.module.scss";
+import { namespace } from "./../styles/namespace";
 const CSS_NS = namespace + "-pagination";
 
 interface PaginationProps {

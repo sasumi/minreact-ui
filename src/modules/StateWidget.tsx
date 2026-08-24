@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "./../components/Spinner";
 
 export const DataLoading = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
     const className = ["loading", props.className].filter(Boolean).join(" ");

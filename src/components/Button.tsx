@@ -1,4 +1,4 @@
-import "@/styles/common.module.scss";
+import "./../styles/common.module.scss";
 import { lockElementInteraction } from "minutool";
 import { memo, useState } from "react";
 import { Spinner } from "./Spinner";

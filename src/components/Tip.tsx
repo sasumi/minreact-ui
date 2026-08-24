@@ -1,8 +1,8 @@
 import { forwardRef, useRef } from "react";
 import * as ReactPopover from "@radix-ui/react-popover";
-import "@/styles/components/popover.scss";
-import "@/styles/common.module.scss";
-import { namespace } from "@/styles/namespace";
+import "./../styles/components/popover.scss";
+import "./../styles/common.module.scss";
+import { namespace } from "./../styles/namespace";
 
 const CSS_NS = namespace;
 

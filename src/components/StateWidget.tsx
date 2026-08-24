@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from ".//Spinner";
 
 /**
  * DataLoading 数据加载中提示组件

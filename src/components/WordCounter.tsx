@@ -1,6 +1,6 @@
-import "@/styles/common.module.scss";
-import "@/styles/components/wordcounter.scss";
-import { namespace } from "@/styles/namespace";
+import "./../styles/common.module.scss";
+import "./../styles/components/wordcounter.scss";
+import { namespace } from "./../styles/namespace";
 import { bindDomEvent } from "minutool";
 import { useEffect, useState } from "react";
 
