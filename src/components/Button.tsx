@@ -2,7 +2,7 @@ import "./../styles/common.module.scss";
 import { lockElementInteraction } from "minutool";
 import { memo, useState } from "react";
 import { Spinner } from "./Spinner";
-import { textTranslate } from "@/utils";
+import { textTranslate } from "./../utils";
 
 const BUTTON_DEBOUNCE_TIME = 200;
 
