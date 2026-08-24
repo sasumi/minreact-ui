@@ -94,6 +94,14 @@ export {
 // WordCounter utilities
 export { default as WordCounter } from './components/WordCounter'
 
+// UseCookie utilities
+export type {
+  CookieOptions
+} from './hooks/useCookie'
+export {
+  useCookie
+} from './hooks/useCookie'
+
 // UseCountdown utilities
 export {
   useCountdown
@@ -108,6 +116,11 @@ export {
 export {
   usePortrait
 } from './hooks/usePortrait'
+
+// UserLocalStorage utilities
+export {
+  useLocalStorage
+} from './hooks/userLocalStorage'
 
 // UseUpdateEffect utilities
 export {
