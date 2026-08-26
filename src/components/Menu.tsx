@@ -42,7 +42,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                 } else {
                     return (
                         <MenuItem
-                            key={item.value}
+                            key={index}
                             {...item}
                             checked={showChecker ? item.value === val : item.checked}
                             type={ENTRY_TYPE_ITEM}
