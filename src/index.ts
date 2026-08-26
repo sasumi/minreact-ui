@@ -20,6 +20,16 @@ export {
   SubmitButton
 } from './components/Button'
 
+// DatalistInput utilities
+export type {
+  DataListInputProps,
+  DataListOption
+} from './components/DatalistInput'
+export {
+  DataListInput,
+  HistoryInput
+} from './components/DatalistInput'
+
 // Dialog utilities
 export type {
   DialogProps

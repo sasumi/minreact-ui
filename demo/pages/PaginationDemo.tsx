@@ -1,4 +1,4 @@
-import { Pagination } from "@/components/Pagination";
+import { Pagination } from "../../src/components/Pagination";
 import { useState } from "react";
 
 function PaginationDemo() {

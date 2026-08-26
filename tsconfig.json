@@ -15,10 +15,6 @@
         "moduleDetection": "force",
         "noEmit": true,
 
-        /* 路径别名 */
-        "paths": {
-            "@/*": ["./src/*"]
-        }
     },
 
     "include": ["src", "demo", "vite.config.ts", "vite.config.js"],

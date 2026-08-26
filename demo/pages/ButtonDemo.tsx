@@ -1,4 +1,4 @@
-import { PrimaryButton, NormalButton, SpanButton, SubmitButton } from "@/components/Button";
+import { PrimaryButton, NormalButton, SpanButton, SubmitButton } from "../../src/components/Button";
 import { useState } from "react";
 
 function ButtonDemo() {

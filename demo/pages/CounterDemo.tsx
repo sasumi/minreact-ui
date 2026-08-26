@@ -1,4 +1,4 @@
-import WordCounter from "@/components/WordCounter";
+import WordCounter from "../../src/components/WordCounter";
 import { useState } from "react";
 
 function CounterDemo() {

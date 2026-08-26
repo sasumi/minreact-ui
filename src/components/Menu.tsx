@@ -47,6 +47,9 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                             checked={showChecker ? item.value === val : item.checked}
                             type={ENTRY_TYPE_ITEM}
                             onClick={() => {
+                                if (item.disabled) {
+                                    return;
+                                }
                                 setVal(item.value);
                                 onChange?.(item.value);
                             }}

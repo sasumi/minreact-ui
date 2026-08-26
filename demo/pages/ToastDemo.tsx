@@ -1,5 +1,5 @@
-import { Toast } from "@/components/Toast";
-import { PrimaryButton, NormalButton } from "@/components/Button";
+import { Toast } from "../../src/components/Toast";
+import { PrimaryButton, NormalButton } from "../../src/components/Button";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

@@ -1,4 +1,4 @@
-import { StepInput } from "@/components/StepInput";
+import { StepInput } from "../../src/components/StepInput";
 import { useState } from "react";
 
 function StepInputDemo() {

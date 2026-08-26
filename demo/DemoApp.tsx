@@ -9,6 +9,7 @@ import DialogDemo from "./pages/DialogDemo";
 import StepInputDemo from "./pages/StepInputDemo";
 import RangeInputDemo from "./pages/RangeInputDemo";
 import PaginationDemo from "./pages/PaginationDemo";
+import HistoryInputDemo from "./pages/HistoryInputDemo";
 import AsyncListDemo from "./pages/AsyncListDemo";
 import StateWidgetDemo from "./pages/StateWidgetDemo";
 import PopoverDemo from "./pages/PopoverDemo";
@@ -23,6 +24,7 @@ const components = [
     { name: "Dialog", label: "对话框", description: "可配置的模态对话框组件", component: DialogDemo, category: "交互组件" },
     { name: "StepInput", label: "步进输入", description: "带加减按钮的数字输入组件", component: StepInputDemo, category: "表单组件" },
     { name: "RangeInput", label: "范围输入", description: "滑块式范围选择器", component: RangeInputDemo, category: "表单组件" },
+    { name: "HistoryInput", label: "历史输入", description: "支持本地历史回填的输入框", component: HistoryInputDemo, category: "表单组件" },
     { name: "Pagination", label: "分页", description: "数据分页组件", component: PaginationDemo, category: "数据组件" },
     { name: "AsyncList", label: "异步列表", description: "支持分页的异步数据列表组件", component: AsyncListDemo, category: "数据组件" },
     { name: "Menu", label: "菜单", description: "菜单组件", component: MenuDemo, category: "交互组件" },

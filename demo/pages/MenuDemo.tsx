@@ -1,4 +1,4 @@
-import { ComboboxMenu, DropdownMenu, Menu, MenuDivider, MenuItemData } from "@/components/Menu";
+import { ComboboxMenu, DropdownMenu, Menu, MenuDivider, MenuItemData } from "../../src/components/Menu";
 import { useState } from "react";
 
 function MenuDemo() {

@@ -1,5 +1,5 @@
-import Novice from "@/components/Novice";
-import { PrimaryButton } from "@/components/Button";
+import Novice from "../../src/components/Novice";
+import { PrimaryButton } from "../../src/components/Button";
 import { useState, useRef } from "react";
 
 function NoviceDemo() {

@@ -1,5 +1,5 @@
-import { Popover } from "@/components/Popover";
-import { PrimaryButton, NormalButton } from "@/components/Button";
+import { Popover } from "../../src/components/Popover";
+import { PrimaryButton, NormalButton } from "../../src/components/Button";
 import { useState } from "react";
 
 function PopoverDemo() {

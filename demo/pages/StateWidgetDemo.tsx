@@ -1,4 +1,4 @@
-import { DataLoading, DataEmpty, RequestError } from "@/components/StateWidget";
+import { DataLoading, DataEmpty, RequestError } from "../../src/components/StateWidget";
 
 function StateWidgetDemo() {
   return (

@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "../../src/components/Spinner";
 
 function SpinnerDemo() {
   return (
