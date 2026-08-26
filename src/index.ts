@@ -36,7 +36,9 @@ export {
 // Menu utilities
 export type {
   MenuDivider,
-  MenuItemData
+  MenuEntry,
+  MenuItemData,
+  MenuProps
 } from './components/Menu'
 export {
   ComboboxMenu,
