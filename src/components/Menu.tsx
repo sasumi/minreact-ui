@@ -30,12 +30,13 @@ export interface MenuProps {
     onChange?: (value: string) => void;
     showChecker?: boolean;
     _className?: string; //默认类名，可以覆盖
+    className?: string; //额外自定义类名
 }
 
-const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu", onChange }: MenuProps) => {
+const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu", className, onChange }: MenuProps) => {
     const [val, setVal] = useState(value);
     return (
-        <div className={_className}>
+        <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
                 if (item.type === ENTRY_TYPE_DIVIDER) {
                     return index !== 0 && items[index - 1].type !== ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
@@ -105,7 +106,9 @@ export const DropdownMenu = ({
     const [open, setOpen] = useState(false);
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <Popover.Trigger className={namespace + "-dropdown-menu-trigger"} aria-disabled={disabled}>{trigger}</Popover.Trigger>
+            <Popover.Trigger className={namespace + "-dropdown-menu-trigger"} aria-disabled={disabled}>
+                {trigger}
+            </Popover.Trigger>
             <Popover.Content className={namespace + "-dropdown-menu-content"}>
                 <MenuImpl
                     items={items}
@@ -154,7 +157,9 @@ export const ComboboxMenu = ({
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <Popover.Trigger className={namespace + "-combobox-menu-trigger"} aria-disabled={disabled}>{trigger}</Popover.Trigger>
+            <Popover.Trigger className={namespace + "-combobox-menu-trigger"} aria-disabled={disabled}>
+                {trigger}
+            </Popover.Trigger>
             <Popover.Content className={namespace + "-combobox-menu-content"}>
                 <div className={namespace + "-combobox-menu-wrap"}>
                     <input type="search" className={namespace + "-combobox-menu-search"} value={searchText} onChange={(e) => setSearchText(e.target.value)} />

@@ -23,7 +23,8 @@ export {
 // DatalistInput utilities
 export type {
   DataListInputProps,
-  DataListOption
+  DataListOption,
+  HistoryInputHandle
 } from './components/DatalistInput'
 export {
   DataListInput,

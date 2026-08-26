@@ -46,7 +46,7 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
     onCloseBy?: (target: HTMLElement) => boolean;
 };
 
-const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, ...rest }, ref) => {
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, onOpenAutoFocus, ...rest }, ref) => {
     const triggerRef = useContext(PopoverTriggerRefContext);
     const wrapperClassName = useContext(PopoverWrapperClassContext);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -75,6 +75,16 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
             e.preventDefault();
         }
     };
+
+    const handleOpenAutoFocus = (event: Event) => {
+        // 默认不聚焦，避免 Popover 打开时抢走触发元素（如输入框）的焦点
+        if (onOpenAutoFocus) {
+            onOpenAutoFocus(event);
+            return;
+        }
+        event.preventDefault();
+    };
+
     return (
         <ReactPopover.Portal>
             <ReactPopover.Content
@@ -96,6 +106,7 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
                 className={CSS_NS + "-popover-content-wrap"}
                 onInteractOutside={handleDismiss}
                 onFocusOutside={handleDismiss}
+                onOpenAutoFocus={handleOpenAutoFocus}
                 {...rest}
             >
                 <div className={CSS_NS + "-popover-content" + (className ? " " + className : "")}>{children}</div>
