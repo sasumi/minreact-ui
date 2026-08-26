@@ -22,9 +22,9 @@ export interface MenuDivider {
     key?: string;
 }
 
-type MenuEntry = MenuItemData | MenuDivider;
+export type MenuEntry = MenuItemData | MenuDivider;
 
-interface MenuProps {
+export interface MenuProps {
     items: MenuEntry[];
     value?: string;
     onChange?: (value: string) => void;

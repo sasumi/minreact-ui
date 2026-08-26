@@ -1,5 +1,8 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
+/** 内存缓存，避免 useSyncExternalStore 频繁 JSON.parse 导致无意义的重渲染 */
+const cache = new Map<string, { raw: string | null; parsed: any }>();
+
 /** 定义事件发布/订阅器，用于在同一页面/标签页的不同组件间同步更新 */
 const dispatchStorageEvent = (key: string, newValue: string | null) => {
     window.dispatchEvent(
@@ -7,26 +10,18 @@ const dispatchStorageEvent = (key: string, newValue: string | null) => {
     );
 };
 
-/** 内存缓存，避免 useSyncExternalStore 频繁 JSON.parse 导致无意义的重渲染 */
-const cache = new Map<string, { raw: string | null; parsed: any }>();
-
 const getSnapshot = <T,>(key: string, initialValue: T): T => {
-    try {
-        const raw = window.localStorage.getItem(key);
-        if (raw === null) return initialValue;
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return initialValue;
 
-        const cached = cache.get(key);
-        if (cached && cached.raw === raw) {
-            return cached.parsed;
-        }
-
-        const parsed = JSON.parse(raw);
-        cache.set(key, { raw, parsed });
-        return parsed;
-    } catch (error) {
-        console.warn(`Error reading localStorage key "${key}":`, error);
-        return initialValue;
+    const cached = cache.get(key);
+    if (cached && cached.raw === raw) {
+        return cached.parsed;
     }
+
+    const parsed = JSON.parse(raw);
+    cache.set(key, { raw, parsed });
+    return parsed;
 };
 
 /**
@@ -68,24 +63,20 @@ export const useLocalStorage = <T>(
 
     const setValue = useCallback(
         (valueOrFn: T | ((prev: T) => T)) => {
-            try {
-                const currentSnapshot = getSnapshot(key, initialValue);
-                const nextValue =
-                    valueOrFn instanceof Function
-                        ? valueOrFn(currentSnapshot)
-                        : valueOrFn;
+            const currentSnapshot = getSnapshot(key, initialValue);
+            const nextValue =
+                valueOrFn instanceof Function
+                    ? valueOrFn(currentSnapshot)
+                    : valueOrFn;
 
-                const serialized = JSON.stringify(nextValue);
-                window.localStorage.setItem(key, serialized);
+            const serialized = JSON.stringify(nextValue);
+            window.localStorage.setItem(key, serialized);
 
-                // 清理/更新缓存
-                cache.set(key, { raw: serialized, parsed: nextValue });
+            // 清理/更新缓存
+            cache.set(key, { raw: serialized, parsed: nextValue });
 
-                // 通知同页面内使用相同 key 的其他 useLocalStorage 组件同步更新
-                dispatchStorageEvent(key, serialized);
-            } catch (error) {
-                console.warn(`Error setting localStorage key "${key}":`, error);
-            }
+            // 通知同页面内使用相同 key 的其他 useLocalStorage 组件同步更新
+            dispatchStorageEvent(key, serialized);
         },
         [key, initialValue]
     );
