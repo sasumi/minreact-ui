@@ -147,6 +147,7 @@ export {
 
 // Utils utilities
 export {
+  highlightText,
   mountReactNode,
   textTranslate
 } from './utils'

@@ -1,4 +1,4 @@
-import { HistoryInput } from "../../src/components/DatalistInput";
+import { DataListInput, HistoryInput } from "../../src/components/DatalistInput";
 import { useState } from "react";
 
 function HistoryInputDemo() {
@@ -9,6 +9,13 @@ function HistoryInputDemo() {
             <div className="demo-page-header">
                 <h2>HistoryInput 历史输入</h2>
                 <p>支持本地历史记录回填的输入框，适合搜索框和高频短文本场景</p>
+            </div>
+
+            <div className="demo-section">
+                <h3 className="demo-section-title">List用法</h3>
+                <div className="demo-example">
+                    <DataListInput options={["React", "Vite", "TypeScript"]} placeholder="试着输入几个关键词，比如 React、Vite、TypeScript" />
+                </div>
             </div>
 
             <div className="demo-section">
@@ -32,7 +39,7 @@ function HistoryInputDemo() {
                 <p className="demo-section-description">和外部状态联动时也能继续复用同一份历史记录</p>
                 <div className="demo-example">
                     <div style={{ display: "grid", gap: "0.75rem", maxWidth: "32rem" }}>
-                        <HistoryInput value={value} onChange={setValue} placeholder="输入并回车或失焦，历史会保持同步" />
+                        <HistoryInput value={value} placeholder="输入并回车或失焦，历史会保持同步" />
                         <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "1rem", padding: "0.9rem 1rem", color: "#334155" }}>
                             当前值：{value || "空"}
                         </div>

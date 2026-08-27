@@ -127,6 +127,16 @@ export const DropdownMenu = ({
     );
 };
 
+/**
+ * 组合框菜单组件，带搜索框
+ * @param trigger 触发器组件
+ * @param items 菜单项数组
+ * @param value 当前选中值
+ * @param disabled 是否禁用
+ * @param showChecker 是否显示选中标记
+ * @param onChange 选中值变化回调
+ * @param hideOnClick 点击选项后是否关闭菜单，默认 true
+ */
 export const ComboboxMenu = ({
     trigger,
     items,

@@ -13,6 +13,10 @@
 	padding: .5em 0;
 	max-height: var(--#{$ns}-menu-max-height);
 	max-width: fit-content;
+
+	@at-root .#{$ns}-popover-content:has(.#{$ns}-menu) {
+		background-color: transparent !important;
+	}
 }
 
 .#{$ns}-menu-divider {

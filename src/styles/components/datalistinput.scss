@@ -1,0 +1,11 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
+
+
+.#{$ns}-datalist {
+	&-input-matched {
+		color: var(--#{$ns}-color-hight);
+	}
+}

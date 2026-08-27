@@ -46,7 +46,13 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
     onCloseBy?: (target: HTMLElement) => boolean;
 };
 
-const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, onOpenAutoFocus, ...rest }, ref) => {
+/**
+ * PopoverContent 组件，作为 Popover 的内容容器，必须放在 Popover 内部
+ * 使用 forwardRef 转发 ref，并从 context 获取 trigger 的 DOM 元素 ref，用于判断点击是否在 trigger 内部
+ * 支持 onCloseBy 回调函数，返回 false 可阻止关闭
+ * 支持 onOpenAutoFocus 回调函数，默认阻止自动聚焦
+ */
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, align = "start", onOpenAutoFocus, ...rest }, ref) => {
     const triggerRef = useContext(PopoverTriggerRefContext);
     const wrapperClassName = useContext(PopoverWrapperClassContext);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -102,7 +108,7 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
                         }
                     }
                 }}
-                align="start"
+                align={align}
                 className={CSS_NS + "-popover-content-wrap"}
                 onInteractOutside={handleDismiss}
                 onFocusOutside={handleDismiss}
@@ -110,7 +116,7 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
                 {...rest}
             >
                 <div className={CSS_NS + "-popover-content" + (className ? " " + className : "")}>{children}</div>
-                <ReactPopover.Arrow className={CSS_NS + "-popover-arrow"} width={20} height={10} />
+                <ReactPopover.Arrow className={CSS_NS + "-popover-arrow"} width={20} height={10} offset={5}/>
             </ReactPopover.Content>
         </ReactPopover.Portal>
     );
@@ -131,7 +137,8 @@ export const Popover = Object.assign(
         Anchor: PopoverAnchor,
         Trigger: PopoverTrigger,
         Content: PopoverContent,
-    }
+        Arrow: ReactPopover.Arrow,
+    },
 );
 
 interface SelectProps {

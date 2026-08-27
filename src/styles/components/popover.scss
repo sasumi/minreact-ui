@@ -42,6 +42,13 @@
 		animation-name: slideDown;
 	}
 
+	// content上下布局+靠左时，箭头位置靠左，更符合用户预期
+	&[data-align="start"][data-side="top"]>span:has(.#{$ns}-popover-arrow),
+	&[data-align="start"][data-side="bottom"]>span:has(.#{$ns}-popover-arrow) {
+		left: 1em !important; //这里1em，如果target小于2em，可能偏后
+		visibility: visible !important; // 避免箭头被隐藏
+	}
+
 	.#{$ns}-popover-arrow polygon {
 		fill: var(--popover-background-color);
 	}
