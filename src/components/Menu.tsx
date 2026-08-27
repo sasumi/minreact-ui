@@ -144,6 +144,7 @@ export const ComboboxMenu = ({
     disabled,
     showChecker = true,
     hideOnClick = true,
+    placeholder = "搜索...",
     onChange,
 }: {
     trigger: React.ReactNode;
@@ -151,6 +152,7 @@ export const ComboboxMenu = ({
     value?: string;
     disabled?: boolean;
     showChecker?: boolean;
+    placeholder?: string;
     onChange?: (val: string) => void;
     hideOnClick?: boolean;
 }) => {
@@ -172,7 +174,13 @@ export const ComboboxMenu = ({
             </Popover.Trigger>
             <Popover.Content className={namespace + "-combobox-menu-content"}>
                 <div className={namespace + "-combobox-menu-wrap"}>
-                    <input type="search" className={namespace + "-combobox-menu-search"} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+                    <input
+                        type="search"
+                        className={namespace + "-combobox-menu-search"}
+                        placeholder={placeholder}
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
 
                     <MenuImpl
                         items={filteredItems}
