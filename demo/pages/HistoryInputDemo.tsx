@@ -14,7 +14,28 @@ function HistoryInputDemo() {
             <div className="demo-section">
                 <h3 className="demo-section-title">List用法</h3>
                 <div className="demo-example">
-                    <DataListInput options={["React", "Vite", "TypeScript"]} placeholder="试着输入几个关键词，比如 React、Vite、TypeScript" />
+                    <DataListInput
+                        options={[
+                            "React",
+                            "Vite",
+                            "TypeScript",
+                            "JavaScript",
+                            "Node.js",
+                            "Webpack",
+                            "Babel",
+                            "ESLint",
+                            "Prettier",
+                            "Jest",
+                            "Vitest",
+                            "Cypress",
+                            "Playwright",
+                            "Tailwind CSS",
+                            "Bootstrap",
+                            "Material UI",
+                            "Ant Design",
+                        ]}
+                        placeholder="试着输入几个关键词，比如 React、Vite、TypeScript"
+                    />
                 </div>
             </div>
 

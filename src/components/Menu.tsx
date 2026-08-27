@@ -8,13 +8,15 @@ export const ENTRY_TYPE_DIVIDER = "divider";
 export const ENTRY_TYPE_ITEM = "item";
 
 export interface MenuItemData {
-    type: typeof ENTRY_TYPE_ITEM;
-    value: string;
-    label: string;
-    disabled?: boolean;
-    title?: string;
-    checked?: boolean | null;
-    children?: React.ReactNode;
+    type: typeof ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
+    value: string; // 唯一标识值，通常用于选中和回调
+    label: string; // 显示文本，默认使用 value
+
+    disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中
+    title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
+    checked?: boolean | null; // null 表示不显示选中标记，true 显示选中，false 显示未选中
+    extension?: React.ReactNode; // 扩展内容，显示在右侧
+    onClick?: () => void; // 点击回调函数，点击菜单项时触发
 }
 
 export interface MenuDivider {
@@ -32,6 +34,35 @@ export interface MenuProps {
     _className?: string; //默认类名，可以覆盖
     className?: string; //额外自定义类名
 }
+
+/**
+ * 统一将数据转换为 MenuItemData 类型
+ * @param data 字符串、对象或 MenuItemData 类型
+ * @returns MenuItemData 类型
+ * @throws 如果数据类型无效，则抛出错误
+ */
+export const MenuItemDataConvert = (data: MenuItemData | object | string) => {
+    if (typeof data === "string") {
+        return {
+            type: ENTRY_TYPE_ITEM,
+            value: data,
+            label: data,
+        } as MenuItemData;
+    }
+    if (typeof data === "object" && "type" in data && data.type === ENTRY_TYPE_ITEM) {
+        return data as MenuItemData;
+    }
+    if (typeof data === "object") {
+        return {
+            type: ENTRY_TYPE_ITEM,
+            value: data?.value,
+            label: data?.label || data?.value,
+            title: data?.title || data?.label || data?.value,
+            ...data,
+        } as MenuItemData;
+    }
+    throw new Error("MenuItemDataConvert: invalid data type");
+};
 
 const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu", className, onChange }: MenuProps) => {
     const [val, setVal] = useState(value);
@@ -70,18 +101,20 @@ const MenuItemIcon = ({ className }: { className?: string }) => {
     return <span className={namespace + "-menu-item-icon" + (className ? " " + className : "")}></span>;
 };
 
-const MenuItem = ({ value, disabled, title, checked = null, children, onClick }: MenuItemData & { onClick?: () => void }) => {
+const MenuItem = (itemData: MenuItemData) => {
+    itemData = MenuItemDataConvert(itemData);
     return (
         <div
             className={namespace + "-menu-item"}
-            key={value}
-            title={title || (typeof children === "string" ? (children as string) : undefined)}
-            aria-disabled={disabled}
-            onClick={onClick}
-            tabIndex={disabled ? -1 : 0}
+            key={itemData.value}
+            title={itemData.title || itemData.label}
+            aria-disabled={itemData.disabled}
+            onClick={itemData.onClick}
+            tabIndex={itemData.disabled ? -1 : 0}
         >
-            {checked !== null && <MenuItemIcon className={checked ? namespace + "-menu-item-icon-checked" : ""} />}
-            <span className={namespace + "-menu-item-content"}>{children || title}</span>
+            {itemData.checked !== null && <MenuItemIcon className={itemData.checked ? namespace + "-menu-item-icon-checked" : ""} />}
+            <span className={namespace + "-menu-item-content"}>{itemData.label}</span>
+            {itemData.extension && <span className={namespace + "-menu-item-extension"}>{itemData.extension}</span>}
         </div>
     );
 };
