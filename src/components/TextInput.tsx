@@ -13,8 +13,9 @@ const MATCHED_CLASS = namespace + "-datalist-input-matched";
 /**
  * 支持历史记录的输入框组件，用户可以输入内容并从下拉列表中选择历史记录或匹配的选项。
  */
-export interface DataListInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onSelect"> {
     options: (string | MenuItemData)[];
+    onSelect?: (value: string) => void;
     value?: string;
     type?: "text" | "search";
 }
@@ -25,7 +26,7 @@ export interface DataListInputProps extends React.InputHTMLAttributes<HTMLInputE
  * @param value 受控输入值
  * @param inputProps 其他 input 属性
  */
-export const DataListInput: React.FC<DataListInputProps> = ({ options, value: controlledValue, ...inputProps }: DataListInputProps) => {
+export const DataListInput: React.FC<DataListInputProps> = ({ options, value: controlledValue, onSelect, ...inputProps }: DataListInputProps) => {
     const [val, setVal] = useState(controlledValue || "");
     const [isOpen, setIsOpen] = useState(false);
     const listboxId = useId();
@@ -98,6 +99,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
                     onChange={(val) => {
                         setVal(val);
                         setIsOpen(false);
+                        onSelect?.(val);
                     }}
                 />
             </Popover.Content>
@@ -115,11 +117,13 @@ export const HistoryInput = ({
     maxItems = 20,
     ref,
     storeKey,
+    onSelect,
     ...inputProps
 }: {
     storeKey: string;
     maxItems?: number;
     ref?: React.Ref<HistoryInputHandle>;
+    onSelect?: (value: string) => void;
 } & Omit<DataListInputProps, "options">) => {
     const isControlled = controlledValue !== undefined;
     const [histories, setHistories] = useLocalStorage<string[]>(storeKey, []);
@@ -175,6 +179,7 @@ export const HistoryInput = ({
                 setVal((e.target as HTMLInputElement).value);
                 inputProps.onInput?.(e);
             }}
+            onSelect={onSelect}
             options={menuEntries}
         />
     );

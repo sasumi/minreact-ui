@@ -3,8 +3,6 @@ import type { HistoryInputHandle } from "../../src/components/TextInput";
 import { useRef, useState } from "react";
 
 function HistoryInputDemo() {
-    const [value, setValue] = useState("");
-
     const hi1Ref = useRef<HistoryInputHandle>(null);
 
     return (
