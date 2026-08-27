@@ -38,8 +38,6 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
     const listboxId = useId();
     const inputRef = useRef<HTMLInputElement>(null);
 
-    inputProps.type = inputProps.type || "text";
-
     // 统一受控与非受控状态
     const currentValue = controlledValue !== undefined ? controlledValue : val;
 
@@ -81,9 +79,11 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
             <Popover.Trigger>
                 <input
                     ref={inputRef}
-                    {...inputProps}
+                    {...{ type: "text", ...inputProps }}
                     value={currentValue}
-                    onInput={(e) => setVal((e.target as HTMLInputElement).value)}
+                    onInput={(e) => {
+                        setVal((e.target as HTMLInputElement).value);
+                    }}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
                     aria-expanded={isOpen}
@@ -92,10 +92,11 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
                 />
             </Popover.Trigger>
             <Popover.Content
-            // id={listboxId}
-            // onCloseBy={(target) => {
-            //     return target !== inputRef.current;
-            // }}
+                id={listboxId}
+                onCloseBy={(target) => {
+                    debugger;
+                    return target !== inputRef.current;
+                }}
             >
                 <Menu
                     items={menuEntries}
