@@ -64,6 +64,11 @@ export {
   Select
 } from './components/Popover'
 
+// QTextEditor utilities
+export {
+  InlineTextEditor as QTextEditor
+} from './components/InlineTextEditor'
+
 // RangeInput utilities
 export { default as RangeInput } from './components/RangeInput'
 

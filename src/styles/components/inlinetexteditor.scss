@@ -1,0 +1,18 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+
+.#{$ns}-inline-text-editor {
+	&::after {
+		content: "\e7a0";
+		font-family: '#{$ns}-icon';
+		margin-left: 0.25em;
+		opacity: 0.2;
+	}
+
+	&:hover,
+	&:focus-within {
+		&::after {
+			opacity: 0.5;
+		}
+	}
+}
