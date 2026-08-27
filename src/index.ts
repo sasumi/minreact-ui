@@ -33,6 +33,11 @@ export {
   Dialog
 } from './components/Dialog'
 
+// InlineTextEditor utilities
+export {
+  InlineTextEditor
+} from './components/InlineTextEditor'
+
 // Menu utilities
 export type {
   MenuDivider,
@@ -63,11 +68,6 @@ export {
   Popover,
   Select
 } from './components/Popover'
-
-// QTextEditor utilities
-export {
-  InlineTextEditor as QTextEditor
-} from './components/InlineTextEditor'
 
 // RangeInput utilities
 export { default as RangeInput } from './components/RangeInput'
