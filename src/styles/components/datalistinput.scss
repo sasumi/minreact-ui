@@ -4,20 +4,24 @@
 @use "./../mixins/icon.scss" as icon;
 
 
-.#{$ns}-datalist {
-	&-input-matched {
-		color: var(--#{$ns}-color-hight);
-	}
+.#{$ns}-datalist-input-matched {
+	color: var(--#{$ns}-color-hight);
 }
 
 .#{$ns}-datalist-input-history-delete {
 	@include icon.icon-button;
-	font-size:0.7em;
+	font-size: 0.7em;
 	opacity: 0.5;
+
 	&:hover {
 		opacity: 1;
 	}
+
 	&:before {
-		content:"\e625";
+		content: "\e625";
+	}
+
+	.#{$ns}-menu-item:has(&) .#{$ns}-menu-item-content {
+		margin-right: .5em;
 	}
 }

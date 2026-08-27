@@ -20,17 +20,6 @@ export {
   SubmitButton
 } from './components/Button'
 
-// DatalistInput utilities
-export type {
-  DataListInputProps,
-  DataListOption,
-  HistoryInputHandle
-} from './components/DatalistInput'
-export {
-  DataListInput,
-  HistoryInput
-} from './components/DatalistInput'
-
 // Dialog utilities
 export type {
   DialogProps
@@ -56,7 +45,8 @@ export {
   DropdownMenu,
   ENTRY_TYPE_DIVIDER,
   ENTRY_TYPE_ITEM,
-  Menu
+  Menu,
+  MenuItemDataConvert
 } from './components/Menu'
 
 // Novice utilities
@@ -93,6 +83,16 @@ export {
 export {
   StepInput
 } from './components/StepInput'
+
+// TextInput utilities
+export type {
+  DataListInputProps,
+  HistoryInputHandle
+} from './components/TextInput'
+export {
+  DataListInput,
+  HistoryInput
+} from './components/TextInput'
 
 // Tip utilities
 export {
@@ -149,5 +149,6 @@ export {
 export {
   highlightText,
   mountReactNode,
+  reactNodeToString,
   textTranslate
 } from './utils'

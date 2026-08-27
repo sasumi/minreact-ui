@@ -3,7 +3,7 @@ import React, { useEffect, useId, useImperativeHandle, useRef, useState } from "
 import { useLocalStorage } from "..";
 import { highlightText } from "../utils";
 import "./../styles/components/datalistinput.scss";
-import { namespace } from "./../styles/namespace";
+import { namespace } from "../styles/namespace";
 import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
 import { Popover } from "./Popover";
@@ -114,15 +114,15 @@ export const HistoryInput = ({
     value: controlledValue,
     maxItems = 20,
     ref,
-    saveKey = "history-input-values",
+    storeKey,
     ...inputProps
 }: {
+    storeKey: string;
     maxItems?: number;
     ref?: React.Ref<HistoryInputHandle>;
-    saveKey?: string;
 } & Omit<DataListInputProps, "options">) => {
     const isControlled = controlledValue !== undefined;
-    const [histories, setHistories] = useLocalStorage<string[]>(saveKey, []);
+    const [histories, setHistories] = useLocalStorage<string[]>(storeKey, []);
     const [val, setVal] = useState(controlledValue || "");
 
     useEffect(() => {

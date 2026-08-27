@@ -1,27 +1,25 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from "react";
 
 /** 内存缓存，避免 useSyncExternalStore 频繁 JSON.parse 导致无意义的重渲染 */
-const cache = new Map<string, { raw: string | null; parsed: any }>();
+const cache = new Map<string, { raw: string | null; parsed: unknown }>();
 
 /** 定义事件发布/订阅器，用于在同一页面/标签页的不同组件间同步更新 */
 const dispatchStorageEvent = (key: string, newValue: string | null) => {
-    window.dispatchEvent(
-        new StorageEvent('storage', { key, newValue })
-    );
+    window.dispatchEvent(new StorageEvent("storage", { key, newValue }));
 };
 
-const getSnapshot = <T,>(key: string, initialValue: T): T => {
+const getSnapshot = <T>(key: string, initialValue: T): T => {
     const raw = window.localStorage.getItem(key);
     if (raw === null) return initialValue;
 
     const cached = cache.get(key);
     if (cached && cached.raw === raw) {
-        return cached.parsed;
+        return cached.parsed as T;
     }
 
-    const parsed = JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
     cache.set(key, { raw, parsed });
-    return parsed;
+    return parsed as T;
 };
 
 /**
@@ -40,34 +38,31 @@ const subscribe = (key: string, callback: () => void) => {
             callback();
         }
     };
-    window.addEventListener('storage', handleStorage);
+    window.addEventListener("storage", handleStorage);
     return () => {
-        window.removeEventListener('storage', handleStorage);
+        window.removeEventListener("storage", handleStorage);
     };
-}
+};
 
 /**
  * 自定义 Hook：useLocalStorage
  * @param key - localStorage 的键名
  * @param initialValue - 初始值
  */
-export const useLocalStorage = <T>(
-    key: string,
-    initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void, () => void] => {
+export const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void, () => void] => {
+    if (!key) {
+        throw new Error("useLocalStorage: key is required");
+    }
     const value = useSyncExternalStore(
         useCallback((cb) => subscribe(key, cb), [key]),
         () => getSnapshot(key, initialValue),
-        () => getServerSnapshot(initialValue)
+        () => getServerSnapshot(initialValue),
     );
 
     const setValue = useCallback(
         (valueOrFn: T | ((prev: T) => T)) => {
             const currentSnapshot = getSnapshot(key, initialValue);
-            const nextValue =
-                valueOrFn instanceof Function
-                    ? valueOrFn(currentSnapshot)
-                    : valueOrFn;
+            const nextValue = valueOrFn instanceof Function ? valueOrFn(currentSnapshot) : valueOrFn;
 
             const serialized = JSON.stringify(nextValue);
             window.localStorage.setItem(key, serialized);
@@ -78,7 +73,7 @@ export const useLocalStorage = <T>(
             // 通知同页面内使用相同 key 的其他 useLocalStorage 组件同步更新
             dispatchStorageEvent(key, serialized);
         },
-        [key, initialValue]
+        [key, initialValue],
     );
 
     // 5. 删除 key
