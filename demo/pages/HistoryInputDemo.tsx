@@ -1,10 +1,11 @@
 import { DataListInput, HistoryInput } from "../../src/components/DatalistInput";
+import type { HistoryInputHandle } from "../../src/components/DatalistInput";
 import { useRef, useState } from "react";
 
 function HistoryInputDemo() {
     const [value, setValue] = useState("");
 
-    const hi1Ref = useRef(null);
+    const hi1Ref = useRef<HistoryInputHandle>(null);
 
     return (
         <div className="demo-page">
@@ -45,31 +46,23 @@ function HistoryInputDemo() {
                 <h3 className="demo-section-title">基础用法</h3>
                 <p className="demo-section-description">输入内容后失焦即可写入历史，选中历史项会自动置顶</p>
                 <div className="demo-example">
-                    <HistoryInput ref={hi1Ref} placeholder="试着输入几个关键词，比如 React、Vite、TypeScript" onKeyDown={e=>{
-                        if(e.key === "Enter"){
-                            hi1Ref.current.commit(e.target.value);
-                        }
-                    }}/>
+                    <HistoryInput
+                        ref={hi1Ref}
+                        placeholder="试着输入几个关键词，比如 React、Vite、TypeScript"
+                        onKeyDown={(e) => {
+                            console.log("onKeyDown", e.key, e.currentTarget.value);
+                            if (e.key === "Enter") {
+                                hi1Ref.current?.commit(e.currentTarget.value);
+                            }
+                        }}
+                    />
                     <div style={{ color: "#64748b", lineHeight: 1.7 }}>
                         <div>交互规则：</div>
                         <ul style={{ margin: "0.25rem 0 0", paddingLeft: "1.25rem" }}>
-                            <li>输入后失焦会自动保存到历史</li>
+                            <li>回车保存到历史</li>
                             <li>选择历史项会去重并置顶</li>
                             <li>历史条数最多保留 8 条</li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div className="demo-section">
-                <h3 className="demo-section-title">受控用法</h3>
-                <p className="demo-section-description">和外部状态联动时也能继续复用同一份历史记录</p>
-                <div className="demo-example">
-                    <div style={{ display: "grid", gap: "0.75rem", maxWidth: "32rem" }}>
-                        <HistoryInput value={value} placeholder="输入并回车或失焦，历史会保持同步" />
-                        <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "1rem", padding: "0.9rem 1rem", color: "#334155" }}>
-                            当前值：{value || "空"}
-                        </div>
                     </div>
                 </div>
             </div>

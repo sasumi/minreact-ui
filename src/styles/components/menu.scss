@@ -51,6 +51,11 @@
 		user-select: none;
 	}
 
+	&-extension {
+		margin-left: auto;
+		margin-right: -0.5em;
+	}
+
 	&:hover {
 		background-color: var(--#{$ns}-color-background-hover);
 	}

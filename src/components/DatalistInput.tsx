@@ -112,7 +112,7 @@ export interface HistoryInputHandle {
 
 export const HistoryInput = ({
     value: controlledValue,
-    maxItems = 8,
+    maxItems = 20,
     ref,
     saveKey = "history-input-values",
     ...inputProps
@@ -167,5 +167,15 @@ export const HistoryInput = ({
         return item;
     });
 
-    return <DataListInput value={currentValue} options={menuEntries} {...inputProps} />;
+    return (
+        <DataListInput
+            {...inputProps}
+            value={isControlled ? controlledValue : undefined}
+            onInput={(e) => {
+                setVal((e.target as HTMLInputElement).value);
+                inputProps.onInput?.(e);
+            }}
+            options={menuEntries}
+        />
+    );
 };

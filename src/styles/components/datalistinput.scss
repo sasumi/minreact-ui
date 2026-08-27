@@ -12,7 +12,12 @@
 
 .#{$ns}-datalist-input-history-delete {
 	@include icon.icon-button;
+	font-size:0.7em;
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
 	&:before {
-		content:"\e62b";
+		content:"\e625";
 	}
 }
