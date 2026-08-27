@@ -8,18 +8,13 @@ import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
 import { Popover } from "./Popover";
 
-export interface DataListOption {
-    value: string;
-    label?: string;
-}
-
 const MATCHED_CLASS = namespace + "-datalist-input-matched";
 
 /**
  * 支持历史记录的输入框组件，用户可以输入内容并从下拉列表中选择历史记录或匹配的选项。
  */
 export interface DataListInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    options: (string | DataListOption)[];
+    options: (string | MenuItemData)[];
     value?: string;
     type?: "text" | "search";
 }
@@ -30,7 +25,7 @@ export interface DataListInputProps extends React.InputHTMLAttributes<HTMLInputE
  * @param value 受控输入值
  * @param inputProps 其他 input 属性
  */
-export const DataListInput: React.FC<DataListInputProps> = ({ options, value: controlledValue, ...inputProps }) => {
+export const DataListInput: React.FC<DataListInputProps> = ({ options, value: controlledValue, ...inputProps }: DataListInputProps) => {
     const [val, setVal] = useState(controlledValue || "");
     const [isOpen, setIsOpen] = useState(false);
     const listboxId = useId();
@@ -46,19 +41,9 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
     const menuEntries: MenuItemData[] = options
         .map((opt) => MenuItemDataConvert(opt))
         .map((item) => {
-            item.children = highlightText(item.label || item.value, matchQuery, MATCHED_CLASS);
+            item.label = highlightText(item.label, matchQuery, MATCHED_CLASS);
             return item;
         });
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!isOpen || menuEntries.length === 0) {
-            return;
-        }
-        if (e.key === "Escape") {
-            setIsOpen(false);
-            return;
-        }
-    };
 
     useEffect(() => {
         if (!isOpen) {
@@ -68,25 +53,34 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
     }, [isOpen, currentValue]);
 
     return (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen && menuEntries.length > 0} onOpenChange={setIsOpen}>
             <Popover.Anchor asChild>
                 <input
                     ref={inputRef}
                     {...{ type: "text", ...inputProps }}
                     value={currentValue}
-                    onFocus={() => {
+                    onFocus={(e) => {
                         setIsOpen(true);
+                        inputProps.onFocus?.(e as React.FocusEvent<HTMLInputElement, Element>);
                     }}
-                    onClick={() => {
+                    onClick={(e) => {
                         setIsOpen(true);
+                        inputProps.onClick?.(e);
                     }}
                     onInput={(e) => {
                         setVal((e.target as HTMLInputElement).value);
                         if (!isOpen) {
                             setIsOpen(true);
                         }
+                        inputProps.onInput?.(e);
                     }}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={(e) => {
+                        if (isOpen && menuEntries.length > 0 && e.key === "Escape") {
+                            setIsOpen(false);
+                        }
+                        inputProps.onKeyDown?.(e);
+                        return;
+                    }}
                     aria-autocomplete="list"
                     aria-expanded={isOpen}
                     aria-haspopup="listbox"
@@ -168,9 +162,7 @@ export const HistoryInput = ({
                     e.stopPropagation();
                     setHistories((preHs) => preHs.filter((h) => h !== history));
                 }}
-            >
-                ×
-            </span>
+            />
         );
         return item;
     });

@@ -1,8 +1,10 @@
 import { DataListInput, HistoryInput } from "../../src/components/DatalistInput";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function HistoryInputDemo() {
     const [value, setValue] = useState("");
+
+    const hi1Ref = useRef(null);
 
     return (
         <div className="demo-page">
@@ -43,7 +45,11 @@ function HistoryInputDemo() {
                 <h3 className="demo-section-title">基础用法</h3>
                 <p className="demo-section-description">输入内容后失焦即可写入历史，选中历史项会自动置顶</p>
                 <div className="demo-example">
-                    <HistoryInput placeholder="试着输入几个关键词，比如 React、Vite、TypeScript" />
+                    <HistoryInput ref={hi1Ref} placeholder="试着输入几个关键词，比如 React、Vite、TypeScript" onKeyDown={e=>{
+                        if(e.key === "Enter"){
+                            hi1Ref.current.commit(e.target.value);
+                        }
+                    }}/>
                     <div style={{ color: "#64748b", lineHeight: 1.7 }}>
                         <div>交互规则：</div>
                         <ul style={{ margin: "0.25rem 0 0", paddingLeft: "1.25rem" }}>

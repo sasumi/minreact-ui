@@ -1,8 +1,9 @@
+import { reactNodeToString } from "../utils";
 import "./../styles/common.module.scss";
 import "./../styles/components/menu.scss";
 import { namespace } from "./../styles/namespace";
 import { Popover } from "./Popover";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 export const ENTRY_TYPE_DIVIDER = "divider";
 export const ENTRY_TYPE_ITEM = "item";
@@ -10,7 +11,7 @@ export const ENTRY_TYPE_ITEM = "item";
 export interface MenuItemData {
     type: typeof ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
     value: string; // 唯一标识值，通常用于选中和回调
-    label: string; // 显示文本，默认使用 value
+    label: ReactNode; // 显示文本，默认使用 value
 
     disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中
     title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
@@ -76,7 +77,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                         <MenuItem
                             key={index}
                             {...item}
-                            checked={showChecker ? item.value === val : item.checked}
+                            checked={showChecker ? item.value === val : null}
                             type={ENTRY_TYPE_ITEM}
                             onClick={() => {
                                 if (item.disabled) {
@@ -107,7 +108,7 @@ const MenuItem = (itemData: MenuItemData) => {
         <div
             className={namespace + "-menu-item"}
             key={itemData.value}
-            title={itemData.title || itemData.label}
+            title={itemData.title}
             aria-disabled={itemData.disabled}
             onClick={itemData.onClick}
             tabIndex={itemData.disabled ? -1 : 0}
@@ -196,7 +197,7 @@ export const ComboboxMenu = ({
         if (item.type === ENTRY_TYPE_DIVIDER) {
             return true; // 保留分隔符
         } else {
-            return item.label.toLowerCase().includes(searchText.toLowerCase());
+            return reactNodeToString(item.label).toLowerCase().includes(searchText.toLowerCase());
         }
     });
 
