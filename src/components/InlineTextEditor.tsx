@@ -35,6 +35,7 @@ export const InlineTextEditor = ({
                     title: title || "编辑",
                     defaultValue: value,
                     type: multiline ? "textarea" : "text",
+                    showTopCloser: false,
                     onSubmit: (value) => {
                         return new Promise(async (resolve, reject) => {
                             if (required && !value) {
