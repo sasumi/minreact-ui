@@ -9,3 +9,10 @@
 		color: var(--#{$ns}-color-hight);
 	}
 }
+
+.#{$ns}-datalist-input-history-delete {
+	@include icon.icon-button;
+	&:before {
+		content:"\e62b";
+	}
+}

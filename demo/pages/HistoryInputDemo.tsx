@@ -12,7 +12,7 @@ function HistoryInputDemo() {
             </div>
 
             <div className="demo-section">
-                <h3 className="demo-section-title">List用法</h3>
+                <h3 className="demo-section-title">普通List用法</h3>
                 <div className="demo-example">
                     <DataListInput
                         options={[

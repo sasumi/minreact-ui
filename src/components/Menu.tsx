@@ -41,23 +41,23 @@ export interface MenuProps {
  * @returns MenuItemData 类型
  * @throws 如果数据类型无效，则抛出错误
  */
-export const MenuItemDataConvert = (data: MenuItemData | object | string) => {
+export const MenuItemDataConvert = (data: MenuItemData | Partial<MenuItemData> | string): MenuItemData => {
     if (typeof data === "string") {
         return {
             type: ENTRY_TYPE_ITEM,
             value: data,
             label: data,
-        } as MenuItemData;
+        };
     }
-    if (typeof data === "object" && "type" in data && data.type === ENTRY_TYPE_ITEM) {
+    if (typeof data === "object" && data !== null && data.type === ENTRY_TYPE_ITEM) {
         return data as MenuItemData;
     }
-    if (typeof data === "object") {
+    if (typeof data === "object" && data !== null) {
         return {
             type: ENTRY_TYPE_ITEM,
-            value: data?.value,
-            label: data?.label || data?.value,
-            title: data?.title || data?.label || data?.value,
+            value: data.value,
+            label: data.label || data.value,
+            title: data.title || data.label || data.value,
             ...data,
         } as MenuItemData;
     }

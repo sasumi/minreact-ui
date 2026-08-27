@@ -161,8 +161,19 @@ export const HistoryInput = ({
 
     const menuEntries: MenuItemData[] = histories.map((history) => {
         const item = MenuItemDataConvert(history);
-        item.children
+        item.extension = (
+            <span
+                className={namespace + "-datalist-input-history-delete"}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setHistories((preHs) => preHs.filter((h) => h !== history));
+                }}
+            >
+                ×
+            </span>
+        );
+        return item;
     });
 
-    return <DataListInput value={currentValue} options={histories.slice(0, maxItems)} {...inputProps} />;
+    return <DataListInput value={currentValue} options={menuEntries} {...inputProps} />;
 };
