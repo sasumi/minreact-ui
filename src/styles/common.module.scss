@@ -43,6 +43,11 @@
 	--#{$ns}-panel-drop-shadow: drop-shadow(var(--#{$ns}-panel-shadow-lite));
 }
 
+.#{$ns}-toastify-container {
+	position: fixed;
+	z-index: var(--#{$ns}-toast-zindex);
+}
+
 [role="button"] {
 	user-select: none;
 }

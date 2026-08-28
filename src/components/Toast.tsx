@@ -1,16 +1,7 @@
-import { createDomByHtml, findAll } from "minutool";
 import { Bounce, toast } from "react-toastify";
 
 const tsConfig = (duration: number): any => {
-    // 获取最后一个Toastify实例的containerId，用于兼容<dialog>里面的toast
-    let ts = findAll(".Toastify");
-    if(!ts.length){
-        const created = createDomByHtml(`<div class="Toastify"></div>`, document.body);
-        ts = Array.isArray(created) ? created : [created];
-    }
-    const containerId = ts[ts.length - 1]?.id;
     return {
-        containerId,
         position: "top-center",
         autoClose: duration,
         hideProgressBar: true,
@@ -35,7 +26,7 @@ const showError = (message: string, callback: (() => void) | null = null, durati
     return toastId;
 };
 
-const showInfo = (message: string, callback: (() => void) | null = null, duration = 200000): ToastId => {
+const showInfo = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
     const toastId = toast.info(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);

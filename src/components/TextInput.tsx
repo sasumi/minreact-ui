@@ -2,7 +2,7 @@ import { findOne } from "minutool";
 import React, { useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import { useLocalStorage } from "..";
 import { highlightText } from "../utils";
-import "./../styles/components/datalistinput.scss";
+import "./../styles/components/textinput.scss";
 import { namespace } from "../styles/namespace";
 import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
