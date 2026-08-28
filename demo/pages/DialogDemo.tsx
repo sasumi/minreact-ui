@@ -1,6 +1,7 @@
 import { Dialog, DIALOG_SIZE_SMALL, DIALOG_SIZE_NORMAL, DIALOG_SIZE_LARGE } from "../../src/components/Dialog";
 import { PrimaryButton, NormalButton } from "../../src/components/Button";
 import { useState } from "react";
+import { Toast } from "../../src";
 
 function DialogDemo() {
     const [open1, setOpen1] = useState(false);
@@ -14,6 +15,8 @@ function DialogDemo() {
                 <div>
                     <p>这是通过 Dialog.show 函数创建的对话框</p>
                     <p>可以在任何地方调用，不需要管理 state</p>
+                    <button onClick={() => Dialog.alert("按钮被点击了")}>点击我</button>
+                    <button onClick={() => Toast.showInfo("这是一个 Toast 提示")}>Toast</button>
                 </div>
             ),
             width: DIALOG_SIZE_NORMAL,

@@ -1,7 +1,5 @@
 import { Toast } from "../../src/components/Toast";
 import { PrimaryButton, NormalButton } from "../../src/components/Button";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function ToastDemo() {
     const handleShowLoading = () => {
@@ -14,8 +12,6 @@ function ToastDemo() {
 
     return (
         <div className="demo-page">
-            <ToastContainer />
-
             <div className="demo-page-header">
                 <h2>Toast 消息提示</h2>
                 <p>全局消息提示组件，基于 react-toastify</p>
@@ -197,7 +193,7 @@ function ToastDemo() {
                         </ul>
                         <h4 style={{ margin: "1rem 0 0.5rem" }}>注意：</h4>
                         <ul style={{ margin: "0.5rem 0", paddingLeft: "1.5rem" }}>
-                            <li>需要在根组件中添加 {`<ToastContainer />`}</li>
+                            <li>Toast 模块会自动将容器挂载到 body，无需手动添加 {`<ToastContainer />`}</li>
                             <li>所有函数返回 toastId，可用于手动关闭</li>
                             <li>callback 会在消息关闭前约200ms执行</li>
                         </ul>

@@ -40,6 +40,7 @@ export default defineConfig(({ command }) => ({
                 "i18next",
                 "react-i18next",
                 "react-toastify",
+                "react-dom/client",
                 "minutool", // 保持外部化
             ],
             output: {
@@ -52,6 +53,7 @@ export default defineConfig(({ command }) => ({
                     i18next: "i18next",
                     "react-i18next": "ReactI18next",
                     "react-toastify": "ReactToastify",
+                    "react-dom/client": "ReactDOM",
                     minutool: "minutool",
                 },
             },

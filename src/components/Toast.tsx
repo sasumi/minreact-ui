@@ -1,6 +1,14 @@
-import { Bounce, toast } from "react-toastify";
+import type { ToastOptions } from "react-toastify";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { mountReactNode } from "../utils";
 
-const tsConfig = (duration: number): any => {
+let ensureContainer = () => {
+    mountReactNode(<ToastContainer position="top-center" theme="light" hideProgressBar closeOnClick pauseOnHover draggable transition={Bounce} />);
+    ensureContainer = () => {};
+};
+
+const tsConfig = (duration: number): ToastOptions => {
     return {
         position: "top-center",
         autoClose: duration,
@@ -19,6 +27,7 @@ type ToastId = string | number;
 const MSG_ELAPSED_OFFSET = 200;
 
 const showError = (message: string, callback: (() => void) | null = null, duration = 4000): ToastId => {
+    ensureContainer();
     const toastId = toast.error(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -27,6 +36,7 @@ const showError = (message: string, callback: (() => void) | null = null, durati
 };
 
 const showInfo = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
+    ensureContainer();
     const toastId = toast.info(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -35,6 +45,7 @@ const showInfo = (message: string, callback: (() => void) | null = null, duratio
 };
 
 const showSuccess = (message: string, callback: ((...args: any[]) => void) | null = null, duration = 1500): ToastId => {
+    ensureContainer();
     const toastId = toast.success(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -43,6 +54,7 @@ const showSuccess = (message: string, callback: ((...args: any[]) => void) | nul
 };
 
 const showWarning = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
+    ensureContainer();
     const toastId = toast.warn(message, tsConfig(duration));
     if (callback) {
         setTimeout(callback, duration - MSG_ELAPSED_OFFSET);
@@ -51,6 +63,7 @@ const showWarning = (message: string, callback: (() => void) | null = null, dura
 };
 
 const showLoading = (message: string, callback: (() => void) | null = null, duration = 200000): ToastId => {
+    ensureContainer();
     const tsc = tsConfig(duration);
     const toastId = toast.loading(message, tsc);
     if (callback && duration) {
@@ -61,6 +74,7 @@ const showLoading = (message: string, callback: (() => void) | null = null, dura
 
 const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, message: string, duration = 200000) => {
     return (...args: any[]) => {
+        ensureContainer();
         const tsc = tsConfig(duration);
         const toastId = toast.loading(message, tsc);
         return promiseFunc(...args).finally(() => {
