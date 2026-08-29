@@ -632,7 +632,7 @@ export const Dialog = Object.assign(DialogImpl, {
     Content,
     Action,
     show: showDialog,
-    showCompoent: showDialogComponent,
+    showComponent: showDialogComponent,
     showIframe: showIframeDialog,
     showImg: showImgPreview,
     prompt,

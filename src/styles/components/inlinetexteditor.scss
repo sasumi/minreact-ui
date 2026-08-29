@@ -1,18 +1,54 @@
 @charset "UTF-8";
 @use "./../common.module.scss" as *;
+@use "./../mixins/icon.scss" as icon;
 
 .#{$ns}-inline-text-editor {
-	&::after {
-		content: "\e7a0";
-		font-family: '#{$ns}-icon';
-		margin-left: 0.25em;
-		opacity: 0.2;
+	&-text {
+		&::after {
+			content: "\e7a0";
+			font-family: '#{$ns}-icon';
+			margin-left: 0.25em;
+			opacity: 0.2;
+		}
+
+		&:hover,
+		&:focus-within {
+			&::after {
+				opacity: 0.5;
+			}
+		}
 	}
 
-	&:hover,
-	&:focus-within {
-		&::after {
-			opacity: 0.5;
+	&-form {
+		display: flex;
+		gap: 0.25em;
+		align-items: center;
+
+		[aria-label="submit"] {
+			@include icon.icon;
+
+			&:before {
+				content: "\e61e";
+			}
+		}
+
+		[aria-label="cancel"] {
+			@include icon.icon;
+			font-size: 0.9em;
+
+			&:before {
+				content: "\e6e0";
+			}
+		}
+	}
+
+	&[data-state="saving"] {
+		.#{$ns}-inline-text-editor-form {
+			[aria-label="submit"]:before {
+				transform-origin: center center;
+				animation: rotate360 1s linear infinite;
+				content: "\e635";
+			}
 		}
 	}
 }

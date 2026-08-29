@@ -17,12 +17,13 @@ type AnyButtonProps = {
     debounce?: boolean;
     checked?: boolean;
     onChange?: (v: any) => void;
+    type?: "button" | "submit" | "reset";
     [key: string]: any;
 };
 
 export const SpanButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton tag="span" {...props}>
+        <AnyButton {...props} tag="span">
             {children}
         </AnyButton>
     );
@@ -30,7 +31,7 @@ export const SpanButton = memo(function ({ children, ...props }: AnyButtonProps)
 
 export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton tag="button" type="submit" {...props}>
+        <AnyButton {...props} tag="button" type="submit">
             {children}
         </AnyButton>
     );
@@ -38,7 +39,7 @@ export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProp
 
 export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton tag="button" {...props}>
+        <AnyButton {...props} tag="button">
             {children}
         </AnyButton>
     );
@@ -46,7 +47,7 @@ export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonPro
 
 export const NormalButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton tag="button" {...props}>
+        <AnyButton {...props} tag="button">
             {children}
         </AnyButton>
     );

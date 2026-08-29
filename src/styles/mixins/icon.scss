@@ -12,8 +12,13 @@
         background-repeat: no-repeat;
         background-position: center;
         background-size: contain;
+        transform-origin: center center;
+        display: inline-block;
         font-family: var(--#{$ns}-font-icon);
         font-size: 1.25em;
+        width: 1em;
+        height: 1em;
+        vertical-align: middle;
         font-style: normal;
         font-weight: normal;
         text-decoration: inherit;
