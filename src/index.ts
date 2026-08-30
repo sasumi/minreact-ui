@@ -130,6 +130,11 @@ export {
   useElementResize
 } from './hooks/useElementResize'
 
+// UseInput utilities
+export {
+  useInput
+} from './hooks/useInput'
+
 // UsePortrait utilities
 export {
   usePortrait
