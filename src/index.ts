@@ -132,7 +132,7 @@ export {
 
 // UseInput utilities
 export {
-  useInput
+  useInputDebounce
 } from './hooks/useInput'
 
 // UsePortrait utilities

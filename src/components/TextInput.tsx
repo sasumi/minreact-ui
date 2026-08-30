@@ -1,5 +1,5 @@
 import { findOne } from "minutool";
-import React, { useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import React, { useEffect, useId, useImperativeHandle, useRef, useState, useMemo } from "react";
 import { useLocalStorage } from "..";
 import { highlightText } from "../utils";
 import "./../styles/components/textinput.scss";
@@ -39,12 +39,14 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
     const matchQuery = currentValue.trim().toLowerCase();
 
     // 标准化选项数据
-    const menuEntries: MenuItemData[] = options
-        .map((opt) => MenuItemDataConvert(opt))
-        .map((item) => {
-            item.label = highlightText(item.label, matchQuery, MATCHED_CLASS);
-            return item;
-        });
+    const menuEntries: MenuItemData[] = useMemo(() => {
+        return options
+            .map((opt) => MenuItemDataConvert(opt))
+            .map((item) => {
+                item.label = highlightText(item.label, matchQuery, MATCHED_CLASS);
+                return item;
+            });
+    }, [options, matchQuery]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -69,10 +71,10 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
                         inputProps.onClick?.(e);
                     }}
                     onInput={(e) => {
-                        setVal((e.target as HTMLInputElement).value);
                         if (!isOpen) {
                             setIsOpen(true);
                         }
+                        setVal((e.target as HTMLInputElement).value);
                         inputProps.onInput?.(e);
                     }}
                     onKeyDown={(e) => {
