@@ -130,10 +130,10 @@ export {
   useElementResize
 } from './hooks/useElementResize'
 
-// UseInput utilities
+// UseInputDebounce utilities
 export {
   useInputDebounce
-} from './hooks/useInput'
+} from './hooks/useInputDebounce'
 
 // UsePortrait utilities
 export {
