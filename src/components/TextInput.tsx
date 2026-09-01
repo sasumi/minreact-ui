@@ -14,11 +14,12 @@ const MATCHED_CLASS = CSS_NS + "-matched";
 /**
  * 支持历史记录的输入框组件，用户可以输入内容并从下拉列表中选择历史记录或匹配的选项。
  */
-export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onSelect"> {
+export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onSelect" | "value"> {
     options: (string | MenuItemData)[];
     onSelect?: (value: string) => void;
     value?: string;
-    type?: "text" | "search";
+    type?: "text" | "search" | "email" | "tel"; // 限制为 text、search、email 或 tel 类型
+    panelExtension?: React.ReactNode; //面板扩展区域
 }
 
 /**
@@ -27,7 +28,14 @@ export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLI
  * @param value 受控输入值
  * @param inputProps 其他 input 属性
  */
-export const DataListInput: React.FC<DataListInputProps> = ({ options, value: controlledValue, onSelect, ...inputProps }: DataListInputProps) => {
+export const DataListInput: React.FC<DataListInputProps> = ({
+    options,
+    value: controlledValue,
+    type = "text", //默认类型为 text
+    onSelect,
+    panelExtension,
+    ...inputProps
+}: DataListInputProps) => {
     const [val, setVal] = useState(controlledValue || "");
     const [isOpen, setIsOpen] = useState(false);
     const listboxId = useId();
@@ -61,7 +69,8 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
             <Popover.Anchor asChild>
                 <input
                     ref={inputRef}
-                    {...{ type: "text", ...inputProps }}
+                    type={type}
+                    {...inputProps}
                     value={currentValue}
                     onFocus={(e) => {
                         setIsOpen(true);
@@ -106,6 +115,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
                         onSelect?.(val);
                     }}
                 />
+                {panelExtension && <div className={CSS_NS + "-extension"}>{panelExtension}</div>}
             </Popover.Content>
         </Popover>
     );
@@ -114,6 +124,8 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
 /** 将指定值（默认当前输入值）写入历史记录 */
 export interface HistoryInputHandle {
     commit: (value?: string) => void;
+    remove: (value: string) => void;
+    clear: () => void;
 }
 
 export const HistoryInput = ({
@@ -157,6 +169,12 @@ export const HistoryInput = ({
         ref,
         () => ({
             commit: (value?: string) => commit(value ?? currentValue),
+            remove: (value: string) => {
+                setHistories((preHs) => preHs.filter((h) => h !== value));
+            },
+            clear: () => {
+                setHistories([]);
+            },
         }),
         [commit, currentValue],
     );
