@@ -2,19 +2,27 @@ import "./../styles/components/popover.scss";
 import * as ReactPopover from "@radix-ui/react-popover";
 import "./../styles/common.module.scss";
 import { namespace } from "./../styles/namespace";
-import { createContext, forwardRef, useContext, useRef, useState, useEffect } from "react";
+import { createContext, forwardRef, useContext, useMemo, useRef, useState, useEffect } from "react";
 import { AnyButton, SpanButton } from "./Button";
 
 const CSS_NS = namespace;
 
-// 用于在 Popover 树内共享 trigger 的 DOM ref
-const PopoverTriggerRefContext = createContext<React.MutableRefObject<any> | null>(null);
+interface PopoverContextValue {
+    // 用于在 Popover 树内共享 trigger 的 DOM ref
+    triggerRef: React.MutableRefObject<any> | null;
 
-// 用于在 Popover 树内共享 className
-const PopoverWrapperClassContext = createContext<string | undefined>(undefined);
+    // 用于在 Popover 树内共享 className
+    wrapperClassName?: string;
+
+    // 控制 Content 是否渲染箭头
+    showArrow?: boolean;
+}
+
+const PopoverContext = createContext<PopoverContextValue | null>(null);
 
 type PopoverProps = React.ComponentProps<typeof ReactPopover.Root> & {
     className?: string;
+    showArrow?: boolean;
 };
 
 const PopoverAnchor = ReactPopover.Anchor;
@@ -24,7 +32,7 @@ const PopoverAnchor = ReactPopover.Anchor;
  * 使用 forwardRef 转发 ref，并将 trigger 的 DOM 元素 ref 存入 context，供 PopoverContent 使用
  */
 const PopoverTrigger = forwardRef<HTMLElement, React.ComponentProps<typeof ReactPopover.Trigger>>(({ children, className = "", ...rest }, ref) => {
-    const triggerRef = useContext(PopoverTriggerRefContext);
+    const { triggerRef } = useContext(PopoverContext) ?? {};
     return (
         <ReactPopover.Trigger
             asChild
@@ -53,8 +61,7 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
  * 支持 onOpenAutoFocus 回调函数，默认阻止自动聚焦
  */
 const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, align = "start", onOpenAutoFocus, ...rest }, ref) => {
-    const triggerRef = useContext(PopoverTriggerRefContext);
-    const wrapperClassName = useContext(PopoverWrapperClassContext);
+    const { triggerRef, wrapperClassName, showArrow = true } = useContext(PopoverContext) ?? {};
     const contentRef = useRef<HTMLDivElement>(null);
     const DIALOG_WRAP_SELECTOR = ".dialog-wrap";
 
@@ -116,21 +123,20 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
                 {...rest}
             >
                 <div className={CSS_NS + "-popover-content" + (className ? " " + className : "")}>{children}</div>
-                <ReactPopover.Arrow className={CSS_NS + "-popover-arrow"} width={20} height={10} offset={5}/>
+                {showArrow && <ReactPopover.Arrow className={CSS_NS + "-popover-arrow"} width={20} height={10} offset={5} />}
             </ReactPopover.Content>
         </ReactPopover.Portal>
     );
 });
 
 export const Popover = Object.assign(
-    ({ children, className, ...rest }: PopoverProps) => {
+    ({ children, className, showArrow, ...rest }: PopoverProps) => {
         const triggerRef = useRef<any>(null);
+        const contextValue = useMemo(() => ({ triggerRef, wrapperClassName: className, showArrow }), [className, showArrow]);
         return (
-            <PopoverTriggerRefContext.Provider value={triggerRef}>
-                <PopoverWrapperClassContext.Provider value={className}>
-                    <ReactPopover.Root {...rest}>{children}</ReactPopover.Root>
-                </PopoverWrapperClassContext.Provider>
-            </PopoverTriggerRefContext.Provider>
+            <PopoverContext.Provider value={contextValue}>
+                <ReactPopover.Root {...rest}>{children}</ReactPopover.Root>
+            </PopoverContext.Provider>
         );
     },
     {
