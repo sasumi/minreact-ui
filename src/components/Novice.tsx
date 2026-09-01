@@ -65,7 +65,7 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
 
     return (
         open && (
-            <Popover open={true} className={CSS_NS + "-popover"}>
+            <Popover open={true} className={CSS_NS + "-popover"} showArrow={true}>
                 <div className={CSS_NS + "-masker"}></div>
                 <Popover.Anchor asChild>
                     <div className={CSS_NS + "-highlight"} style={targetOffset}></div>

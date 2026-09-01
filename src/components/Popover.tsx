@@ -61,7 +61,7 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
  * 支持 onOpenAutoFocus 回调函数，默认阻止自动聚焦
  */
 const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, align = "start", onOpenAutoFocus, ...rest }, ref) => {
-    const { triggerRef, wrapperClassName, showArrow = true } = useContext(PopoverContext) ?? {};
+    const { triggerRef, wrapperClassName, showArrow = false } = useContext(PopoverContext) ?? {};
     const contentRef = useRef<HTMLDivElement>(null);
     const DIALOG_WRAP_SELECTOR = ".dialog-wrap";
 

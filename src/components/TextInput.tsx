@@ -57,7 +57,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
     }, [isOpen, currentValue]);
 
     return (
-        <Popover open={isOpen && menuEntries.length > 0} onOpenChange={setIsOpen} showArrow={false}>
+        <Popover open={isOpen && menuEntries.length > 0} onOpenChange={setIsOpen}>
             <Popover.Anchor asChild>
                 <input
                     ref={inputRef}
