@@ -33,6 +33,12 @@ export {
   Dialog
 } from './components/Dialog'
 
+// Image utilities
+export {
+  ImageLoader,
+  patchImgLoader
+} from './components/Image'
+
 // InlineTextEditor utilities
 export {
   InlineTextEditor

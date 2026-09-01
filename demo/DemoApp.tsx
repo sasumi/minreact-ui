@@ -16,6 +16,7 @@ import PopoverDemo from "./pages/PopoverDemo";
 import ToastDemo from "./pages/ToastDemo";
 import NoviceDemo from "./pages/NoviceDemo";
 import MenuDemo from "./pages/MenuDemo";
+import ImageDemo from "./pages/ImageDemo";
 
 const components = [
     { name: "Button", label: "按钮", description: "多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等", component: ButtonDemo, category: "基础组件" },
@@ -32,6 +33,7 @@ const components = [
     { name: "Popover", label: "气泡弹出层", description: "可定位的浮动弹出层组件", component: PopoverDemo, category: "交互组件" },
     { name: "Toast", label: "消息提示", description: "全局消息提示组件", component: ToastDemo, category: "反馈组件" },
     { name: "Novice", label: "新手引导", description: "分步引导用户的新手教程组件", component: NoviceDemo, category: "交互组件" },
+    { name: "Image", label: "图片加载", description: "支持加载、错误、空状态的图片组件", component: ImageDemo, category: "基础组件" },
 ];
 
 /** Sentinel used when the URL does not point at a specific component (the gallery). */

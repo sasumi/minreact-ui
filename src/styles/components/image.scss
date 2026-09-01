@@ -1,0 +1,40 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
+
+img.#{$ns}-img {
+    &[data-state="empty"],
+    &[data-state="loading"],
+    &[data-state="error"] {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
+
+.#{$ns}-img__holder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-size: min(100%, 3em);
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &[data-state="empty"] {
+        background-image: url("../../assets/img_empty.svg");
+    }
+
+    &[data-state="loading"] {
+        background-image: url("../../assets/img_loading.gif");
+    }
+
+    &[data-state="error"] {
+        background-image: url("../../assets/img_error.svg");
+    }
+    &[data-state="normal"] {
+        display: none;
+    }
+}
