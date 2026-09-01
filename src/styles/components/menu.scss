@@ -4,80 +4,78 @@
 @use "./../mixins/icon.scss" as icon;
 
 :root {
-	--#{$ns}-menu-max-height: 20em;
+    --#{$ns}-menu-max-height: 20em;
 }
 
 .#{$ns}-menu {
-	@include com.panel();
-	overflow: auto;
-	padding: .5em 0;
-	max-height: var(--#{$ns}-menu-max-height);
-	max-width: fit-content;
+    background-color: transparent;
+    overflow: auto;
+    padding: 0.5em 0;
+    max-height: var(--#{$ns}-menu-max-height);
+    max-width: fit-content;
 
-	@at-root .#{$ns}-popover-content:has(.#{$ns}-menu) {
-		background-color: transparent !important;
-	}
-}
+	//分隔线
+    &-divider {
+        border-top: 1px solid;
+        margin: 0.25em 0.5em;
+        opacity: 0.15;
+    }
 
-.#{$ns}-menu-divider {
-	border-top: 1px solid;
-	margin: .25em .5em;
-	opacity: 0.15;
-}
+	//菜单项
+    &-item {
+        padding: 0.15em 1em;
+        display: flex;
+        gap: 0.35em;
 
-.#{$ns}-menu-item {
-	padding: 0.15em 1em;
-	display: flex;
-	gap: 0.35em;
+        &[aria-disabled="true"] {
+            opacity: 0.3;
+        }
 
-	&[aria-disabled="true"] {
-		opacity: 0.3;
-	}
+        &-icon {
+            @include icon.icon;
+            width: 1.15em;
+            margin-left: -0.35em;
+            overflow: hidden;
 
-	&-icon {
-		@include icon.icon;
-		width: 1.15em;
-		margin-left: -0.35em;
-		overflow: hidden;
+            &-checked::before {
+                zoom: 0.8;
+                content: "\e61e";
+            }
+        }
 
-		&-checked::before {
-			zoom: 0.8;
-			content: "\e61e";
-		}
-	}
+        &-content {
+            flex: 1;
+            user-select: none;
+        }
 
-	&-content {
-		flex: 1;
-		user-select: none;
-	}
+        &-extension {
+            margin-left: auto;
+            margin-right: -0.5em;
+        }
 
-	&-extension {
-		margin-left: auto;
-		margin-right: -0.5em;
-	}
-
-	&:hover {
-		background-color: var(--#{$ns}-color-background-hover);
-	}
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
 }
 
 .#{$ns}-dropdown-menu {
-	overflow: auto;
-	padding: .5em 0;
-	max-height: var(--#{$ns}-menu-max-height);
+    overflow: auto;
+    padding: 0.5em 0;
+    max-height: var(--#{$ns}-menu-max-height);
 }
 
 .#{$ns}-combobox-menu-wrap {
-	.#{$ns}-combobox-menu-search {
-		padding: 0.5em .5em;
-		margin: 0.5em;
-		border-width: 0 0 1px 0;
-		outline: none;
-	}
+    .#{$ns}-combobox-menu-search {
+        padding: 0.5em 0.5em;
+        margin: 0.5em;
+        border-width: 0 0 1px 0;
+        outline: none;
+    }
 
-	.#{$ns}-combobox-menu {
-		overflow: auto;
-		padding: 0 0 .5em 0;
-		max-height: var(--#{$ns}-menu-max-height);
-	}
+    .#{$ns}-combobox-menu {
+        overflow: auto;
+        padding: 0 0 0.5em 0;
+        max-height: var(--#{$ns}-menu-max-height);
+    }
 }
