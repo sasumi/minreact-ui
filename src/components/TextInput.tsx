@@ -1,5 +1,5 @@
 import { findOne } from "minutool";
-import React, { useEffect, useId, useImperativeHandle, useRef, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, useMemo } from "react";
 import { useLocalStorage } from "..";
 import { highlightText } from "../utils";
 import "./../styles/components/textinput.scss";
@@ -20,6 +20,8 @@ export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLI
     value?: string;
     type?: "text" | "search" | "email" | "tel"; // 限制为 text、search、email 或 tel 类型
     panelExtension?: React.ReactNode; //面板扩展区域
+    open?: boolean; // 受控：外部控制列表显隐
+    onOpenChange?: (open: boolean) => void; // 列表显隐变化回调
 }
 
 /**
@@ -34,10 +36,23 @@ export const DataListInput: React.FC<DataListInputProps> = ({
     type = "text", //默认类型为 text
     onSelect,
     panelExtension,
+    open: controlledOpen,
+    onOpenChange: onOpenChangeProp,
     ...inputProps
 }: DataListInputProps) => {
     const [val, setVal] = useState(controlledValue || "");
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isControlledOpen = controlledOpen !== undefined;
+    const isOpen = isControlledOpen ? controlledOpen : internalOpen;
+
+    // 统一受控与非受控的显隐切换，同时通知外部
+    const handleOpenChange = (next: boolean) => {
+        if (!isControlledOpen) {
+            setInternalOpen(next);
+        }
+        onOpenChangeProp?.(next);
+    };
+
     const listboxId = useId();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,7 +80,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({
     }, [isOpen, currentValue]);
 
     return (
-        <Popover open={isOpen && menuEntries.length > 0} onOpenChange={setIsOpen}>
+        <Popover open={isOpen && menuEntries.length > 0} onOpenChange={handleOpenChange}>
             <Popover.Anchor asChild>
                 <input
                     ref={inputRef}
@@ -73,23 +88,23 @@ export const DataListInput: React.FC<DataListInputProps> = ({
                     {...inputProps}
                     value={currentValue}
                     onFocus={(e) => {
-                        setIsOpen(true);
+                        handleOpenChange(true);
                         inputProps.onFocus?.(e as React.FocusEvent<HTMLInputElement, Element>);
                     }}
                     onClick={(e) => {
-                        setIsOpen(true);
+                        handleOpenChange(true);
                         inputProps.onClick?.(e);
                     }}
                     onInput={(e) => {
                         if (!isOpen) {
-                            setIsOpen(true);
+                            handleOpenChange(true);
                         }
                         setVal((e.target as HTMLInputElement).value);
                         inputProps.onInput?.(e);
                     }}
                     onKeyDown={(e) => {
                         if (isOpen && menuEntries.length > 0 && e.key === "Escape") {
-                            setIsOpen(false);
+                            handleOpenChange(false);
                         }
                         inputProps.onKeyDown?.(e);
                         return;
@@ -111,7 +126,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({
                     items={menuEntries}
                     onChange={(val) => {
                         setVal(val);
-                        setIsOpen(false);
+                        handleOpenChange(false);
                         onSelect?.(val);
                     }}
                 />
@@ -126,6 +141,8 @@ export interface HistoryInputHandle {
     commit: (value?: string) => void;
     remove: (value: string) => void;
     clear: () => void;
+    open: () => void;
+    close: () => void;
 }
 
 export const HistoryInput = ({
@@ -134,6 +151,8 @@ export const HistoryInput = ({
     ref,
     storeKey,
     onSelect,
+    open: controlledOpen,
+    onOpenChange: onOpenChangeProp,
     ...inputProps
 }: {
     storeKey: string;
@@ -144,6 +163,21 @@ export const HistoryInput = ({
     const isControlled = controlledValue !== undefined;
     const [histories, setHistories] = useLocalStorage<string[]>(storeKey, []);
     const [val, setVal] = useState(controlledValue || "");
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const isControlledOpen = controlledOpen !== undefined;
+    const isOpen = isControlledOpen ? controlledOpen : internalOpen;
+
+    // 统一受控与非受控的显隐切换，同时通知外部
+    const handleOpenChange = useCallback(
+        (next: boolean) => {
+            if (!isControlledOpen) {
+                setInternalOpen(next);
+            }
+            onOpenChangeProp?.(next);
+        },
+        [isControlledOpen, onOpenChangeProp],
+    );
 
     useEffect(() => {
         if (isControlled) {
@@ -175,8 +209,10 @@ export const HistoryInput = ({
             clear: () => {
                 setHistories([]);
             },
+            open: () => handleOpenChange(true),
+            close: () => handleOpenChange(false),
         }),
-        [commit, currentValue],
+        [commit, currentValue, handleOpenChange],
     );
 
     const menuEntries: MenuItemData[] = histories.map((history) => {
@@ -197,6 +233,8 @@ export const HistoryInput = ({
         <DataListInput
             {...inputProps}
             value={isControlled ? controlledValue : undefined}
+            open={isOpen}
+            onOpenChange={handleOpenChange}
             onInput={(e) => {
                 setVal((e.target as HTMLInputElement).value);
                 inputProps.onInput?.(e);
