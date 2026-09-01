@@ -54,6 +54,10 @@ export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
 export const patchImgLoader = ({ ...props }) => {
     const img_id = guid('img');
     const holder_id = guid('img__holder');
+    if(!props.src){
+        delete props.src;
+    }
+    props.class = props.class ? `${CSS_NS} ${props.class}` : CSS_NS;
     return `
         <img id="${img_id}" ${Object.entries(props)
             .map(([key, value]) => `${key}="${value}"`)
