@@ -3,25 +3,31 @@
 @use "./../mixins/misc.scss" as com;
 @use "./../mixins/icon.scss" as icon;
 
-
 .#{$ns}-datalist-input-matched {
-	color: var(--#{$ns}-color-hight);
+    color: var(--#{$ns}-color-hight);
+}
+
+// 下拉菜单宽度适配输入框宽度（--radix-popover-trigger-width 由 Radix 提供，等于 anchor/trigger 宽度）
+.#{$ns}-popover-content.#{$ns}-datalist-input-menu,
+.#{$ns}-popover-content.#{$ns}-datalist-input-menu .#{$ns}-menu {
+    min-width: var(--radix-popover-trigger-width);
+    width: max-content;
 }
 
 .#{$ns}-datalist-input-history-delete {
-	@include icon.icon-button;
-	font-size: 0.7em;
-	opacity: 0.3;
+    @include icon.icon-button;
+    font-size: 0.7em;
+    opacity: 0.3;
 
-	&:hover {
-		opacity: 1;
-	}
+    &:hover {
+        opacity: 1;
+    }
 
-	&:before {
-		content: "\e6e0";
-	}
+    &:before {
+        content: "\e6e0";
+    }
 
-	.#{$ns}-menu-item:has(&) .#{$ns}-menu-item-content {
-		margin-right: .5em;
-	}
+    .#{$ns}-menu-item:has(&) .#{$ns}-menu-item-content {
+        margin-right: 0.5em;
+    }
 }

@@ -8,7 +8,8 @@ import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
 import { Popover } from "./Popover";
 
-const MATCHED_CLASS = namespace + "-datalist-input-matched";
+const CSS_NS = namespace + "-datalist-input";
+const MATCHED_CLASS = CSS_NS + "-matched";
 
 /**
  * 支持历史记录的输入框组件，用户可以输入内容并从下拉列表中选择历史记录或匹配的选项。
@@ -92,6 +93,7 @@ export const DataListInput: React.FC<DataListInputProps> = ({ options, value: co
             </Popover.Anchor>
             <Popover.Content
                 id={listboxId}
+                className={CSS_NS + "-menu"}
                 onCloseBy={(target) => {
                     return target !== inputRef.current;
                 }}
