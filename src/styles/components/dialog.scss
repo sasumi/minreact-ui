@@ -124,7 +124,7 @@
 
 	&-iframe-loading {
 		.#{$ns}-dialog-content {
-			background: url("/assets/loading.gif") no-repeat center center;
+			background: url("../../assets/img_loading.gif") no-repeat center center;
 		}
 
 		iframe {

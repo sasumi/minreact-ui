@@ -12,7 +12,7 @@
             "import": "./dist/minreactui.js",
             "require": "./dist/minreactui.umd.cjs"
         },
-        "./dist/minreactui.css": "./dist/minreactui.css"
+        "./dist/minreact-ui.css": "./dist/minreact-ui.css"
     },
     "files": [
         "dist"
@@ -23,7 +23,7 @@
     ],
     "scripts": {
         "dev": "vite demo --config vite.config.ts",
-        "build": "tsc && vite build && tsc -p tsconfig.build.json",
+        "build": "tsc && vite build && tsc -p tsconfig.build.json && node scripts/copy-assets.js",
         "prebuild": "npm run generate:index",
         "prepublishOnly": "npm run build",
         "generate:index": "node scripts/generate-index.js",
