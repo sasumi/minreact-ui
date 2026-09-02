@@ -69,6 +69,6 @@ export const patchImgLoader = ({ ...props }) => {
                 onerror="this.dataset.state='error';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='error'}"`
             }
         />
-        <span id="${holder_id}" class="${CSS_NS}__holder" data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}" title="${STATE_TITLE_MAP[STATE_LOADING]}"></span>
+        <span id="${holder_id}" class="${CSS_NS}__holder" data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}" title="${STATE_TITLE_MAP[isEmpty ? STATE_EMPTY : STATE_LOADING]}"></span>
     `;
 };
