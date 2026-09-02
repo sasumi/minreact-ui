@@ -1,4 +1,4 @@
-import RangeInput from "../../src/components/RangeInput";
+import {RangeInput} from "../../src/components/RangeInput";
 import { useState } from "react";
 
 function RangeInputDemo() {

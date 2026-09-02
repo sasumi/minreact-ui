@@ -36,7 +36,7 @@ export function useAsync<T>(fn: () => AbortablePromise<T>) {
 /**
  * 异步列表+分页组件，适用于需要分页的列表数据加载场景
  */
-export default function AsyncPagination({
+export const AsyncPagination = ({
     fetcher,
     children,
     pageSize = 10,
@@ -52,7 +52,7 @@ export default function AsyncPagination({
     loading?: (...args: any[]) => ReactNode;
     error?: (error: Error) => ReactNode;
     empty?: (...args: any[]) => ReactNode;
-}) {
+}) => {
     const [asyncState, setAsyncState] = useState<AsyncState<any[]>>({ loading: true });
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
@@ -97,7 +97,7 @@ export default function AsyncPagination({
             </CommonListAsyncRenderer>
         </>
     );
-}
+};
 
 /**
  * 适用于列表数据的 AsyncRenderer，提供 loading、error、empty 三种状态的默认展示组件，

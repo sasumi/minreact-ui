@@ -22,7 +22,7 @@ interface RangeInputProps {
     onInput?: (v: number) => void;
 }
 
-function RangeInput({
+export const RangeInput = ({
     value,
     min = 0,
     max = 100,
@@ -33,7 +33,7 @@ function RangeInput({
     inputPromptText: inputPromptTitle = "请输入数值",
     inputRangeAlertText = "请输入范围在 {min} 到 {max} 之间的数值",
     onInput = () => {},
-}: RangeInputProps) {
+}: RangeInputProps) => {
     min = Number(min);
     max = Number(max);
     const [val, setVal] = useState<number>(value);
@@ -108,6 +108,4 @@ function RangeInput({
             </span>
         </>
     );
-}
-
-export default RangeInput;
+};

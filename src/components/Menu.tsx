@@ -1,15 +1,16 @@
+import { ReactNode, useState } from "react";
 import { reactNodeToString } from "../utils";
 import "./../styles/common.module.scss";
 import "./../styles/components/menu.scss";
 import { namespace } from "./../styles/namespace";
+import { AnyButton } from "./Button";
 import { Popover } from "./Popover";
-import { ReactNode, useState } from "react";
 
-export const ENTRY_TYPE_DIVIDER = "divider";
-export const ENTRY_TYPE_ITEM = "item";
+export const MENU_ENTRY_TYPE_DIVIDER = "divider";
+export const MENU_ENTRY_TYPE_ITEM = "item";
 
 export interface MenuItemData {
-    type: typeof ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
+    type: typeof MENU_ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
     value: string; // 唯一标识值，通常用于选中和回调
     label: ReactNode; // 显示文本，默认使用 value
 
@@ -21,7 +22,7 @@ export interface MenuItemData {
 }
 
 export interface MenuDivider {
-    type: typeof ENTRY_TYPE_DIVIDER;
+    type: typeof MENU_ENTRY_TYPE_DIVIDER;
     key?: string;
 }
 
@@ -45,17 +46,17 @@ export interface MenuProps {
 export const MenuItemDataConvert = (data: MenuItemData | Partial<MenuItemData> | string): MenuItemData => {
     if (typeof data === "string") {
         return {
-            type: ENTRY_TYPE_ITEM,
+            type: MENU_ENTRY_TYPE_ITEM,
             value: data,
             label: data,
         };
     }
-    if (typeof data === "object" && data !== null && data.type === ENTRY_TYPE_ITEM) {
+    if (typeof data === "object" && data !== null && data.type === MENU_ENTRY_TYPE_ITEM) {
         return data as MenuItemData;
     }
     if (typeof data === "object" && data !== null) {
         return {
-            type: ENTRY_TYPE_ITEM,
+            type: MENU_ENTRY_TYPE_ITEM,
             value: data.value,
             label: data.label || data.value,
             title: data.title || data.label || data.value,
@@ -70,15 +71,15 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
     return (
         <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
-                if (item.type === ENTRY_TYPE_DIVIDER) {
-                    return index !== 0 && items[index - 1].type !== ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
+                if (item.type === MENU_ENTRY_TYPE_DIVIDER) {
+                    return index !== 0 && items[index - 1].type !== MENU_ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
                 } else {
                     return (
                         <MenuItem
                             key={index}
                             {...item}
                             checked={showChecker ? item.value === val : null}
-                            type={ENTRY_TYPE_ITEM}
+                            type={MENU_ENTRY_TYPE_ITEM}
                             onClick={() => {
                                 if (item.disabled) {
                                     return;
@@ -194,7 +195,7 @@ export const ComboboxMenu = ({
     const [open, setOpen] = useState(false);
 
     const filteredItems = items.filter((item) => {
-        if (item.type === ENTRY_TYPE_DIVIDER) {
+        if (item.type === MENU_ENTRY_TYPE_DIVIDER) {
             return true; // 保留分隔符
         } else {
             return reactNodeToString(item.label).toLowerCase().includes(searchText.toLowerCase());
@@ -240,3 +241,52 @@ export const Menu = Object.assign(MenuImpl, {
     Divider: MenuDivider,
     Icon: MenuItemIcon,
 });
+
+/**
+ * Select 选择组件，基于 Popover 实现
+ */
+export const Select = ({
+    items,
+    name,
+    triggerClassName,
+    disabled = false,
+    value,
+    placeholder = "请选择",
+    onChange,
+}: {
+    items: MenuEntry[];
+    name?: string;
+    value?: any;
+    triggerClassName?: string;
+    disabled?: boolean;
+    placeholder?: string;
+    onChange?: (value: any) => void;
+}) => {
+    const [val, setVal] = useState(value);
+
+    const trigger = (
+        <AnyButton disabled={disabled} className={triggerClassName}>
+            {val !== undefined && val !== null
+                ? (
+                      items.find((item) => {
+                          return item.type === MENU_ENTRY_TYPE_ITEM && item.value === val;
+                      }) as MenuItemData
+                  )?.label
+                : placeholder}
+            {name && <input type="hidden" name={name} value={val ?? ""} />}
+        </AnyButton>
+    );
+
+    return (
+        <DropdownMenu
+            items={items}
+            value={val}
+            onChange={(v) => {
+                setVal(v);
+                onChange?.(v);
+            }}
+            disabled={disabled}
+            trigger={trigger}
+        />
+    );
+};

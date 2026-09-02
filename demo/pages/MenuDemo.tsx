@@ -1,4 +1,4 @@
-import { ComboboxMenu, DropdownMenu, Menu, MenuDivider, MenuItemData } from "../../src/components/Menu";
+import { ComboboxMenu, DropdownMenu, Menu, MenuDivider, MenuItemData, Select } from "../../src/components/Menu";
 import { useState } from "react";
 
 function MenuDemo() {
@@ -21,6 +21,7 @@ function MenuDemo() {
     ];
 
     const [comboxVal, setComboxVal] = useState<string | undefined>(undefined);
+    const [selectVal, setSelectVal] = useState<string | undefined>(undefined);
 
     return (
         <>
@@ -45,6 +46,35 @@ function MenuDemo() {
                 items={TestMenuItems}
                 onChange={(val) => {
                     setComboxVal(val);
+                }}
+            />
+
+            <h3>Select选择器</h3>
+            <Select
+                items={TestMenuItems}
+                value={selectVal}
+                onChange={(val) => {
+                    setSelectVal(val);
+                }}
+            />
+
+            <h3>自定义占位符</h3>
+            <Select
+                items={TestMenuItems}
+                value={selectVal}
+                placeholder="自定义占位符"
+                onChange={(val) => {
+                    setSelectVal(val);
+                }}
+            />
+
+            <h3>禁用的 Select 选择器</h3>
+            <Select
+                items={TestMenuItems}
+                value="item2"
+                disabled={true}
+                onChange={(val) => {
+                    setSelectVal(val);
                 }}
             />
         </>

@@ -1,9 +1,8 @@
-import "./../styles/components/popover.scss";
 import * as ReactPopover from "@radix-ui/react-popover";
+import { createContext, forwardRef, useContext, useMemo, useRef } from "react";
 import "./../styles/common.module.scss";
+import "./../styles/components/popover.scss";
 import { namespace } from "./../styles/namespace";
-import { createContext, forwardRef, useContext, useMemo, useRef, useState, useEffect } from "react";
-import { AnyButton, SpanButton } from "./Button";
 
 const CSS_NS = namespace;
 
@@ -146,73 +145,3 @@ export const Popover = Object.assign(
         Arrow: ReactPopover.Arrow,
     },
 );
-
-interface SelectProps {
-    name?: string;
-    items: Array<{ label: string; value: any }>;
-    selectedIndex?: number;
-    disabled?: boolean;
-    disabledValues?: any[];
-    disabledIndexes?: number[];
-    lite?: boolean;
-    value?: any;
-    onChange?: (value: any) => void;
-}
-
-/**
- * Select 选择组件，基于 Popover 实现
- */
-export const Select = ({
-    items,
-    name,
-    selectedIndex = 0,
-    disabled = false,
-    lite = false,
-    disabledValues = [],
-    disabledIndexes = [],
-    value,
-    onChange,
-}: SelectProps) => {
-    const [open, setOpen] = useState(false);
-    const [current, setCurrent] = useState(value != null ? items.find((item) => item.value === value) : items[selectedIndex] || items[0]);
-
-    // 当外部 value 变化时，同步更新 current
-    useEffect(() => {
-        if (value != null) {
-            const found = items.find((item) => item.value === value);
-            if (found) {
-                setCurrent(found);
-            }
-        }
-    }, [value, items]);
-
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <Popover.Trigger asChild>
-                <SpanButton className={"element select-ui" + (lite ? " select-ui-lite" : "")} disabled={disabled} aria-label={name}>
-                    <span className="txt">{current?.label || ""}</span>
-                    {name && <input type="hidden" name={name} value={current?.value} />}
-                </SpanButton>
-            </Popover.Trigger>
-            <Popover.Content>
-                <ul className="menu">
-                    {items.map((item, index) => (
-                        <AnyButton
-                            tag="li"
-                            className={item.value === current?.value ? "active" : ""}
-                            key={item.value}
-                            disabled={disabledValues.includes(item.value) || disabledIndexes.includes(index)}
-                            onClick={() => {
-                                if (onChange) onChange(item.value);
-                                setCurrent(item);
-                                setOpen(false);
-                            }}
-                        >
-                            {item.label}
-                        </AnyButton>
-                    ))}
-                </ul>
-            </Popover.Content>
-        </Popover>
-    );
-};

@@ -1,4 +1,4 @@
-import AsyncPagination from "../../src/components/AsyncList";
+import {AsyncPagination} from "../../src/components/AsyncList";
 import { useState } from "react";
 
 // 模拟异步数据获取
