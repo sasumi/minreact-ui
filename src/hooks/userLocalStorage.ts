@@ -8,7 +8,7 @@ const dispatchStorageEvent = (key: string, newValue: string | null) => {
     window.dispatchEvent(new StorageEvent("storage", { key, newValue }));
 };
 
-const getSnapshot = <T>(key: string, initialValue: T): T => {
+const getSnapshot = <T>(key: string, initialValue: T | null): T | null => {
     const raw = window.localStorage.getItem(key);
     if (raw === null) return initialValue;
 
@@ -25,7 +25,7 @@ const getSnapshot = <T>(key: string, initialValue: T): T => {
 /**
  * SSR 降级 Snapshot
  */
-const getServerSnapshot = <T>(initialValue: T): T => {
+const getServerSnapshot = <T>(initialValue: T | null): T | null => {
     return initialValue;
 };
 
@@ -47,9 +47,11 @@ const subscribe = (key: string, callback: () => void) => {
 /**
  * 自定义 Hook：useLocalStorage
  * @param key - localStorage 的键名
- * @param initialValue - 初始值
+ * @param initialValue - 初始值（传 null 表示"未设置"，返回值类型变为 T | null）
  */
-export const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void, () => void] => {
+export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void, () => void];
+export function useLocalStorage<T>(key: string, initialValue: null): [T | null, (value: T | null | ((prev: T | null) => T | null)) => void, () => void];
+export function useLocalStorage<T>(key: string, initialValue: T | null) {
     if (!key) {
         throw new Error("useLocalStorage: key is required");
     }
@@ -60,7 +62,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T 
     );
 
     const setValue = useCallback(
-        (valueOrFn: T | ((prev: T) => T)) => {
+        (valueOrFn: T | null | ((prev: T | null) => T | null)) => {
             const currentSnapshot = getSnapshot(key, initialValue);
             const nextValue = valueOrFn instanceof Function ? valueOrFn(currentSnapshot) : valueOrFn;
 
@@ -88,4 +90,4 @@ export const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T 
     }, [key]);
 
     return [value, setValue, removeValue];
-};
+}
