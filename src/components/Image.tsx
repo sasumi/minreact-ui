@@ -65,9 +65,10 @@ export const patchImgLoader = ({ ...props }) => {
             data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}"
             ${
                 !isEmpty &&
-                `onload="this.dataset.state='normal';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='normal'}"
-                onerror="this.dataset.state='error';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='error'}"/>`
+                `onload="this.dataset.state='normal';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='normal'}" 
+                onerror="this.dataset.state='error';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='error'}"`
             }
+        />
         <span id="${holder_id}" class="${CSS_NS}__holder" data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}" title="${STATE_TITLE_MAP[STATE_LOADING]}"></span>
     `;
 };
