@@ -55,18 +55,6 @@ const getSnapshot = <T>(key: string): T[] => {
     return parsed;
 };
 
-const subscribe = (key: string, callback: () => void) => {
-    const handleStorage = (e: StorageEvent) => {
-        if (e.key === key || e.key === null) {
-            callback();
-        }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => {
-        window.removeEventListener("storage", handleStorage);
-    };
-};
-
 /**
  * 历史记录存储 Hook，基于 localStorage 管理历史记录项，支持添加、删除、清空和读取。
  * @template T 历史记录项的类型，默认为字符串。

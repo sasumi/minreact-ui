@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useId, useImperativeHandle, useRef, useS
 import { highlightText } from "../utils";
 import "./../styles/components/textinput.scss";
 import { namespace } from "../styles/namespace";
-import { useHistoryStore } from "./HistoryStore";
+import { useHistoryStore } from "../hooks/useHistoryStore";
 import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
 import { Popover } from "./Popover";
