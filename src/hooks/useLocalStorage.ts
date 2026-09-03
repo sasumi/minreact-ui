@@ -10,7 +10,12 @@ const dispatchStorageEvent = (key: string, newValue: string | null) => {
 };
 
 const getSnapshot = <T>(key: string, initialValue: T | null): T | null => {
-    const raw = window.localStorage.getItem(key);
+    let raw: string | null;
+    try {
+        raw = window.localStorage.getItem(key);
+    } catch {
+        return initialValue;
+    }
     if (raw === null) return initialValue;
 
     const cached = cache.get(key);
@@ -18,7 +23,12 @@ const getSnapshot = <T>(key: string, initialValue: T | null): T | null => {
         return cached.parsed as T;
     }
 
-    const parsed: unknown = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(raw);
+    } catch {
+        return initialValue;
+    }
     cache.set(key, { raw, parsed });
     return parsed as T;
 };

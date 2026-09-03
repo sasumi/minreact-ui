@@ -151,15 +151,15 @@ export {
   useInputDebounce
 } from './hooks/useInputDebounce'
 
+// UseLocalStorage utilities
+export {
+  useLocalStorage
+} from './hooks/useLocalStorage'
+
 // UsePortrait utilities
 export {
   usePortrait
 } from './hooks/usePortrait'
-
-// UserLocalStorage utilities
-export {
-  useLocalStorage
-} from './hooks/userLocalStorage'
 
 // UseUpdateEffect utilities
 export {
