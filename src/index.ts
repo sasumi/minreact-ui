@@ -33,6 +33,14 @@ export {
   Dialog
 } from './components/Dialog'
 
+// HistoryStore utilities
+export type {
+  UseHistoryStoreResult
+} from './components/HistoryStore'
+export {
+  useHistoryStore
+} from './components/HistoryStore'
+
 // Image utilities
 export {
   ImageLoader,

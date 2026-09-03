@@ -1,6 +1,6 @@
 import { DataListInput, HistoryInput } from "../../src/components/TextInput";
 import type { HistoryInputHandle } from "../../src/components/TextInput";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 function HistoryInputDemo() {
     const hi1Ref = useRef<HistoryInputHandle>(null);
@@ -48,6 +48,7 @@ function HistoryInputDemo() {
                         ref={hi1Ref}
                         placeholder="试着输入几个关键词，比如 React、Vite、TypeScript"
                         storeKey="history-input-demo"
+                        maxItems={8}
                         onKeyDown={(e) => {
                             console.log("onKeyDown", e.key, e.currentTarget.value);
                             if (e.key === "Enter") {

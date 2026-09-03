@@ -1,9 +1,9 @@
 import { findOne } from "minutool";
 import React, { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, useMemo } from "react";
-import { useLocalStorage } from "..";
 import { highlightText } from "../utils";
 import "./../styles/components/textinput.scss";
 import { namespace } from "../styles/namespace";
+import { useHistoryStore } from "./HistoryStore";
 import type { MenuItemData } from "./Menu";
 import { Menu, MenuItemDataConvert } from "./Menu";
 import { Popover } from "./Popover";
@@ -185,7 +185,7 @@ export const HistoryInput = ({
     onSelect?: (value: string) => false | void;
 } & Omit<DataListInputProps, "options">) => {
     const isControlled = controlledValue !== undefined;
-    const [histories, setHistories] = useLocalStorage<string[]>(storeKey, []);
+    const { histories, add, remove, clear } = useHistoryStore<string>(storeKey, { maxItems });
     const [val, setVal] = useState(controlledValue || "");
     const [internalOpen, setInternalOpen] = useState(false);
 
@@ -211,32 +211,16 @@ export const HistoryInput = ({
 
     const currentValue = isControlled ? controlledValue || "" : val;
 
-    const commit = (nextValue: string) => {
-        const val = nextValue.trim();
-        if (!val) {
-            return;
-        }
-        setHistories((preHs) => {
-            const recentHistories = preHs.filter((history) => history !== val);
-            return [val, ...recentHistories].slice(0, maxItems);
-        });
-    };
-
-    // 记录历史改由外部调用：暴露 commitHistory，默认写入当前输入值
     useImperativeHandle(
         ref,
         () => ({
-            commit: (value?: string) => commit(value ?? currentValue),
-            remove: (value: string) => {
-                setHistories((preHs) => preHs.filter((h) => h !== value));
-            },
-            clear: () => {
-                setHistories([]);
-            },
+            commit: (value?: string) => add(value ?? currentValue),
+            remove: (value: string) => remove(value),
+            clear: () => clear(),
             open: () => handleOpenChange(true),
             close: () => handleOpenChange(false),
         }),
-        [commit, currentValue, handleOpenChange],
+        [add, remove, clear, currentValue, handleOpenChange],
     );
 
     const menuEntries: MenuItemData[] = histories.map((history) => {
@@ -246,7 +230,7 @@ export const HistoryInput = ({
                 className={namespace + "-datalist-input-history-delete"}
                 onClick={(e) => {
                     e.stopPropagation();
-                    setHistories((preHs) => preHs.filter((h) => h !== history));
+                    remove(history);
                 }}
             />
         );

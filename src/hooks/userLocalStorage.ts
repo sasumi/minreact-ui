@@ -1,3 +1,4 @@
+import { bindStorageEvent } from "minutool";
 import { useCallback, useSyncExternalStore } from "react";
 
 /** 内存缓存，避免 useSyncExternalStore 频繁 JSON.parse 导致无意义的重渲染 */
@@ -30,21 +31,6 @@ const getServerSnapshot = <T>(initialValue: T | null): T | null => {
 };
 
 /**
- * 订阅方法：同时监听原生 storage 事件（跨标签页）和自定义事件（同标签页）
- */
-const subscribe = (key: string, callback: () => void) => {
-    const handleStorage = (e: StorageEvent) => {
-        if (e.key === key || e.key === null) {
-            callback();
-        }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => {
-        window.removeEventListener("storage", handleStorage);
-    };
-};
-
-/**
  * 自定义 Hook：useLocalStorage
  * @param key - localStorage 的键名
  * @param initialValue - 初始值（传 null 表示"未设置"，返回值类型变为 T | null）
@@ -56,7 +42,7 @@ export function useLocalStorage<T>(key: string, initialValue: T | null) {
         throw new Error("useLocalStorage: key is required");
     }
     const value = useSyncExternalStore(
-        useCallback((cb) => subscribe(key, cb), [key]),
+        useCallback((cb) => bindStorageEvent(key, cb), [key]),
         () => getSnapshot(key, initialValue),
         () => getServerSnapshot(initialValue),
     );
