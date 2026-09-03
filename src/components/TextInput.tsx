@@ -16,12 +16,24 @@ const MATCHED_CLASS = CSS_NS + "-matched";
  */
 export interface DataListInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onSelect" | "value"> {
     options: (string | MenuItemData)[];
-    onSelect?: (value: string) => void;
+
+    // 选择历史记录或匹配选项时的回调，返回 false 可阻止默认行为（如更新输入框的值）
+    onSelect?: (value: string) => false | void;
+
+    // 当前输入值（受控）
     value?: string;
-    type?: "text" | "search" | "email" | "tel"; // 限制为 text、search、email 或 tel 类型
-    panelExtension?: React.ReactNode; //面板扩展区域
-    open?: boolean; // 受控：外部控制列表显隐
-    onOpenChange?: (open: boolean) => void; // 列表显隐变化回调
+
+    // 输入框类型，默认为 text
+    type?: "text" | "search" | "email" | "tel";
+
+    // 下拉面板扩展区域
+    panelExtension?: React.ReactNode;
+
+    // 受控：外部控制列表显隐
+    open?: boolean;
+
+    // 列表显隐变化回调
+    onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -125,9 +137,10 @@ export const DataListInput: React.FC<DataListInputProps> = ({
                 <Menu
                     items={menuEntries}
                     onChange={(val) => {
-                        setVal(val);
+                        if (onSelect?.(val) !== false) {
+                            setVal(val);
+                        }
                         handleOpenChange(false);
-                        onSelect?.(val);
                     }}
                 />
                 {panelExtension && <div className={CSS_NS + "-extension"}>{panelExtension}</div>}
@@ -145,6 +158,17 @@ export interface HistoryInputHandle {
     close: () => void;
 }
 
+/**
+ * 历史输入组件，支持记录和管理输入历史
+ * @param value 当前输入值（受控）
+ * @param maxItems 最大历史记录条数
+ * @param ref 获取组件实例的方法
+ * @param storeKey 本地存储的键名
+ * @param onSelect 选择历史记录时的回调
+ * @param open 控制下拉面板的显隐
+ * @param onOpenChange 下拉面板显隐变化的回调
+ * @param inputProps 其他原生输入框属性
+ */
 export const HistoryInput = ({
     value: controlledValue,
     maxItems = 20,
@@ -158,7 +182,7 @@ export const HistoryInput = ({
     storeKey: string;
     maxItems?: number;
     ref?: React.Ref<HistoryInputHandle>;
-    onSelect?: (value: string) => void;
+    onSelect?: (value: string) => false | void;
 } & Omit<DataListInputProps, "options">) => {
     const isControlled = controlledValue !== undefined;
     const [histories, setHistories] = useLocalStorage<string[]>(storeKey, []);
