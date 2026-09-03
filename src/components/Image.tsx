@@ -52,23 +52,22 @@ export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
  */
 export const patchImgLoader = ({ ...props }) => {
     const img_id = guid("img");
-    const holder_id = guid("img__holder");
     const isEmpty = !props.src;
     if (isEmpty) {
         delete props.src;
     }
     props.class = props.class ? `${CSS_NS} ${props.class}` : CSS_NS;
     return `
+        <span class="${CSS_NS}__holder" data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}" title="${STATE_TITLE_MAP[isEmpty ? STATE_EMPTY : STATE_LOADING]}"></span>
         <img id="${img_id}" ${Object.entries(props)
             .map(([key, value]) => `${key}="${value}"`)
             .join(" ")}
             data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}"
             ${
                 !isEmpty &&
-                `onload="this.dataset.state='normal';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='normal'}" 
-                onerror="this.dataset.state='error';var h=document.getElementById('${holder_id}');if(h){h.dataset.state='error'}"`
+                `onload="this.setAttribute('data-state','normal');var h=this.previousElementSibling;if(h){h.setAttribute('data-state','normal')}" 
+                onerror="this.setAttribute('data-state','error');var h=this.previousElementSibling;if(h){h.setAttribute('data-state','error')}"`
             }
         />
-        <span id="${holder_id}" class="${CSS_NS}__holder" data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}" title="${STATE_TITLE_MAP[isEmpty ? STATE_EMPTY : STATE_LOADING]}"></span>
     `;
 };
