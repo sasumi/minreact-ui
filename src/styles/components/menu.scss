@@ -26,6 +26,7 @@
         padding: 0.25em 1em;
         display: flex;
         gap: 0.35em;
+        align-items: center;
 
         &[aria-disabled="true"] {
             opacity: 0.3;
@@ -39,7 +40,7 @@
             margin-left: -0.35em;
             overflow: hidden;
         }
-        
+
         &-icon-checked {
             @include icon.icon;
             &::before {
