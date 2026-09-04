@@ -12,8 +12,8 @@ export const MENU_ENTRY_TYPE_ITEM = "item";
 export interface MenuItemData {
     type: typeof MENU_ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
     value: string; // 唯一标识值，通常用于选中和回调
+    icon?: React.ReactNode; // 菜单项的图标，显示在左侧
     label: ReactNode; // 显示文本，默认使用 value
-
     disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中
     title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
     checked?: boolean | null; // null 表示不显示选中标记，true 显示选中，false 显示未选中
@@ -74,6 +74,11 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
         setVal(value);
     }, [value]);
 
+    // 只要存在任意带图标的项，就为整列预留等宽图标列，让不带图标的项文字也能对齐
+    const hasIcon = items.some(
+        (item) => item.type !== MENU_ENTRY_TYPE_DIVIDER && Boolean(MenuItemDataConvert(item as MenuItemData).icon),
+    );
+
     return (
         <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
@@ -84,6 +89,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                         <MenuItem
                             key={index}
                             {...item}
+                            reserveIcon={hasIcon}
                             checked={showChecker ? item.value === val : null}
                             type={MENU_ENTRY_TYPE_ITEM}
                             onClick={() => {
@@ -105,12 +111,19 @@ const MenuDivider = () => {
     return <div className={namespace + "-menu-divider"} />;
 };
 
-const MenuItemIcon = ({ className }: { className?: string }) => {
-    return <span className={namespace + "-menu-item-icon" + (className ? " " + className : "")}></span>;
+const MenuItemIcon = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+    return <span className={namespace + "-menu-item-icon" + (className ? " " + className : "")}>{children}</span>;
 };
 
-const MenuItem = (itemData: MenuItemData) => {
+const CheckedIcon = () => {
+    return <span className={namespace + "-menu-item-icon-checked"}></span>;
+};
+
+const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
     itemData = MenuItemDataConvert(itemData);
+    // 只要菜单中存在带图标的项（reserveIcon）或开启了选中标记（checked 非 null），
+    // 就为每一行渲染等宽的前置图标列。没有图标/标记的行渲染空列，保证文字纵向对齐。
+    const hasLeadingColumn = Boolean(itemData.reserveIcon) || itemData.checked !== null || Boolean(itemData.icon);
     return (
         <div
             className={namespace + "-menu-item"}
@@ -120,7 +133,12 @@ const MenuItem = (itemData: MenuItemData) => {
             onClick={itemData.onClick}
             tabIndex={itemData.disabled ? -1 : 0}
         >
-            {itemData.checked !== null && <MenuItemIcon className={itemData.checked ? namespace + "-menu-item-icon-checked" : ""} />}
+            {/** 当前版本不支持check和icon同时出现 */}
+            {hasLeadingColumn && (
+                <MenuItemIcon>
+                    {itemData.icon ? itemData.icon : itemData.checked === true && <CheckedIcon />}
+                </MenuItemIcon>
+            )}
             <span className={namespace + "-menu-item-content"}>{itemData.label}</span>
             {itemData.extension && <span className={namespace + "-menu-item-extension"}>{itemData.extension}</span>}
         </div>

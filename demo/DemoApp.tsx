@@ -153,4 +153,12 @@ function DemoApp() {
     );
 }
 
+export const DemoSection = ({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) => (
+    <section className="demo-section">
+        <h3 className="demo-section-title">{title}</h3>
+        {description && <p className="demo-section-description">{description}</p>}
+        {children && <div className="demo-example">{children}</div>}
+    </section>
+);
+
 export default DemoApp;

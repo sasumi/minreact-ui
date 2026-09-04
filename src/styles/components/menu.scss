@@ -14,14 +14,14 @@
     max-height: var(--#{$ns}-menu-max-height);
     max-width: fit-content;
 
-	//分隔线
+    //分隔线
     &-divider {
         border-top: 1px solid;
         margin: 0.25em 0.5em;
         opacity: 0.15;
     }
 
-	//菜单项
+    //菜单项
     &-item {
         padding: 0.25em 1em;
         display: flex;
@@ -32,12 +32,17 @@
         }
 
         &-icon {
-            @include icon.icon;
-            width: 1.15em;
+            display:flex;
+            align-items:center;
+            justify-content: center;
+            width: 1.25em;
             margin-left: -0.35em;
             overflow: hidden;
-
-            &-checked::before {
+        }
+        
+        &-icon-checked {
+            @include icon.icon;
+            &::before {
                 zoom: 0.8;
                 content: "\e61e";
             }
