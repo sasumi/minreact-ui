@@ -22,6 +22,8 @@ const PopoverContext = createContext<PopoverContextValue | null>(null);
 type PopoverProps = React.ComponentProps<typeof ReactPopover.Root> & {
     className?: string;
     showArrow?: boolean;
+    /** 是否禁用：禁用时 Popover 不会打开 */
+    disabled?: boolean;
 };
 
 const PopoverAnchor = ReactPopover.Anchor;
@@ -129,12 +131,18 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
 });
 
 export const Popover = Object.assign(
-    ({ children, className, showArrow, ...rest }: PopoverProps) => {
+    ({ children, className, showArrow, disabled, open, onOpenChange, ...rest }: PopoverProps) => {
         const triggerRef = useRef<any>(null);
         const contextValue = useMemo(() => ({ triggerRef, wrapperClassName: className, showArrow }), [className, showArrow]);
         return (
             <PopoverContext.Provider value={contextValue}>
-                <ReactPopover.Root {...rest}>{children}</ReactPopover.Root>
+                <ReactPopover.Root
+                    {...rest}
+                    open={disabled ? false : open}
+                    onOpenChange={disabled ? undefined : onOpenChange}
+                >
+                    {children}
+                </ReactPopover.Root>
             </PopoverContext.Provider>
         );
     },

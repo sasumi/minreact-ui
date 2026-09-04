@@ -5,6 +5,7 @@ import { useState } from "react";
 function PopoverDemo() {
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [disabled, setDisabled] = useState(true);
 
     return (
         <div className="demo-page">
@@ -29,6 +30,26 @@ function PopoverDemo() {
                             </div>
                         </Popover.Content>
                     </Popover>
+                </div>
+            </div>
+
+            <div className="demo-section">
+                <h3 className="demo-section-title">禁用状态</h3>
+                <p className="demo-section-description">通过 disabled 属性禁用 Popover，点击不会打开</p>
+                <div className="demo-example">
+                    <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                        <Popover disabled={disabled}>
+                            <Popover.Trigger>
+                                <NormalButton>{disabled ? "已禁用" : "可打开"}</NormalButton>
+                            </Popover.Trigger>
+                            <Popover.Content side="bottom">
+                                <div style={{ padding: "0.5rem 1rem" }}>Popover 内容</div>
+                            </Popover.Content>
+                        </Popover>
+                        <NormalButton onClick={() => setDisabled(!disabled)}>
+                            {disabled ? "启用" : "禁用"}
+                        </NormalButton>
+                    </div>
                 </div>
             </div>
 
