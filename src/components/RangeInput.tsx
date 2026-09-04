@@ -41,6 +41,11 @@ export const RangeInput = ({
     const rangeRef = useRef<HTMLInputElement>(null);
     precision = precision === null ? detectedPrecision(min, max, step) : precision;
 
+    // 外部 value 变化时同步内部值
+    useEffect(() => {
+        setVal(value);
+    }, [value]);
+
     useEffect(() => {
         changeTm && clearTimeout(changeTm);
         changeTm = setTimeout(() => {

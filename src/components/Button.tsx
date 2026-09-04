@@ -84,7 +84,7 @@ export const AnyButton = memo(function ({ tag: Tag, children, ...props }: AnyBut
     delete attrs.onClick;
     delete attrs.debounce;
     return (
-        <TagEl {...attrs} role="button" aria-role="button" tabIndex={props.disabled ? -1 : 0} onClick={callback} onKeyDown={callback}>
+        <TagEl {...attrs} role="button" aria-role="button" tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
             {children}
         </TagEl>
     );

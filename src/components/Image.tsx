@@ -1,5 +1,5 @@
 import { guid } from "minutool";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import "./../styles/components/image.scss";
 import { namespace } from "./../styles/namespace";
 
@@ -24,6 +24,12 @@ const STATE_TITLE_MAP = {
  */
 export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(({ ...rest }, ref) => {
     const [state, setState] = useState(!rest.src ? STATE_EMPTY : STATE_LOADING);
+
+    // src 变化时重置加载状态，避免切换图片后仍停留在旧的 loading/error 状态
+    useEffect(() => {
+        setState(!rest.src ? STATE_EMPTY : STATE_LOADING);
+    }, [rest.src]);
+
     return (
         <>
             <img
@@ -65,7 +71,7 @@ export const patchImgLoader = ({ ...props }) => {
             data-state="${isEmpty ? STATE_EMPTY : STATE_LOADING}"
             ${
                 !isEmpty &&
-                `onload="this.setAttribute('data-state','normal');var h=this.previousElementSibling;if(h){h.setAttribute('data-state','normal')}" 
+                `onload="this.setAttribute('data-state','normal');var h=this.previousElementSibling;if(h){h.setAttribute('data-state','normal')}"
                 onerror="this.setAttribute('data-state','error');var h=this.previousElementSibling;if(h){h.setAttribute('data-state','error')}"`
             }
         />

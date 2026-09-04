@@ -1,7 +1,7 @@
 import { SpanButton } from "./Button";
 import "./../styles/components/inlinetexteditor.scss";
 import { namespace } from "./../styles/namespace";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CSS_NS = `${namespace}-inline-text-editor`;
 const STATE_IDLE = "idle";
@@ -27,6 +27,18 @@ export const InlineTextEditor = ({
     maxlength?: number;
     saveHandler: (value: string) => Promise<void>;
 }) => {
+    const [val, setVal] = useState(value);
+    const [state, setState] = useState<typeof STATE_IDLE | typeof STATE_EDITING | typeof STATE_SAVING>(STATE_IDLE);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    // 外部 value 变化时同步显示值（仅在未编辑时），避免父组件切换数据后仍显示旧值
+    useEffect(() => {
+        if (state === STATE_IDLE) {
+            setVal(value);
+        }
+    }, [value]);
+
     if (readonly) {
         return (
             <span className={`${CSS_NS}-text`} aria-readonly="true">
@@ -34,11 +46,6 @@ export const InlineTextEditor = ({
             </span>
         );
     }
-
-    const [val, setVal] = useState(value);
-    const [state, setState] = useState<typeof STATE_IDLE | typeof STATE_EDITING | typeof STATE_SAVING>(STATE_IDLE);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
 
     return (
         <div className={`${CSS_NS}`} data-state={state}>

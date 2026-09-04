@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { reactNodeToString } from "../utils";
 import "./../styles/common.module.scss";
 import "./../styles/components/menu.scss";
@@ -68,6 +68,12 @@ export const MenuItemDataConvert = (data: MenuItemData | Partial<MenuItemData> |
 
 const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu", className, onChange }: MenuProps) => {
     const [val, setVal] = useState(value);
+
+    // 外部 value（受控选中项）变化时同步内部选中值
+    useEffect(() => {
+        setVal(value);
+    }, [value]);
+
     return (
         <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
