@@ -1,7 +1,12 @@
-import React, { forwardRef, useImperativeHandle, useState, useEffect, useMemo, useCallback } from "react";
+import React, { forwardRef, useImperativeHandle, useState, useEffect, useMemo, useCallback, isValidElement } from "react";
 import * as RadixTabs from "@radix-ui/react-tabs";
+import { SpanButton } from "./Button";
+import { namespace } from "./../styles/namespace";
+
+const CSS_NS = namespace + "-tabs";
 
 export interface TabItem {
+    /** 触发器，如果提供的是string，会额外包裹在 SpanButton 中 */
     trigger: React.ReactNode | string;
     content: React.ReactNode | string;
     disabled?: boolean;
@@ -105,24 +110,26 @@ export const Tabs = forwardRef<TabsRef, TabsProps>((props, ref) => {
 
     return (
         <RadixTabs.Root className={className || ""} value={currentValue} onValueChange={handleValueChange} {...rest}>
-            <RadixTabs.List>
+            <RadixTabs.List className={CSS_NS + "__triggers"}>
                 {itemsWithValue.map((item) => (
-                    <RadixTabs.Trigger key={item.value} value={item.value} disabled={item.disabled}>
-                        {item.trigger}
+                    <RadixTabs.Trigger key={item.value} value={item.value} disabled={item.disabled} asChild={true}>
+                        <SpanButton className={CSS_NS + "__trigger"}>{item.trigger}</SpanButton>
                     </RadixTabs.Trigger>
                 ))}
             </RadixTabs.List>
-
-            {itemsWithValue.map((item, idx) => (
-                <RadixTabs.Content
-                    key={item.value}
-                    value={item.value}
-                    hidden={idx !== safeIndex}
-                    {...(!destroyOnHide ? { forceMount: true } : {})}
-                >
-                    {item.content}
-                </RadixTabs.Content>
-            ))}
+            <div className={CSS_NS + "__contents"}>
+                {itemsWithValue.map((item, idx) => (
+                    <RadixTabs.Content
+                        key={item.value}
+                        className={CSS_NS + "__content"}
+                        value={item.value}
+                        hidden={idx !== safeIndex}
+                        {...(!destroyOnHide ? { forceMount: true } : {})}
+                    >
+                        {item.content}
+                    </RadixTabs.Content>
+                ))}
+            </div>
         </RadixTabs.Root>
     );
 });
