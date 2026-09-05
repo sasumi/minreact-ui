@@ -46,7 +46,6 @@ export {
 
 // Menu utilities
 export type {
-  MenuDivider,
   MenuEntry,
   MenuItemData,
   MenuProps
@@ -54,11 +53,11 @@ export type {
 export {
   ComboboxMenu,
   DropdownMenu,
-  MENU_ENTRY_TYPE_DIVIDER,
-  MENU_ENTRY_TYPE_ITEM,
   Menu,
   MenuItemDataConvert,
-  Select
+  MenuItemDivider,
+  Select,
+  isMenuDivider
 } from './components/Menu'
 
 // Novice utilities

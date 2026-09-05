@@ -6,11 +6,7 @@ import { namespace } from "./../styles/namespace";
 import { AnyButton } from "./Button";
 import { Popover } from "./Popover";
 
-export const MENU_ENTRY_TYPE_DIVIDER = "divider";
-export const MENU_ENTRY_TYPE_ITEM = "item";
-
 export interface MenuItemData {
-    type: typeof MENU_ENTRY_TYPE_ITEM; // 唯一标识类型，表示这是一个菜单项
     value: string; // 唯一标识值，通常用于选中和回调
     icon?: React.ReactNode; // 菜单项的图标，显示在左侧
     label: ReactNode; // 显示文本，默认使用 value
@@ -21,12 +17,16 @@ export interface MenuItemData {
     onClick?: () => void; // 点击回调函数，点击菜单项时触发
 }
 
-export interface MenuDivider {
-    type: typeof MENU_ENTRY_TYPE_DIVIDER;
-    key?: string;
-}
+/**
+ * 分隔线哨兵常量：直接放进 items 数组即表示该位置渲染一条分隔线。
+ * 数组元素是对象即为菜单项，是此符号即为分隔线，无需再用 type 字段区分。
+ */
+export const MenuItemDivider = Symbol("menu-divider");
 
-export type MenuEntry = MenuItemData | MenuDivider;
+export type MenuEntry = MenuItemData | typeof MenuItemDivider;
+
+/** 判断菜单条目是否为分隔线（类型收窄辅助函数） */
+export const isMenuDivider = (entry: MenuEntry): entry is typeof MenuItemDivider => entry === MenuItemDivider;
 
 export interface MenuProps {
     items: MenuEntry[];
@@ -46,17 +46,12 @@ export interface MenuProps {
 export const MenuItemDataConvert = (data: MenuItemData | Partial<MenuItemData> | string): MenuItemData => {
     if (typeof data === "string") {
         return {
-            type: MENU_ENTRY_TYPE_ITEM,
             value: data,
             label: data,
         };
     }
-    if (typeof data === "object" && data !== null && data.type === MENU_ENTRY_TYPE_ITEM) {
-        return data as MenuItemData;
-    }
     if (typeof data === "object" && data !== null) {
         return {
-            type: MENU_ENTRY_TYPE_ITEM,
             value: data.value,
             label: data.label || data.value,
             title: data.title || data.label || data.value,
@@ -75,15 +70,13 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
     }, [value]);
 
     // 只要存在任意带图标的项，就为整列预留等宽图标列，让不带图标的项文字也能对齐
-    const hasIcon = items.some(
-        (item) => item.type !== MENU_ENTRY_TYPE_DIVIDER && Boolean(MenuItemDataConvert(item as MenuItemData).icon),
-    );
+    const hasIcon = items.some((item) => !isMenuDivider(item) && Boolean(item.icon));
 
     return (
         <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
-                if (item.type === MENU_ENTRY_TYPE_DIVIDER) {
-                    return index !== 0 && items[index - 1].type !== MENU_ENTRY_TYPE_DIVIDER ? <MenuDivider key={item.key || index} /> : null;
+                if (isMenuDivider(item)) {
+                    return index !== 0 && !isMenuDivider(items[index - 1]) ? <MenuDivider key={index} /> : null;
                 } else {
                     return (
                         <MenuItem
@@ -91,7 +84,6 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                             {...item}
                             reserveIcon={hasIcon}
                             checked={showChecker ? item.value === val : null}
-                            type={MENU_ENTRY_TYPE_ITEM}
                             onClick={() => {
                                 if (item.disabled) {
                                     return;
@@ -134,11 +126,7 @@ const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
             tabIndex={itemData.disabled ? -1 : 0}
         >
             {/** 当前版本不支持check和icon同时出现 */}
-            {hasLeadingColumn && (
-                <MenuItemIcon>
-                    {itemData.icon ? itemData.icon : itemData.checked === true && <CheckedIcon />}
-                </MenuItemIcon>
-            )}
+            {hasLeadingColumn && <MenuItemIcon>{itemData.icon ? itemData.icon : itemData.checked === true && <CheckedIcon />}</MenuItemIcon>}
             <span className={namespace + "-menu-item-content"}>{itemData.label}</span>
             {itemData.extension && <span className={namespace + "-menu-item-extension"}>{itemData.extension}</span>}
         </div>
@@ -219,8 +207,8 @@ export const ComboboxMenu = ({
     const [open, setOpen] = useState(false);
 
     const filteredItems = items.filter((item) => {
-        if (item.type === MENU_ENTRY_TYPE_DIVIDER) {
-            return true; // 保留分隔符
+        if (isMenuDivider(item)) {
+            return true; // 保留分隔线
         } else {
             return reactNodeToString(item.label).toLowerCase().includes(searchText.toLowerCase());
         }
@@ -288,15 +276,11 @@ export const Select = ({
 }) => {
     const [val, setVal] = useState(value);
 
+    const currentItem = items.find((item): item is MenuItemData => !isMenuDivider(item) && item.value === val);
+
     const trigger = (
         <AnyButton disabled={disabled} className={triggerClassName}>
-            {val !== undefined && val !== null
-                ? (
-                      items.find((item) => {
-                          return item.type === MENU_ENTRY_TYPE_ITEM && item.value === val;
-                      }) as MenuItemData
-                  )?.label
-                : placeholder}
+            {val !== undefined && val !== null ? currentItem?.label : placeholder}
             {name && <input type="hidden" name={name} value={val ?? ""} />}
         </AnyButton>
     );
