@@ -97,6 +97,16 @@ export {
   StepInput
 } from './components/StepInput'
 
+// Tabs utilities
+export type {
+  TabItem,
+  TabsProps,
+  TabsRef
+} from './components/Tabs'
+export {
+  Tabs
+} from './components/Tabs'
+
 // TextInput utilities
 export type {
   DataListInputProps,
