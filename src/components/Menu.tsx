@@ -7,14 +7,14 @@ import { AnyButton } from "./Button";
 import { Popover } from "./Popover";
 
 export interface MenuItemData {
-    value: string; // 唯一标识值，通常用于选中和回调
+    value: any; // 唯一标识值，通常用于选中和回调
     icon?: React.ReactNode; // 菜单项的图标，显示在左侧
     label: ReactNode; // 显示文本，默认使用 value
     disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中
     title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
     checked?: boolean | null; // null 表示不显示选中标记，true 显示选中，false 显示未选中
     extension?: React.ReactNode; // 扩展内容，显示在右侧
-    onClick?: () => void; // 点击回调函数，点击菜单项时触发
+    onClick?: (item: MenuItemData) => void; // 点击回调函数，点击菜单项时触发，并传入当前菜单项数据
 }
 
 /**
@@ -30,8 +30,8 @@ export const isMenuDivider = (entry: MenuEntry): entry is typeof MenuItemDivider
 
 export interface MenuProps {
     items: MenuEntry[];
-    value?: string;
-    onChange?: (value: string) => void;
+    value?: any;
+    onChange?: (value: any) => void;
     showChecker?: boolean;
     _className?: string; //默认类名，可以覆盖
     className?: string; //额外自定义类名
@@ -88,6 +88,7 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
                                 if (item.disabled) {
                                     return;
                                 }
+                                item.onClick?.(item);
                                 setVal(item.value);
                                 onChange?.(item.value);
                             }}
@@ -119,10 +120,9 @@ const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
     return (
         <div
             className={namespace + "-menu-item"}
-            key={itemData.value}
             title={itemData.title}
             aria-disabled={itemData.disabled}
-            onClick={itemData.onClick}
+            onClick={() => itemData.onClick?.(itemData)}
             tabIndex={itemData.disabled ? -1 : 0}
         >
             {/** 当前版本不支持check和icon同时出现 */}
@@ -144,11 +144,11 @@ export const DropdownMenu = ({
 }: {
     trigger: React.ReactNode;
     items: MenuEntry[];
-    value?: string;
+    value?: any;
     disabled?: boolean;
     showChecker?: boolean;
     hideOnClick?: boolean;
-    onChange?: (val: string) => void;
+    onChange?: (val: any) => void;
 }) => {
     const [open, setOpen] = useState(false);
     return (
@@ -196,11 +196,11 @@ export const ComboboxMenu = ({
 }: {
     trigger: React.ReactNode;
     items: MenuEntry[];
-    value?: string;
+    value?: any;
     disabled?: boolean;
     showChecker?: boolean;
     placeholder?: string;
-    onChange?: (val: string) => void;
+    onChange?: (val: any) => void;
     hideOnClick?: boolean;
 }) => {
     const [searchText, setSearchText] = useState("");
@@ -274,14 +274,14 @@ export const Select = ({
     placeholder?: string;
     onChange?: (value: any) => void;
 }) => {
-    const [val, setVal] = useState(value);
+    const [val, setVal] = useState<any>(value);
 
     const currentItem = items.find((item): item is MenuItemData => !isMenuDivider(item) && item.value === val);
 
     const trigger = (
         <AnyButton disabled={disabled} className={triggerClassName}>
             {val !== undefined && val !== null ? currentItem?.label : placeholder}
-            {name && <input type="hidden" name={name} value={val ?? ""} />}
+            {name && <input type="hidden" name={name} value={String(val) ?? ""} />}
         </AnyButton>
     );
 
