@@ -249,10 +249,7 @@ const showDialog = ({
 /**
  * 显示 React 组件作为对话框
  */
-const showDialogComponent = <P extends object>(
-    DialogComponent: ComponentType<P & { open: boolean; setOpen: (open: boolean) => void }>,
-    props: P = {} as P,
-) => {
+const showDialogComponent = <P extends object>(DialogComponent: ComponentType<P & { open: boolean; setOpen: (open: boolean) => void }>, props: P = {} as P) => {
     const unmountRef: { current: (() => void) | null } = { current: null };
     const DialogWrapper = () => {
         const [open, setOpen] = useState(true);
@@ -390,6 +387,7 @@ const prompt = ({
                         </Dialog.Content>
                         <Dialog.Action>
                             <NormalButton
+                                data-variant="confirm"
                                 type="submit"
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -399,6 +397,7 @@ const prompt = ({
                                 确认
                             </NormalButton>
                             <NormalButton
+                                data-variant="cancel"
                                 type="button"
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -555,6 +554,7 @@ const confirm = ({
             action: (
                 <>
                     <button
+                        data-variant="confirm"
                         onClick={() => {
                             if (onPreConfirm?.() === false) {
                                 return;
@@ -566,6 +566,7 @@ const confirm = ({
                         {confirmText}
                     </button>
                     <button
+                        data-variant="cancel"
                         onClick={() => {
                             if (onPreCancel?.() === false) {
                                 return;
@@ -607,6 +608,7 @@ const alert = (
             content: message,
             action: (
                 <NormalButton
+                    data-variant="ok"
                     onClick={() => {
                         closer?.();
                         resolve();

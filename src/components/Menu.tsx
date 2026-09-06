@@ -7,7 +7,7 @@ import { AnyButton } from "./Button";
 import { Popover } from "./Popover";
 
 export interface MenuItemData {
-    value: any; // 唯一标识值，通常用于选中和回调
+    value?: any; // 唯一标识值，通常用于选中和回调
     icon?: React.ReactNode; // 菜单项的图标，显示在左侧
     label: ReactNode; // 显示文本，默认使用 value
     disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中

@@ -31,7 +31,7 @@ export const SpanButton = memo(function ({ children, ...props }: AnyButtonProps)
 
 export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton {...props} tag="button" type="submit">
+        <AnyButton {...props} tag="button" type="submit" data-variant="submit">
             {children}
         </AnyButton>
     );
@@ -39,7 +39,7 @@ export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProp
 
 export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonProps) {
     return (
-        <AnyButton {...props} tag="button">
+        <AnyButton {...props} tag="button" data-variant="primary">
             {children}
         </AnyButton>
     );
