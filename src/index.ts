@@ -180,6 +180,11 @@ export {
   useWindowResize
 } from './hooks/useWindowResize'
 
+// UseZindex utilities
+export {
+  useZindex
+} from './hooks/useZindex'
+
 // Utils utilities
 export {
   highlightText,
