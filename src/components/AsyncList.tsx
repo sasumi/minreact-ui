@@ -1,7 +1,7 @@
 import { DataEmpty, DataLoading, RequestError } from "./../modules/StateWidget";
 import type { AbortablePromise } from "minutool";
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { DependencyList, ReactNode } from "react";
 import { Pagination } from "./Pagination";
 
 export type AsyncState<T> = {
@@ -12,24 +12,39 @@ export type AsyncState<T> = {
     error?: Error;
 };
 
-export function useAsync<T>(fn: () => AbortablePromise<T>) {
+/**
+ * 通用异步数据加载 hook：挂载时执行一次；传 deps 后，deps 变化会重新取数。
+ * 竞态安全：重新取数 / 卸载时会把旧请求作废（序号比对 + 尽力 abort），
+ * 过期请求即便随后 resolve/reject 也不会覆盖最新状态。
+ * @param fn - 返回 Promise 的取数函数（api 层基于 minutool request 时自带 abort）
+ * @param deps - 变化时触发重新取数的依赖；缺省 [] 表示只在挂载时取一次
+ */
+export function useAsync<T>(fn: () => Promise<T>, deps: DependencyList = []) {
     const [state, setState] = useState<AsyncState<T>>({ loading: true });
+    const seqRef = useRef(0);
 
     useEffect(() => {
+        const seq = ++seqRef.current;
         setState({ loading: true });
         const promise = fn();
         promise
             .then((data) => {
+                if (seq !== seqRef.current) return;
                 setState({ success: true, data });
             })
             .catch((error) => {
+                if (seq !== seqRef.current) return;
                 setState({ error: error as Error });
             });
 
         return () => {
-            promise.abort?.();
+            // 作废在途请求：序号递增使旧结果失效，并尽力 abort（fetcher 为普通 Promise 时为空操作）
+            seqRef.current++;
+            (promise as { abort?: () => void }).abort?.();
         };
-    }, []);
+        // deps 由调用方按需传入（默认 []），fn 是否为最新以 deps 变化为准
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, deps);
     return state;
 }
 

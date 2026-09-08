@@ -84,7 +84,8 @@ export const AnyButton = memo(function ({ tag: Tag, children, ...props }: AnyBut
     delete attrs.onClick;
     delete attrs.debounce;
     return (
-        <TagEl {...attrs} role="button" aria-role="button" tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
+        // role="button" 即可表达按钮语义；aria-role 是非法属性（合法的是 role），会造成 React 每次渲染报 Invalid aria prop 警告
+        <TagEl {...attrs} role="button" tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
             {children}
         </TagEl>
     );
