@@ -170,12 +170,6 @@ export {
   usePortrait
 } from './hooks/usePortrait'
 
-// UseTimeout utilities
-export {
-  useInterval,
-  useTimeout
-} from './hooks/useTimeout'
-
 // UseUpdateEffect utilities
 export {
   useUpdateEffect
