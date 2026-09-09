@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SpanButton } from "./Button";
+import { Clickable } from "./Button";
 import "./../styles/components/stepinput.scss";
 import "./../styles/common.module.scss";
 import { namespace } from "./../styles/namespace";
@@ -31,7 +31,7 @@ export const StepInput = ({
     return (
         <>
             <span className={`${CSS_NS}-step-input-wrap`}>
-                <SpanButton
+                <Clickable
                     className={"si-minus" + (min !== null && val <= min ? " disabled" : "")}
                     onClick={() => {
                         if (min !== null && val - step < min) {
@@ -39,9 +39,9 @@ export const StepInput = ({
                         }
                         setVal(val - step);
                     }}
-                ></SpanButton>
+                ></Clickable>
                 <input type="text" value={val} pattern="\d*" onChange={(e) => setVal(parseInt(e.target.value))} />
-                <SpanButton
+                <Clickable
                     className={"si-plus" + (max !== null && val >= max ? " disabled" : "")}
                     onClick={() => {
                         if (max !== null && val + step > max) {
@@ -49,7 +49,7 @@ export const StepInput = ({
                         }
                         setVal(val + step);
                     }}
-                ></SpanButton>
+                ></Clickable>
             </span>
         </>
     );

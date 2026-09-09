@@ -1,4 +1,5 @@
 import "./../styles/common.module.scss";
+import { namespace } from "./../styles/namespace";
 import { lockElementInteraction } from "minutool";
 import { memo, useState } from "react";
 import { Spinner } from "./Spinner";
@@ -131,7 +132,7 @@ export const ReloadButton = ({
 /**
  * 按钮
  */
-export const AnyButton = memo(function ({ tag, children, ...props }: ClickableProps) {
+export const AnyButton = memo(function ({ tag = "span", children, ...props }: ClickableProps) {
     props.role = props.role || "button";
     return (
         <Clickable {...props} tag={tag}>
@@ -143,7 +144,7 @@ export const AnyButton = memo(function ({ tag, children, ...props }: ClickablePr
 /**
  * 可点击的按钮组件，支持防抖、禁用状态和键盘操作（Enter 和空格键）
  */
-export const Clickable = memo(function ({ tag, children, ...props }: ClickableProps) {
+export const Clickable = memo(function ({ tag = "span", children, ...props }: ClickableProps) {
     const [lastClickTime, setLastClickTime] = useState<number | null>(null);
     const callback = (event: any) => {
         if (props.onClick && (event.type === "click" || event.key === "Enter" || event.key === " ")) {
@@ -166,9 +167,9 @@ export const Clickable = memo(function ({ tag, children, ...props }: ClickablePr
     if (props.disabled) {
         props["aria-disabled"] = true;
     }
-    let attrs: Record<string, any> = { ...props };
-    attrs.style = { ...attrs.style };
+    props.className = (props.className || "") + ` ${namespace}-clickable`;
 
+    let attrs: Record<string, any> = { ...props };
     delete attrs.onClick;
     delete attrs.debounce;
     return (

@@ -1,4 +1,4 @@
-import { SpanButton } from ".//Button";
+import { Clickable } from ".//Button";
 import "./../styles/common.module.scss";
 import "./../styles/components/novice.scss";
 import { ReactNode, useEffect, useState } from "react";
@@ -80,20 +80,20 @@ function Novice({ stepInfos, onClose = () => {}, nextButtonTitle = "下一项", 
                     <div className={CSS_NS + "-content"}>{stepInfos[noviceIndex].content}</div>
                     <div className={CSS_NS + "-actions"}>
                         {noviceIndex > 0 && (
-                            <SpanButton className={CSS_NS + "-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
+                            <Clickable className={CSS_NS + "-previous-btn"} onClick={() => switchNovice(noviceIndex - 1)}>
                                 {prevButtonTitle}
-                            </SpanButton>
+                            </Clickable>
                         )}
-                        <SpanButton
+                        <Clickable
                             className={CSS_NS + "-next-btn"}
                             disabled={noviceIndex == stepInfos.length - 1}
                             onClick={() => switchNovice(noviceIndex + 1)}
                         >
                             {nextButtonTitle}
-                        </SpanButton>
-                        <SpanButton className={CSS_NS + "-close-btn"} onClick={() => closeHandle()}>
+                        </Clickable>
+                        <Clickable className={CSS_NS + "-close-btn"} onClick={() => closeHandle()}>
                             {closeButtonTitle}
-                        </SpanButton>
+                        </Clickable>
                     </div>
                 </Popover.Content>
             </Popover>

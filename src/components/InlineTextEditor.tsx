@@ -1,4 +1,4 @@
-import { SpanButton } from "./Button";
+import { Clickable, SpanButton } from "./Button";
 import "./../styles/components/inlinetexteditor.scss";
 import { namespace } from "./../styles/namespace";
 import { useEffect, useRef, useState } from "react";
@@ -89,7 +89,8 @@ export const InlineTextEditor = ({
                         readOnly={state === STATE_SAVING}
                         maxLength={maxlength}
                     />
-                    <SpanButton
+                    <Clickable
+                        tag="input"
                         type="submit"
                         aria-label="submit"
                         disabled={state === STATE_SAVING}
@@ -102,7 +103,7 @@ export const InlineTextEditor = ({
                             formRef.current?.requestSubmit();
                         }}
                     />
-                    <SpanButton disabled={state === STATE_SAVING} aria-label="cancel" title="取消" onClick={() => setState(STATE_IDLE)} />
+                    <Clickable disabled={state === STATE_SAVING} aria-label="cancel" title="取消" onClick={() => setState(STATE_IDLE)} />
                 </form>
             )}
         </div>

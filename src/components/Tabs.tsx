@@ -1,12 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useState, useEffect, useMemo, useCallback, isValidElement } from "react";
 import * as RadixTabs from "@radix-ui/react-tabs";
-import { SpanButton } from "./Button";
+import { Clickable } from "./Button";
 import { namespace } from "./../styles/namespace";
 
 const CSS_NS = namespace + "-tabs";
 
 export interface TabItem {
-    /** 触发器，如果提供的是string，会额外包裹在 SpanButton 中 */
+    /** 触发器，如果提供的是string，会额外包裹在 Clickable 中 */
     trigger: React.ReactNode | string;
     content: React.ReactNode | string;
     disabled?: boolean;
@@ -113,7 +113,7 @@ export const Tabs = forwardRef<TabsRef, TabsProps>((props, ref) => {
             <RadixTabs.List className={CSS_NS + "__triggers"}>
                 {itemsWithValue.map((item) => (
                     <RadixTabs.Trigger key={item.value} value={item.value} disabled={item.disabled} asChild={true}>
-                        <SpanButton className={CSS_NS + "__trigger"}>{item.trigger}</SpanButton>
+                        <Clickable className={CSS_NS + "__trigger"}>{item.trigger}</Clickable>
                     </RadixTabs.Trigger>
                 ))}
             </RadixTabs.List>

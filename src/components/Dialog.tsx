@@ -1,12 +1,12 @@
-import { NormalButton, SpanButton } from ".//Button";
-import "./../styles/common.module.scss";
-import "./../styles/components/dialog.scss";
-import { namespace } from "./../styles/namespace";
-import { mountReactNode } from "./../utils.tsx";
 import { bindClick, bindNodeMove, calcRemainingMSecs, detectedPrecision, findOne, lockElementInteraction, precisionToStep } from "minutool";
 import type { ComponentType, ReactNode } from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import "./../styles/common.module.scss";
+import "./../styles/components/dialog.scss";
+import { namespace } from "./../styles/namespace";
+import { mountReactNode } from "./../utils.tsx";
+import { Clickable, NormalButton } from ".//Button";
 
 const CSS_NS = namespace;
 const TITLE_CLASS_NAME = `${CSS_NS}-dialog-title`;
@@ -151,12 +151,12 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                 }}
             >
                 {showTopCloser && (
-                    <SpanButton
+                    <Clickable
+                        className={TOP_CLOSER_CLASS_NAME}
                         onClick={(e) => {
                             setOpen(false);
                         }}
-                        className={TOP_CLOSER_CLASS_NAME}
-                    ></SpanButton>
+                    />
                 )}
                 {children}
             </dialog>

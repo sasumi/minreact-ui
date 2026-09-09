@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { SpanButton } from "./Button";
+import { Clickable } from "./Button";
 import "./../styles/components/pagination.scss";
 import { textTranslate } from "./../utils.tsx";
 import "./../styles/common.module.scss";
@@ -48,7 +48,7 @@ export function Pagination({
     return (
         <div className={`${CSS_NS}`} aria-disabled={disabled}>
             <span className={`${CSS_NS}-current`} title={textTranslate(itemsPerPageText, { num: pageSize })}>
-                <SpanButton
+                <Clickable
                     className={`${CSS_NS}-page-jumper`}
                     onClick={() => {
                         let n = prompt(textTranslate(jumpToPageText, { num: p }));
@@ -68,17 +68,17 @@ export function Pagination({
                     }}
                 >
                     {textTranslate(pageInfoText, { CURRENT_PAGE: p, TOTAL_PAGE: totalPages })}
-                </SpanButton>
+                </Clickable>
                 {textTranslate(totalItemsText, { num: total })}
             </span>
-            <SpanButton
+            <Clickable
                 className={`${CSS_NS}-icon-left`}
                 onClick={() => {
                     p > 1 && setP(p - 1);
                 }}
                 disabled={p == 1}
             />
-            <SpanButton
+            <Clickable
                 className={`${CSS_NS}-icon-right`}
                 onClick={() => {
                     p < totalPages && setP(p + 1);
