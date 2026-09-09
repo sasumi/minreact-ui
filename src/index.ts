@@ -13,6 +13,7 @@ export {
 // Button utilities
 export {
   AnyButton,
+  Clickable,
   NormalButton,
   PrimaryButton,
   ReloadButton,
