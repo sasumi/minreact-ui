@@ -6,7 +6,7 @@ import { textTranslate } from "./../utils";
 
 const BUTTON_DEBOUNCE_TIME = 200;
 
-type AnyButtonProps = {
+type ClickableProps = {
     tag?: string;
     children?: React.ReactNode;
     className?: string;
@@ -21,7 +21,7 @@ type AnyButtonProps = {
     [key: string]: any;
 };
 
-export const SpanButton = memo(function ({ children, ...props }: AnyButtonProps) {
+export const SpanButton = memo(function ({ children, ...props }: ClickableProps) {
     return (
         <AnyButton {...props} tag="span">
             {children}
@@ -29,7 +29,7 @@ export const SpanButton = memo(function ({ children, ...props }: AnyButtonProps)
     );
 });
 
-export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProps) {
+export const SubmitButton = memo(function ({ children, ...props }: ClickableProps) {
     return (
         <AnyButton {...props} tag="button" type="submit" data-variant="submit">
             {children}
@@ -37,7 +37,7 @@ export const SubmitButton = memo(function ({ children, ...props }: AnyButtonProp
     );
 });
 
-export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonProps) {
+export const PrimaryButton = memo(function ({ children, ...props }: ClickableProps) {
     return (
         <AnyButton {...props} tag="button" data-variant="primary">
             {children}
@@ -45,49 +45,11 @@ export const PrimaryButton = memo(function ({ children, ...props }: AnyButtonPro
     );
 });
 
-export const NormalButton = memo(function ({ children, ...props }: AnyButtonProps) {
+export const NormalButton = memo(function ({ children, ...props }: ClickableProps) {
     return (
         <AnyButton {...props} tag="button">
             {children}
         </AnyButton>
-    );
-});
-
-export const AnyButton = memo(function ({ tag: Tag, children, ...props }: AnyButtonProps) {
-    const [lastClickTime, setLastClickTime] = useState<number | null>(null);
-    const callback = (event: any) => {
-        if (props.onClick && (event.type === "click" || event.key === "Enter" || event.key === " ")) {
-            // event.preventDefault(); // 防止默认行为（如滚动）
-            if (!props.disabled) {
-                const now = Date.now();
-                //按钮默认开启debounce
-                if ((props.debounce || props.debounce === undefined) && lastClickTime && now - lastClickTime < BUTTON_DEBOUNCE_TIME) {
-                    console.debug("button debounce");
-                    return false;
-                }
-                setLastClickTime(now);
-                props.onClick(event);
-            }
-            return false;
-        }
-    };
-
-    const TagEl = (Tag || "span") as any;
-
-    // aria-disabled 属性用于无障碍访问，表示元素是否可交互
-    if (props.disabled) {
-        props["aria-disabled"] = true;
-    }
-    let attrs: Record<string, any> = { ...props };
-    attrs.style = { ...attrs.style };
-
-    delete attrs.onClick;
-    delete attrs.debounce;
-    return (
-        // role="button" 即可表达按钮语义；aria-role 是非法属性（合法的是 role），会造成 React 每次渲染报 Invalid aria prop 警告
-        <TagEl {...attrs} role="button" tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
-            {children}
-        </TagEl>
     );
 });
 
@@ -165,3 +127,54 @@ export const ReloadButton = ({
         </SpanButton>
     );
 };
+
+/**
+ * 按钮
+ */
+export const AnyButton = memo(function ({ tag, children, ...props }: ClickableProps) {
+    props.role = props.role || "button";
+    return (
+        <Clickable {...props} tag={tag}>
+            {children}
+        </Clickable>
+    );
+});
+
+/**
+ * 可点击的按钮组件，支持防抖、禁用状态和键盘操作（Enter 和空格键）
+ */
+export const Clickable = memo(function ({ tag, children, ...props }: ClickableProps) {
+    const [lastClickTime, setLastClickTime] = useState<number | null>(null);
+    const callback = (event: any) => {
+        if (props.onClick && (event.type === "click" || event.key === "Enter" || event.key === " ")) {
+            if (!props.disabled) {
+                const now = Date.now();
+                if ((props.debounce || props.debounce === undefined) && lastClickTime && now - lastClickTime < BUTTON_DEBOUNCE_TIME) {
+                    console.debug("button debounce");
+                    return false;
+                }
+                setLastClickTime(now);
+                props.onClick(event);
+            }
+            return false;
+        }
+    };
+
+    const TagEl = (tag || "span") as any;
+
+    // aria-disabled 属性用于无障碍访问，表示元素是否可交互
+    if (props.disabled) {
+        props["aria-disabled"] = true;
+    }
+    let attrs: Record<string, any> = { ...props };
+    attrs.style = { ...attrs.style };
+
+    delete attrs.onClick;
+    delete attrs.debounce;
+    return (
+        // role="button" 即可表达按钮语义；aria-role 是非法属性（合法的是 role），会造成 React 每次渲染报 Invalid aria prop 警告
+        <TagEl {...attrs} tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
+            {children}
+        </TagEl>
+    );
+});
