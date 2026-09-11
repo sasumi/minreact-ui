@@ -115,6 +115,49 @@ function ControlledDemo() {
     );
 }
 
+/** 通过 children 渲染函数把 List 与 Panels 拆分到不同位置，自定义布局与 className */
+function SplitLayoutDemo() {
+    const cardItems: TabItem[] = [
+        { trigger: "概览", content: <p>「概览」面板：List 放在卡片头部，Panels 位于卡片主体。</p> },
+        { trigger: "用量", content: <p>「用量」面板：触发标签与内容区可以分别指定 className。</p> },
+        { trigger: "设置", content: <p>「设置」面板：切换标签时 List 保持不动，只有内容区随之更新。</p> },
+    ];
+    const footerItems: TabItem[] = [
+        { trigger: "详情", content: <p>「详情」面板：这里把 Panels 放在了上方。</p> },
+        { trigger: "评论", content: <p>「评论」面板：List 被移到卡片底部，作为页脚导航使用。</p> },
+        { trigger: "附件", content: <p>「附件」面板：List 与 Panels 的先后顺序完全由外部决定。</p> },
+    ];
+    return (
+        <div className="demo-row" style={{ alignItems: "flex-start" }}>
+            <div className="demo-col">
+                <p style={{ fontWeight: 500, margin: "0 0 0.75rem" }}>List 在卡片头部 · Panels 在主体</p>
+                <Tabs className="tabs-demo tabs-demo--split" items={cardItems}>
+                    {({ List, Panels }) => (
+                        <div className="tabs-demo-card">
+                            <div className="tabs-demo-card__header">
+                                <span className="tabs-demo-card__title">工作区控制台</span>
+                                <List />
+                            </div>
+                            <Panels className="tabs-demo-card__panels" />
+                        </div>
+                    )}
+                </Tabs>
+            </div>
+            <div className="demo-col">
+                <p style={{ fontWeight: 500, margin: "0 0 0.75rem" }}>顺序反转 · Panels 在上、List 在下</p>
+                <Tabs className="tabs-demo tabs-demo--split" items={footerItems}>
+                    {({ List, Panels }) => (
+                        <div className="tabs-demo-card">
+                            <Panels className="tabs-demo-card__panels" />
+                            <List className="tabs-demo-card__footer" />
+                        </div>
+                    )}
+                </Tabs>
+            </div>
+        </div>
+    );
+}
+
 function TabsDemo() {
     const basicItems: TabItem[] = [
         {
@@ -134,6 +177,7 @@ function TabsDemo() {
                     <h4>属性说明</h4>
                     <p>TabItem：trigger（触发标签）、content（面板内容）、disabled（禁用）、onActive（激活回调）。</p>
                     <p>TabsProps：defaultIndex、index、onIndexChange、destroyOnHide，其余属性透传给 Radix Root。</p>
+                    <p>children：传入 (slots) =&gt; ReactNode 渲染函数时进入分离布局模式，slots 提供 List 与 Panels 两个插槽。</p>
                 </div>
             ),
         },
@@ -198,7 +242,7 @@ function TabsDemo() {
         <div className="demo-page">
             <div className="demo-page-header">
                 <h2>Tabs 标签页</h2>
-                <p>基于 @radix-ui/react-tabs 的标签页组件，支持受控/非受控、禁用、内容挂载策略、命令式切换与垂直布局</p>
+                <p>基于 @radix-ui/react-tabs 的标签页组件，支持受控/非受控、禁用、内容挂载策略、命令式切换、垂直布局与 List / Panels 分离布局</p>
             </div>
 
             <DemoSection title="基础用法" description="默认非受控模式，点击标签或使用方向键（←/→）进行切换">
@@ -231,6 +275,10 @@ function TabsDemo() {
 
             <DemoSection title="垂直布局" description='设置 orientation="vertical" 切换为纵向排列，标签在左、内容在右，使用 ↑/↓ 方向键导航'>
                 <Tabs className="tabs-demo tabs-demo--vertical" orientation="vertical" items={verticalItems} />
+            </DemoSection>
+
+            <DemoSection title="布局分离（List / Panels）" description="children 传入渲染函数时获得 List 与 Panels 两个插槽，可自行决定摆放位置与 className">
+                <SplitLayoutDemo />
             </DemoSection>
         </div>
     );

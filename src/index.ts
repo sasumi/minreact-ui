@@ -101,7 +101,8 @@ export {
 export type {
   TabItem,
   TabsProps,
-  TabsRef
+  TabsRef,
+  TabsSlots
 } from './components/Tabs'
 export {
   Tabs

@@ -109,6 +109,61 @@
     }
 }
 
+/* List / Panels 分离布局：children 渲染函数自定义摆放位置 */
+.tabs-demo--split {
+    [role="tablist"] {
+        flex-wrap: nowrap;
+        border-bottom: 0;
+    }
+
+    [role="tab"] {
+        margin: 0;
+        padding: 0.35rem 0.8rem;
+        border-bottom: 0;
+        border-radius: 999px;
+
+        &[data-state="active"] {
+            color: #fff;
+            background: var(--tabs-accent);
+        }
+    }
+
+    [role="tabpanel"] {
+        padding: 0;
+    }
+}
+
+.tabs-demo-card {
+    border: 1px solid var(--tabs-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tabs-demo-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    background: #f7f8fa;
+    border-bottom: 1px solid var(--tabs-border);
+}
+
+.tabs-demo-card__title {
+    font-weight: 600;
+    color: #333;
+}
+
+.tabs-demo-card__panels {
+    padding: 0.9rem;
+}
+
+.tabs-demo-card__footer {
+    padding: 0.5rem 0.9rem;
+    background: #f7f8fa;
+    border-top: 1px solid var(--tabs-border);
+}
+
 /* onActive 演示中的日志条 */
 .tabs-demo-log {
     margin-top: 1rem;
