@@ -170,8 +170,12 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
  * 可以通过 moveable 属性设置标题是否可拖动
  */
 const Title = Object.assign(
-    ({ children, className }: DialogTitleProps) => {
-        return <div className={`${TITLE_CLASS_NAME} ${className || ""}`}>{children}</div>;
+    ({ children, ...props }: DialogTitleProps & React.HTMLAttributes<HTMLDivElement>) => {
+        return (
+            <div {...props} className={`${TITLE_CLASS_NAME} ${props?.className || ""}`}>
+                {children}
+            </div>
+        );
     },
     { _type: DialogTitleSymbol },
 );
@@ -180,8 +184,12 @@ const Title = Object.assign(
  * 内容子组件
  */
 const Content = Object.assign(
-    ({ children, className }: DialogContentProps) => {
-        return <div className={`${CONTENT_CLASS_NAME} ${className || ""}`}>{children}</div>;
+    ({ children, ...props }: DialogContentProps & React.HTMLAttributes<HTMLDivElement>) => {
+        return (
+            <div {...props} className={`${CONTENT_CLASS_NAME} ${props.className || ""}`}>
+                {children}
+            </div>
+        );
     },
     { _type: DialogContentSymbol },
 );
@@ -190,9 +198,9 @@ const Content = Object.assign(
  * 操作按钮区域子组件
  */
 const Action = Object.assign(
-    ({ children, className, align = "right", gap = ".5em" }: DialogActionProps) => {
+    ({ children, className, align = "right", gap = ".5em", ...props }: DialogActionProps & React.HTMLAttributes<HTMLDivElement>) => {
         return (
-            <div className={`${ACTION_CLASS_NAME} ${className || ""}`} style={{ "--align": align, "--gap": gap } as React.CSSProperties}>
+            <div {...props} className={`${ACTION_CLASS_NAME} ${className || ""}`} style={{ "--align": align, "--gap": gap } as React.CSSProperties}>
                 {children}
             </div>
         );
