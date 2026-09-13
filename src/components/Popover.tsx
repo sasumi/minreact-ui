@@ -22,7 +22,6 @@ const PopoverContext = createContext<PopoverContextValue | null>(null);
 type PopoverProps = React.ComponentProps<typeof ReactPopover.Root> & {
     className?: string;
     showArrow?: boolean;
-    /** 是否禁用：禁用时 Popover 不会打开 */
     disabled?: boolean;
 };
 

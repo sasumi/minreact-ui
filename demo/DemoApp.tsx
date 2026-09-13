@@ -18,6 +18,7 @@ import NoviceDemo from "./pages/NoviceDemo";
 import MenuDemo from "./pages/MenuDemo";
 import ImageDemo from "./pages/ImageDemo";
 import TabsDemo from "./pages/TabsDemo";
+import SelectionDemo from "./pages/SelectionDemo";
 
 const components = [
     { name: "Button", label: "按钮", description: "多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等", component: ButtonDemo, category: "基础组件" },
@@ -36,6 +37,7 @@ const components = [
     { name: "Novice", label: "新手引导", description: "分步引导用户的新手教程组件", component: NoviceDemo, category: "交互组件" },
     { name: "Image", label: "图片加载", description: "支持加载、错误、空状态的图片组件", component: ImageDemo, category: "基础组件" },
     { name: "Tabs", label: "标签页", description: "数据驱动的标签页切换组件，支持受控/非受控与 List / Panels 分离布局", component: TabsDemo, category: "交互组件" },
+    { name: "Selection", label: "选择", description: "useSelection 多选状态 Hook 与底层 Checkbox，支持全选/半选/反选/裁剪与跨页选择", component: SelectionDemo, category: "表单组件" },
 ];
 
 /** Sentinel used when the URL does not point at a specific component (the gallery). */

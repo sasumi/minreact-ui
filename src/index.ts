@@ -80,6 +80,19 @@ export {
   RangeInput
 } from './components/RangeInput'
 
+// Selection utilities
+export type {
+  CheckboxAllProps,
+  CheckboxItemProps,
+  CheckboxProps,
+  UseSelectionOptions,
+  UseSelectionResult
+} from './components/Selection'
+export {
+  Checkbox,
+  useSelection
+} from './components/Selection'
+
 // Spinner utilities
 export {
   Spinner
