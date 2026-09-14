@@ -34,6 +34,11 @@ export {
   Dialog
 } from './components/Dialog'
 
+// FilePicker utilities
+export {
+  FilePicker
+} from './components/FilePicker'
+
 // Image utilities
 export {
   ImageLoader,
