@@ -11,6 +11,15 @@ type FilePickerProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChan
     accept?: string;
 };
 
+/**
+ * 文件选择组件，需要配合触发元素 label 使用
+ * @param onChange 文件选择回调
+ * @param maxSize 最大文件大小
+ * @param minSize 最小文件大小
+ * @param maxCount 最大文件数量
+ * @param multiple 是否允许多选
+ * @param accept 接受的文件类型
+ */
 export const FilePicker = forwardRef<HTMLInputElement, FilePickerProps>(
     ({ onChange, maxSize = Infinity, maxCount = undefined, minSize = 0, ...inputProps }: FilePickerProps, ref) => {
         return (
