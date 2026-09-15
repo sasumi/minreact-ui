@@ -51,6 +51,8 @@
 
         &-content {
             flex: 1;
+            // 允许收缩到内容最小宽度以下，长文本才能按菜单宽度截断（配合 .ellipsis 之类的截断样式）
+            min-width: 0;
             user-select: none;
         }
 

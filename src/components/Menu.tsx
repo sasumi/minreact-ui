@@ -51,11 +51,14 @@ export const MenuItemDataConvert = (data: MenuItemData | Partial<MenuItemData> |
         };
     }
     if (typeof data === "object" && data !== null) {
+        // label 可能是 React 节点（例如套了截断样式的 <div className="ellipsis">…），
+        // 直接当作 title 会被渲染成 "[object Object]"，这里统一转成纯文本
+        const labelText = reactNodeToString(data.label) || (typeof data.value === "string" ? data.value : "");
         return {
+            ...data,
             value: data.value,
             label: data.label || data.value,
-            title: data.title || data.label || data.value,
-            ...data,
+            title: data.title || labelText,
         } as MenuItemData;
     }
     throw new Error("MenuItemDataConvert: invalid data type");
