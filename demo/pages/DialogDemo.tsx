@@ -49,6 +49,96 @@ function DialogDemo() {
             });
     };
 
+    // 进度对话框：总量已知，到达总量后自动关闭
+    const showProgressBasic = () => {
+        const progress = Dialog.showProgress({
+            title: "正在处理",
+            message: "共 <b>100</b> 个任务，完成后自动关闭",
+        });
+        let done = 0;
+        const timer = setInterval(() => {
+            done += 5;
+            progress.updater(done, 100);
+            if (done >= 100) {
+                clearInterval(timer);
+            }
+        }, 20000);
+    };
+
+    // 进度对话框：总量在过程中变更（先 10 个，再追加到 30 个）
+    const showProgressGrowing = () => {
+        const progress = Dialog.showProgress({
+            title: "扫描中",
+            message: "任务数量会动态增加",
+            autoClose: false,
+            canAbort: false,
+        });
+        let done = 0;
+        let total = 10;
+        const timer = setInterval(() => {
+            done += 1;
+            progress.updater(done, total);
+            if (done === 10) {
+                total = 30;
+                progress.updater(done, total);
+            }
+            if (done >= total) {
+                clearInterval(timer);
+                setTimeout(() => {
+                    progress.close();
+                    Toast.showSuccess("扫描完成");
+                }, 500);
+            }
+        }, 250);
+    };
+
+    // 进度对话框：可中止，通过 isAborted 让业务侧停止后续工作
+    const showProgressAbortable = () => {
+        const progress = Dialog.showProgress({
+            title: "可中止的任务",
+            message: "点击右上角关闭按钮可中止任务",
+            canAbort: true,
+            autoClose: false,
+        });
+        let done = 0;
+        const timer = setInterval(() => {
+            if (progress.isAborted()) {
+                clearInterval(timer);
+                Toast.showWarning("任务已中止");
+                return;
+            }
+            done += 2;
+            progress.updater(done, 100);
+            if (done >= 100) {
+                clearInterval(timer);
+                progress.close();
+                Toast.showSuccess("任务已完成");
+            }
+        }, 100);
+    };
+
+    // 进度对话框：自定义剩余时间文案，{timeStr} 会被替换为剩余时长
+    const showProgressCustomText = () => {
+        const progress = Dialog.showProgress({
+            title: "下载中",
+            canAbort: false,
+            autoClose: false,
+            remainTimesText: "还需 {timeStr}，请勿关闭页面",
+        });
+        let loaded = 0;
+        const timer = setInterval(() => {
+            loaded += 1;
+            progress.updater(loaded, 20);
+            if (loaded >= 20) {
+                clearInterval(timer);
+                setTimeout(() => {
+                    progress.close();
+                    Toast.showSuccess("下载完成");
+                }, 800);
+            }
+        }, 300);
+    };
+
     return (
         <div className="demo-page">
             <div className="demo-page-header">
@@ -104,6 +194,29 @@ function DialogDemo() {
                     <PrimaryButton onClick={showAlert}>提示对话框</PrimaryButton>
                     <PrimaryButton onClick={showPrompt}>输入对话框</PrimaryButton>
                 </div>
+            </DemoSection>
+
+            <DemoSection
+                title="Dialog.showProgress 进度对话框"
+                description="返回 { updater, isAborted, close }，通过 updater(progress, total?) 推进进度"
+            >
+                <div className="demo-row">
+                    <PrimaryButton onClick={showProgressBasic}>自动关闭</PrimaryButton>
+                    <PrimaryButton onClick={showProgressGrowing}>总量动态变化</PrimaryButton>
+                    <PrimaryButton onClick={showProgressAbortable}>可中止</PrimaryButton>
+                    <PrimaryButton onClick={showProgressCustomText}>自定义剩余时间文案</PrimaryButton>
+                </div>
+                <ul style={{ marginTop: "0.75rem", paddingLeft: "1.2rem", opacity: 0.75, fontSize: "0.85rem" }}>
+                    <li>
+                        <code>updater(progress, total?)</code> 同时更新已完成量与总量；<code>total</code> 省略时沿用上次的值。
+                    </li>
+                    <li>
+                        <code>isAborted()</code> 在用户点击右上角关闭按钮后返回 true，业务侧据此停止后续任务。
+                    </li>
+                    <li>
+                        <code>autoClose</code> 为 true 时进度到达总量自动关闭；<code>canAbort</code> 控制是否显示关闭按钮。
+                    </li>
+                </ul>
             </DemoSection>
 
             <DemoSection title="不显示关闭按钮">

@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import "./../styles/common.module.scss";
 import "./../styles/components/dialog.scss";
 import { namespace } from "./../styles/namespace";
-import { mountReactNode } from "./../utils.tsx";
+import { mountReactNode, textTranslate } from "./../utils.tsx";
 import { Clickable, NormalButton } from ".//Button";
 
 const CSS_NS = namespace;
@@ -441,6 +441,16 @@ interface ProgressDialogRet {
 }
 
 /**
+ * 将剩余秒数格式化为 `12秒` 或 `1分05秒`
+ * @param secs - 剩余秒数
+ */
+const formatDuration = (secs: number) => {
+    const minutes = Math.floor(secs / 60);
+    const seconds = secs % 60;
+    return minutes > 0 ? `${minutes}分${String(seconds).padStart(2, "0")}秒` : `${seconds}秒`;
+};
+
+/**
  * 显示进度对话框
  */
 const showProgressDialog = ({
@@ -462,6 +472,7 @@ const showProgressDialog = ({
         const [progressValue, setProgressValue] = useState(0);
         const [totalValue, setTotalValue] = useState(100);
         const [startTime] = useState(() => Date.now());
+        const CSS_CLS = `${CSS_NS}-dialog-progress`;
 
         const isAborted = () => {
             return aborted || abortControllerRef.current.signal.aborted;
@@ -488,30 +499,34 @@ const showProgressDialog = ({
         }, [progressValue, totalValue]);
 
         const remainSecs = Math.floor(calcRemainingMSecs(progressValue, totalValue, startTime) / 1000);
-        const remainSecsStr = remainSecs === Infinity ? "" : remainTimesText;
+        const remainSecsStr = Number.isFinite(remainSecs) ? textTranslate(remainTimesText, { timeStr: formatDuration(remainSecs) }) : "";
 
         return (
             <Dialog
                 open={true}
                 setOpen={(open) => {
                     if (!open) {
+                        abortControllerRef.current.abort();
+                        setAborted(true);
                         closer?.();
                     }
                 }}
                 showTopCloser={canAbort}
-                className={`${CSS_NS}-dialog-progress`}
+                className={CSS_CLS}
                 autoFocus={false}
             >
-                <Dialog.Title>{title}</Dialog.Title>
-                {!!message && <div className="pd-message" dangerouslySetInnerHTML={{ __html: message }} />}
-                <progress value={progressValue} max={totalValue} className="progress" />
-                <div className="pd-status">
-                    <span className="p-tm">{remainSecsStr}</span>
-                    <span className="p-txt">
-                        {progressValue}/{totalValue}
-                        {totalValue > 0 && ` (${Math.floor((progressValue / totalValue) * 100)}%)`}
-                    </span>
-                </div>
+                <Dialog.Content>
+                    {!!title && <div className={`${CSS_CLS}-title`}>{title}</div>}
+                    {!!message && <div className={`${CSS_CLS}-message`} dangerouslySetInnerHTML={{ __html: message }} />}
+                    <progress value={progressValue} max={totalValue} className="progress" />
+                    <div className={`${CSS_CLS}-status`}>
+                        <span className={`${CSS_CLS}-tm`}>{remainSecsStr}</span>
+                        <span className={`${CSS_CLS}-txt`}>
+                            {progressValue}/{totalValue}
+                            {totalValue > 0 && ` (${Math.floor((progressValue / totalValue) * 100)}%)`}
+                        </span>
+                    </div>
+                </Dialog.Content>
             </Dialog>
         );
     };

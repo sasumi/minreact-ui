@@ -17,10 +17,12 @@ export const InlineTextEditor = ({
     required = false,
     readonly = false,
     maxlength,
+    placeholder,
     saveHandler,
 }: {
     value: string;
     title?: string;
+    placeholder?: string;
     readonly?: boolean;
     multiline?: boolean;
     required?: boolean;
@@ -60,7 +62,7 @@ export const InlineTextEditor = ({
                         setState(STATE_EDITING);
                     }}
                 >
-                    {val}
+                    {val || placeholder}
                 </span>
             )}
 
@@ -84,6 +86,7 @@ export const InlineTextEditor = ({
                         ref={inputRef}
                         type="text"
                         defaultValue={val}
+                        placeholder={placeholder}
                         required={required}
                         autoFocus={true}
                         readOnly={state === STATE_SAVING}

@@ -4,206 +4,210 @@
 @use "./../mixins/icon.scss" as icon;
 
 :root {
-	--#{$ns}-dialog-inner-padding: 1em;
-	--#{$ns}-dialog-max-height: calc(100vh - 2em);
-	--#{$ns}-dialog-max-width: calc(100vw - 2em);
-	--#{$ns}-dialog-content-max-height: calc(100vh - 20em);
-	--#{$ns}-dialog-masker-background: rgba(0, 0, 0, 0.4);
+    --#{$ns}-dialog-inner-padding: 1em;
+    --#{$ns}-dialog-max-height: calc(100vh - 2em);
+    --#{$ns}-dialog-max-width: calc(100vw - 2em);
+    --#{$ns}-dialog-content-max-height: calc(100vh - 20em);
+    --#{$ns}-dialog-masker-background: rgba(0, 0, 0, 0.4);
 }
 
 .#{$ns}-dialog {
-	@include com.panel();
-	max-height: var(--#{$ns}-dialog-max-height);
-	max-width: var(--#{$ns}-dialog-max-width);
-	position: fixed;
-	z-index: var(--#{$ns}-dialog-zindex);
-	margin: auto;
-	inset: 0;
-	border: none;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
+    @include com.panel();
+    max-height: var(--#{$ns}-dialog-max-height);
+    max-width: var(--#{$ns}-dialog-max-width);
+    position: fixed;
+    z-index: var(--#{$ns}-dialog-zindex);
+    margin: auto;
+    inset: 0;
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 
-	.#{$ns}-dialog-title {
-		flex-shrink: 0;
-		opacity: 0.8;
-		line-height: 1;
-		padding: var(--#{$ns}-dialog-inner-padding) 0 0 var(--#{$ns}-dialog-inner-padding);
-	}
+    .#{$ns}-dialog-title {
+        flex-shrink: 0;
+        opacity: 0.8;
+        line-height: 1;
+        padding: var(--#{$ns}-dialog-inner-padding) 0 0 var(--#{$ns}-dialog-inner-padding);
+    }
 
-	.#{$ns}-dialog-content {
-		flex: 1;
-		padding: var(--#{$ns}-dialog-inner-padding); //内容块再往里面缩padding，避免内容贴边
-		overflow: auto;
-		max-width: calc(100vw - 2em);
-	}
+    .#{$ns}-dialog-content {
+        flex: 1;
+        padding: var(--#{$ns}-dialog-inner-padding); //内容块再往里面缩padding，避免内容贴边
+        overflow: auto;
+        max-width: calc(100vw - 2em);
+    }
 
-	.#{$ns}-dialog-close-btn {
-		font-size: 1em;
-		width: 1em;
-		height: 1em;
-		position: absolute;
-		right: var(--#{$ns}-dialog-inner-padding);
-		top: var(--#{$ns}-dialog-inner-padding);
-		z-index: 1;
-		@include icon.icon-button;
+    .#{$ns}-dialog-close-btn {
+        font-size: 1em;
+        width: 1em;
+        height: 1em;
+        position: absolute;
+        right: var(--#{$ns}-dialog-inner-padding);
+        top: var(--#{$ns}-dialog-inner-padding);
+        z-index: 1;
+        @include icon.icon-button;
 
-		&:before {
-			content: "\e625";
-		}
-	}
+        &:before {
+            content: "\e625";
+        }
+    }
 
-	.#{$ns}-dialog-actions {
-		flex-shrink: 0;
-		display: flex;
-		padding: var(--#{$ns}-dialog-inner-padding);
-		gap: var(--gap, var(--#{$ns}-dialog-inner-padding));
-		justify-content: var(--align, var(--#{$ns}-dialog-inner-padding));
-	}
+    .#{$ns}-dialog-actions {
+        flex-shrink: 0;
+        display: flex;
+        padding: var(--#{$ns}-dialog-inner-padding);
+        gap: var(--gap, var(--#{$ns}-dialog-inner-padding));
+        justify-content: var(--align, var(--#{$ns}-dialog-inner-padding));
+    }
 
-	.#{$ns}-dialog-content~.#{$ns}-dialog-actions {
-		margin-top: calc(var(--#{$ns}-dialog-inner-padding) * -1); //去掉内容块的padding-bottom，避免内容块和按钮块之间的间距过大
-	}
+    .#{$ns}-dialog-content ~ .#{$ns}-dialog-actions {
+        margin-top: calc(var(--#{$ns}-dialog-inner-padding) * -1); //去掉内容块的padding-bottom，避免内容块和按钮块之间的间距过大
+    }
 
-	.form-portrait .#{$ns}-dialog-actions {
-		padding: 0;
-	}
+    .form-portrait .#{$ns}-dialog-actions {
+        padding: 0;
+    }
 
-	&::backdrop {
-		background-color: var(--#{$ns}-dialog-masker-background);
-		box-shadow: 1px 1px 10px #ccc;
-		backdrop-filter: blur(3px);
-	}
+    &::backdrop {
+        background-color: var(--#{$ns}-dialog-masker-background);
+        box-shadow: 1px 1px 10px #ccc;
+        backdrop-filter: blur(3px);
+    }
 
-	&-alert,
-	&-confirm,
-	&-prompt {
-		min-width: 15em;
-		max-width: min(30em, calc(100vw - 2em));
-		max-height: calc(100vh - 20em);
+    &-alert,
+    &-confirm,
+    &-prompt {
+        min-width: 15em;
+        max-width: min(30em, calc(100vw - 2em));
+        max-height: calc(100vh - 20em);
 
-		.#{$ns}-dialog-content {
-			padding: .5em var(--#{$ns}-dialog-inner-padding);
-			overflow: auto;
-		}
-	}
+        .#{$ns}-dialog-content {
+            padding: 0.5em var(--#{$ns}-dialog-inner-padding);
+            overflow: auto;
+        }
+    }
 
-	&-prompt {
-		.#{$ns}-dialog-content {
-			padding: 1em var(--#{$ns}-dialog-inner-padding);
-		}
+    &-prompt {
+        .#{$ns}-dialog-content {
+            padding: 1em var(--#{$ns}-dialog-inner-padding);
+        }
 
-		.#{$ns}-dialog-title {
-			padding-top: 1.5em;
-			font-size: 1em;
-		}
+        .#{$ns}-dialog-title {
+            padding-top: 1.5em;
+            font-size: 1em;
+        }
 
-		input[type="text"],
-		input[type="password"],
-		input[type="number"],
-		textarea {
-			width: 100%;
-			box-sizing: border-box;
-		}
-	}
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
 
-	&-iframe {
-		.#{$ns}-dialog-content {
-			padding: 0 !important;
-		}
+    &-iframe {
+        .#{$ns}-dialog-content {
+            padding: 0 !important;
+        }
 
-		iframe {
-			display: block;
-			width: 100%;
-			height: var(--init-height, var(--content-height, var(--default-height, 10em)));
-			border: none;
-			max-width: 100vw;
-			max-height: var(--#{$ns}-dialog-content-max-height);
-		}
-	}
+        iframe {
+            display: block;
+            width: 100%;
+            height: var(--init-height, var(--content-height, var(--default-height, 10em)));
+            border: none;
+            max-width: 100vw;
+            max-height: var(--#{$ns}-dialog-content-max-height);
+        }
+    }
 
-	&-iframe-loading {
-		.#{$ns}-dialog-content {
-			background: url("../../assets/img_loading.gif") no-repeat center center;
-		}
+    &-iframe-loading {
+        .#{$ns}-dialog-content {
+            background: url("../../assets/img_loading.gif") no-repeat center center;
+        }
 
-		iframe {
-			visibility: hidden;
-		}
-	}
+        iframe {
+            visibility: hidden;
+        }
+    }
 
-	&-img-preview {
-		.#{$ns}-dialog-content {
-			padding: 0;
+    &-img-preview {
+        .#{$ns}-dialog-content {
+            padding: 0;
 
-			img {
-				display: block;
-				cursor: pointer;
-				width: 100%;
-				height: 100%;
-				object-fit: contain;
-			}
-		}
+            img {
+                display: block;
+                cursor: pointer;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
 
-		.#{$ns}-dialog-close-btn {
-			background-color: var(--#{$ns}-color-background);
-			border-radius: 50%;
-			width: 2.5em;
-			height: 2.5em;
-			top: -1em;
-			right: -1em;
-			opacity: 0.5;
-			transition: all 0.1s ease-in-out;
+        .#{$ns}-dialog-close-btn {
+            background-color: var(--#{$ns}-color-background);
+            border-radius: 50%;
+            width: 2.5em;
+            height: 2.5em;
+            top: -1em;
+            right: -1em;
+            opacity: 0.5;
+            transition: all 0.1s ease-in-out;
 
-			@include icon.icon-button;
+            @include icon.icon-button;
 
-			&:hover {
-				opacity: 1;
-			}
-		}
-	}
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
 
-	&-progress {
-		.#{$ns}-dialog-content {
-			padding: 1.5em;
-		}
+    &-progress {
+        min-width: 20em;
+        max-width: min(30em, calc(100vw - 2em));
+        max-height: calc(100vh - 20em);
 
-		progress {
-			width: 20em;
-			margin: 0.75em 0;
-		}
+        .#{$ns}-dialog-content {
+            padding: 1.5em;
+        }
+        progress {
+            width: 100%;
+        }
 
-		.pd-title {}
+        &-title {
+            font-weight: bold;
+        }
 
-		.pd-message {
-			opacity: 0.6;
-		}
+        &-message {
+            opacity: 0.6;
+        }
 
-		.pd-status {
-			zoom: .8;
-			display: flex;
-			justify-content: space-between;
-			opacity: 0.6;
-		}
-	}
+        &-status {
+            zoom: 0.8;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.6;
+        }
+    }
 }
 
 .#{$ns}-dialog-wrap {
-	.#{$ns}-dialog-masker {
-		position: absolute;
-		inset: 0;
-		background: var(--#{$ns}-dialog-masker-background);
-		backdrop-filter: blur(3px);
-		z-index: var(--#{$ns}-dialog-zindex);
-	}
+    .#{$ns}-dialog-masker {
+        position: absolute;
+        inset: 0;
+        background: var(--#{$ns}-dialog-masker-background);
+        backdrop-filter: blur(3px);
+        z-index: var(--#{$ns}-dialog-zindex);
+    }
 
-	&[data-modal="false"] {
-		.#{$ns}-dialog-masker {
-			display: none;
-		}
+    &[data-modal="false"] {
+        .#{$ns}-dialog-masker {
+            display: none;
+        }
 
-		.#{$ns}-dialog {
-			border: 1px solid var(--#{$ns}-color-element-border);
-		}
-	}
+        .#{$ns}-dialog {
+            border: 1px solid var(--#{$ns}-color-element-border);
+        }
+    }
 }
