@@ -21,6 +21,15 @@
         opacity: 0.15;
     }
 
+    //菜单标题
+    &-caption {
+        padding: 0.1em 1.2em;
+        font-size: 0.85em;
+        opacity: 0.6;
+        user-select: none;
+        cursor: default;
+    }
+
     //菜单项
     &-item {
         padding: 0.25em 1em;

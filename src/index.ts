@@ -52,6 +52,7 @@ export {
 
 // Menu utilities
 export type {
+  MenuCaption,
   MenuEntry,
   MenuItemData,
   MenuProps
@@ -63,6 +64,7 @@ export {
   MenuItemDataConvert,
   MenuItemDivider,
   Select,
+  isMenuCaption,
   isMenuDivider
 } from './components/Menu'
 

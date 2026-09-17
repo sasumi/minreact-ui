@@ -6,15 +6,22 @@ import { namespace } from "./../styles/namespace";
 import { AnyButton } from "./Button";
 import { Popover } from "./Popover";
 
+//菜单项
 export interface MenuItemData {
     value?: any; // 唯一标识值，通常用于选中和回调
-    icon?: React.ReactNode; // 菜单项的图标，显示在左侧
+    icon?: ReactNode; // 菜单项的图标，显示在左侧
     label: ReactNode; // 显示文本，默认使用 value
     disabled?: boolean; // 禁用状态，禁用的菜单项无法被选中
     title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
     checked?: boolean | null; // null 表示不显示选中标记，true 显示选中，false 显示未选中
-    extension?: React.ReactNode; // 扩展内容，显示在右侧
+    extension?: ReactNode; // 扩展内容，显示在右侧
     onClick?: (item: MenuItemData) => void; // 点击回调函数，点击菜单项时触发，并传入当前菜单项数据
+}
+
+//菜单标题
+export interface MenuCaption {
+    type: "caption"; // 固定标记，用于区分菜单标题与菜单项
+    label: ReactNode;
 }
 
 /**
@@ -23,10 +30,14 @@ export interface MenuItemData {
  */
 export const MenuItemDivider = Symbol("menu-divider");
 
-export type MenuEntry = MenuItemData | typeof MenuItemDivider;
+export type MenuEntry = MenuItemData | MenuCaption | typeof MenuItemDivider;
 
 /** 判断菜单条目是否为分隔线（类型收窄辅助函数） */
 export const isMenuDivider = (entry: MenuEntry): entry is typeof MenuItemDivider => entry === MenuItemDivider;
+
+/** 判断菜单条目是否为菜单标题（类型收窄辅助函数） */
+export const isMenuCaption = (entry: MenuEntry): entry is MenuCaption =>
+    !isMenuDivider(entry) && (entry as MenuCaption).type === "caption";
 
 export interface MenuProps {
     items: MenuEntry[];
@@ -73,14 +84,18 @@ const MenuImpl = ({ items, value, showChecker, _className = namespace + "-menu",
     }, [value]);
 
     // 只要存在任意带图标的项，就为整列预留等宽图标列，让不带图标的项文字也能对齐
-    const hasIcon = items.some((item) => !isMenuDivider(item) && Boolean(item.icon));
+    const hasIcon = items.some((item) => !isMenuDivider(item) && !isMenuCaption(item) && Boolean(item.icon));
 
     return (
         <div className={_className + (className ? " " + className : "")}>
             {items.map((item, index) => {
                 if (isMenuDivider(item)) {
                     return index !== 0 && !isMenuDivider(items[index - 1]) ? <MenuDivider key={index} /> : null;
-                } else {
+                }
+                else if (isMenuCaption(item)) {
+                    return <MenuCaptionItem key={index} label={item.label} />;
+                }
+                else {
                     return (
                         <MenuItem
                             key={index}
@@ -107,7 +122,11 @@ const MenuDivider = () => {
     return <div className={namespace + "-menu-divider"} />;
 };
 
-const MenuItemIcon = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+const MenuCaptionItem = ({ label }: { label: ReactNode }) => {
+    return <div className={namespace + "-menu-caption"}>{label}</div>;
+};
+
+const MenuItemIcon = ({ className, children }: { className?: string; children?: ReactNode }) => {
     return <span className={namespace + "-menu-item-icon" + (className ? " " + className : "")}>{children}</span>;
 };
 
@@ -145,7 +164,7 @@ export const DropdownMenu = ({
     showChecker,
     hideOnClick = true,
 }: {
-    trigger: React.ReactNode;
+    trigger: ReactNode;
     items: MenuEntry[];
     value?: any;
     disabled?: boolean;
@@ -197,7 +216,7 @@ export const ComboboxMenu = ({
     placeholder = "搜索...",
     onChange,
 }: {
-    trigger: React.ReactNode;
+    trigger: ReactNode;
     items: MenuEntry[];
     value?: any;
     disabled?: boolean;
@@ -210,11 +229,10 @@ export const ComboboxMenu = ({
     const [open, setOpen] = useState(false);
 
     const filteredItems = items.filter((item) => {
-        if (isMenuDivider(item)) {
-            return true; // 保留分隔线
-        } else {
-            return reactNodeToString(item.label).toLowerCase().includes(searchText.toLowerCase());
+        if (isMenuDivider(item) || isMenuCaption(item)) {
+            return true; // 保留分隔线与菜单标题
         }
+        return reactNodeToString(item.label).toLowerCase().includes(searchText.toLowerCase());
     });
 
     return (
@@ -254,6 +272,7 @@ export const ComboboxMenu = ({
 export const Menu = Object.assign(MenuImpl, {
     Item: MenuItem,
     Divider: MenuDivider,
+    Caption: MenuCaptionItem,
     Icon: MenuItemIcon,
 });
 
@@ -279,7 +298,9 @@ export const Select = ({
 }) => {
     const [val, setVal] = useState<any>(value);
 
-    const currentItem = items.find((item): item is MenuItemData => !isMenuDivider(item) && item.value === val);
+    const currentItem = items.find(
+        (item): item is MenuItemData => !isMenuDivider(item) && !isMenuCaption(item) && item.value === val
+    );
 
     const trigger = (
         <AnyButton disabled={disabled} className={triggerClassName}>

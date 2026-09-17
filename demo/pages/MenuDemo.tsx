@@ -16,9 +16,10 @@ function MenuDemo() {
     );
 
     const TestMenuItems: MenuEntry[] = [
+        { type: "caption", label: "基础操作" },
         { label: "菜单项1", value: "item1", title: "这个是菜单项1" },
         { label: "菜单项2", value: "item2", title: "这个是菜单项2" },
-        MenuItemDivider,
+        { type: "caption", label: "高级设置" },
         { label: "菜单项3", value: "item3", title: "这个是菜单项3" },
         { label: "菜单项4", value: "item4", title: "这个是菜单项4", disabled: true },
         MenuItemDivider,
@@ -37,6 +38,21 @@ function MenuDemo() {
         { label: "菜单项1", icon: icon1, value: "item1", title: "这个是菜单项1" },
         { label: "菜单项13", value: "item13", title: "这个是菜单项13" },
         { label: "菜单项13", icon: icon2, value: "item14", title: "这个是菜单项13" },
+    ];
+
+    // 分组标题菜单：用 MenuCaption 将菜单项划分为若干分组
+    const TestMenuItemsGrouped: MenuEntry[] = [
+        { type: "caption", label: "文件" },
+        { label: "新建", value: "new", title: "新建文件" },
+        { label: "打开", value: "open", title: "打开文件" },
+        { label: "保存", value: "save", title: "保存文件" },
+        MenuItemDivider,
+        { type: "caption", label: "编辑" },
+        { label: "剪切", value: "cut", title: "剪切" },
+        { label: "复制", value: "copy", title: "复制" },
+        MenuItemDivider,
+        { type: "caption", label: "危险操作" },
+        { label: "删除", value: "delete", title: "删除文件" },
     ];
 
     const [comboxVal, setComboxVal] = useState<string | undefined>(undefined);
@@ -68,6 +84,20 @@ function MenuDemo() {
 
             <DemoSection title="自定义图标菜单">
                 <DropdownMenu trigger={<button>点击触发菜单</button>} items={TestMenuItemsWithIcon} value="item2" />
+            </DemoSection>
+
+            <DemoSection title="分组标题菜单" description="使用 { type: 'caption', label } 作为分组标题，各项会渲染为不可点击的标题行">
+                <DropdownMenu trigger={<button>点击触发分组菜单</button>} items={TestMenuItemsGrouped} />
+            </DemoSection>
+
+            <DemoSection title="带标题的选择器" description="Select 中同样支持分组标题，标题项不会被选中">
+                <Select
+                    items={TestMenuItemsGrouped}
+                    value={selectVal}
+                    onChange={(val) => {
+                        setSelectVal(val);
+                    }}
+                />
             </DemoSection>
 
             <DemoSection title="ComboBox菜单">
