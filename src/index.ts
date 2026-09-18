@@ -144,6 +144,9 @@ export {
 } from './components/Tip'
 
 // Toast utilities
+export type {
+  ToastMessage
+} from './components/Toast'
 export {
   Toast
 } from './components/Toast'

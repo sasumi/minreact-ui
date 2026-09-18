@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { ToastOptions } from "react-toastify";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,9 +25,12 @@ const tsConfig = (duration: number): ToastOptions => {
 
 type ToastId = string | number;
 
+/** Toast 内容：字符串或任意节点（可内嵌按钮等交互元素） */
+export type ToastMessage = ReactNode;
+
 const MSG_ELAPSED_OFFSET = 200;
 
-const showError = (message: string, callback: (() => void) | null = null, duration = 4000): ToastId => {
+const showError = (message: ToastMessage, callback: (() => void) | null = null, duration = 4000): ToastId => {
     ensureContainer();
     const toastId = toast.error(message, tsConfig(duration));
     if (callback) {
@@ -35,7 +39,7 @@ const showError = (message: string, callback: (() => void) | null = null, durati
     return toastId;
 };
 
-const showInfo = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
+const showInfo = (message: ToastMessage, callback: (() => void) | null = null, duration = 3000): ToastId => {
     ensureContainer();
     const toastId = toast.info(message, tsConfig(duration));
     if (callback) {
@@ -44,7 +48,7 @@ const showInfo = (message: string, callback: (() => void) | null = null, duratio
     return toastId;
 };
 
-const showSuccess = (message: string, callback: ((...args: any[]) => void) | null = null, duration = 1500): ToastId => {
+const showSuccess = (message: ToastMessage, callback: ((...args: any[]) => void) | null = null, duration = 1500): ToastId => {
     ensureContainer();
     const toastId = toast.success(message, tsConfig(duration));
     if (callback) {
@@ -53,7 +57,7 @@ const showSuccess = (message: string, callback: ((...args: any[]) => void) | nul
     return toastId;
 };
 
-const showWarning = (message: string, callback: (() => void) | null = null, duration = 3000): ToastId => {
+const showWarning = (message: ToastMessage, callback: (() => void) | null = null, duration = 3000): ToastId => {
     ensureContainer();
     const toastId = toast.warn(message, tsConfig(duration));
     if (callback) {
@@ -62,7 +66,7 @@ const showWarning = (message: string, callback: (() => void) | null = null, dura
     return toastId;
 };
 
-const showLoading = (message: string, callback: (() => void) | null = null, duration = 200000): ToastId => {
+const showLoading = (message: ToastMessage, callback: (() => void) | null = null, duration = 200000): ToastId => {
     ensureContainer();
     const tsc = tsConfig(duration);
     const toastId = toast.loading(message, tsc);
@@ -72,7 +76,7 @@ const showLoading = (message: string, callback: (() => void) | null = null, dura
     return toastId;
 };
 
-const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, message: string, duration = 200000) => {
+const bindLoading = (promiseFunc: (...args: any[]) => Promise<any>, message: ToastMessage, duration = 200000) => {
     return (...args: any[]) => {
         ensureContainer();
         const tsc = tsConfig(duration);
