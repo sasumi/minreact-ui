@@ -97,9 +97,13 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     ref,
 ) {
     const dlgRef = useRef<HTMLDialogElement | null>(null);
+    // setOpen 可能每次渲染都是新函数（命令式包装器即如此），用 ref 让事件回调始终调用最新实现
+    const setOpenRef = useRef(setOpen);
+    setOpenRef.current = setOpen;
 
     useImperativeHandle(ref, () => dlgRef.current!, []);
 
+    // 依赖只取「会改变绑定方式」的开关：父组件每次渲染都重建绑定会把拖动后的位置重置回居中
     useEffect(() => {
         if (!open || !dlgRef.current) return;
         const dlg = dlgRef.current;
@@ -109,19 +113,29 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
             focusFirstElement(dlgRef.current);
         }
         if (moveable && findOne(`.${TITLE_CLASS_NAME}`, dlg)) {
+            // 在标题上按下即开始拖动，必须早于 bindNodeMove 的监听（这里挂在对话框的捕获阶段）先把当前
+            // 位置落地：对话框靠 inset:0 + margin:auto 居中，只设 left/top 时 auto 边距会二次分配，位置不跟手
+            const onTitleMouseDown = (event: MouseEvent) => {
+                const target = event.target as Element | null;
+                if (event.button === 0 && target?.closest(`.${TITLE_CLASS_NAME}`)) {
+                    materializePosition(dlg);
+                }
+            };
+            dlg.addEventListener("mousedown", onTitleMouseDown, true);
+            cleanup.push(() => dlg.removeEventListener("mousedown", onTitleMouseDown, true));
             cleanup.push(bindNodeMove(dlg, `.${TITLE_CLASS_NAME}`));
         }
         if (showTopCloser) {
             cleanup.push(
                 bindClick(`.${TOP_CLOSER_CLASS_NAME}`, () => {
-                    setOpen(false);
+                    setOpenRef.current(false);
                 }),
             );
         }
         if (clickMaskerToClose) {
             cleanup.push(
                 bindClick(`.${MASKER_CLASS_NAME}`, () => {
-                    setOpen(false);
+                    setOpenRef.current(false);
                 }),
             );
         }
@@ -129,7 +143,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         return () => {
             cleanup.forEach((fn) => fn());
         };
-    });
+    }, [open, moveable, showTopCloser, clickMaskerToClose, autoFocus]);
 
     if (!open) {
         return null;
@@ -665,6 +679,19 @@ export const Dialog = Object.assign(DialogImpl, {
     confirm,
     alert,
 });
+
+/**
+ * 把对话框当前的视觉位置落地为 left/top，并清掉用于居中的 auto 边距（供拖动前调用）
+ * @param dlg - 对话框元素
+ */
+const materializePosition = (dlg: HTMLDialogElement): void => {
+    const { left, top } = dlg.getBoundingClientRect();
+    dlg.style.margin = "0";
+    dlg.style.right = "auto";
+    dlg.style.bottom = "auto";
+    dlg.style.left = `${left}px`;
+    dlg.style.top = `${top}px`;
+};
 
 /**
  * 将焦点设置到容器内的第一个可聚焦元素上
