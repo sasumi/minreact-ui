@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TimePicker, TimePickerPanel } from "../../src/components/TimePicker";
+import { SpanButton } from "../../src/components/Button";
 import { DemoSection } from "../DemoApp";
 
 function TimePickerDemo() {
@@ -12,6 +13,8 @@ function TimePickerDemo() {
     const [open, setOpen] = useState(false);
     const [controlled, setControlled] = useState("2026-09-19");
     const [custom, setCustom] = useState("2026-09-19 19:00");
+    const [buttonValue, setButtonValue] = useState("2026-09-19 19:00");
+    const [spanValue, setSpanValue] = useState("");
 
     return (
         <div className="demo-page">
@@ -72,6 +75,22 @@ function TimePickerDemo() {
                 <div className="demo-row">
                     <TimePicker format="datetime" value={custom} onChange={setCustom} side="top" cancelText="关闭" confirmText="好的" />
                     <span>面板向上弹出（空间不足时会自动翻转）</span>
+                </div>
+            </DemoSection>
+
+            <DemoSection title="自定义触发对象" description="通过 trigger 指定触发元素；传函数可拿到当前显示值">
+                <div className="demo-row">
+                    <TimePicker format="datetime" value={buttonValue} onChange={setButtonValue} trigger={<button type="button" style={{ height: "2em", padding: "0 0.75em" }}>选择日期时间</button>} />
+                    <span>当前值: {buttonValue}</span>
+                </div>
+                <div className="demo-row">
+                    <TimePicker
+                        format="date"
+                        value={spanValue}
+                        onChange={setSpanValue}
+                        trigger={(text) => <SpanButton style={{ display: "inline-block", padding: "0.25em 0.75em", border: "1px solid #ddd", borderRadius: 4, background: "#fff" }}>{text || "点我选择日期"}</SpanButton>}
+                    />
+                    <span>函数形式可回显当前值: {spanValue || "(空)"}</span>
                 </div>
             </DemoSection>
         </div>

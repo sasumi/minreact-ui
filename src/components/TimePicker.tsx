@@ -639,6 +639,11 @@ export interface TimePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
     align?: "start" | "center" | "end";
     /** 面板容器的附加类名 */
     panelClassName?: string;
+    /**
+     * 自定义触发对象：传 ReactNode 直接作为触发元素，传函数可拿到当前显示值
+     * 不传时使用内置的可编辑输入框
+     */
+    trigger?: React.ReactNode | ((displayValue: string) => React.ReactNode);
     /** 取消按钮文案，透传给面板 */
     cancelText?: string;
     /** 确定按钮文案，透传给面板 */
@@ -650,6 +655,7 @@ export interface TimePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
  * @param format 选择维度，决定输入框格式与面板内容
  * @param value 当前值
  * @param onChange 值变化回调
+ * @param trigger 自定义触发对象，不传则使用内置输入框
  */
 export const TimePicker = ({
     format = FORMAT_DATETIME,
@@ -662,13 +668,15 @@ export const TimePicker = ({
     side = "bottom",
     align = "start",
     panelClassName,
+    trigger,
     cancelText,
     confirmText,
     className,
     ...inputProps
 }: TimePickerProps) => {
     const [innerOpen, setInnerOpen] = useState(false);
-    const anchorRef = useRef<HTMLDivElement>(null);
+    const inputAnchorRef = useRef<HTMLDivElement>(null);
+    const triggerAnchorRef = useRef<HTMLElement>(null);
     const isControlledOpen = controlledOpen !== undefined;
     const open = isControlledOpen ? controlledOpen : innerOpen;
 
@@ -717,46 +725,58 @@ export const TimePicker = ({
 
     const { onFocus, onBlur, onClick, onKeyDown, ...restInputProps } = inputProps;
 
+    /** 自定义触发对象优先，没有就用内置输入框 */
+    const triggerNode = typeof trigger === "function" ? trigger(displayValue) : trigger;
+
     return (
         <Popover open={open} onOpenChange={handleOpenChange}>
-            <Popover.Anchor ref={anchorRef} className={`${CSS_NS}-anchor`}>
-                <input
-                    {...restInputProps}
-                    className={`${CSS_NS}-input${className ? " " + className : ""}`}
-                    value={text}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    autoComplete="off"
-                    onChange={(e) => setText(e.target.value)}
-                    onFocus={(e) => {
-                        onFocus?.(e);
-                        setOpen(true);
-                    }}
-                    onClick={(e) => {
-                        onClick?.(e);
-                        // 输入框已聚焦时不会再触发 focus，这里补一次展开
-                        setOpen(true);
-                    }}
-                    onBlur={(e) => {
-                        onBlur?.(e);
-                        commitText();
-                    }}
-                    onKeyDown={(e) => {
-                        onKeyDown?.(e);
-                        if (e.key === "Enter") {
+            {triggerNode ? (
+                <Popover.Trigger ref={triggerAnchorRef} aria-disabled={disabled}>
+                    {triggerNode}
+                </Popover.Trigger>
+            ) : (
+                <Popover.Anchor ref={inputAnchorRef} className={`${CSS_NS}-anchor`}>
+                    <input
+                        {...restInputProps}
+                        className={`${CSS_NS}-input${className ? " " + className : ""}`}
+                        value={text}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        autoComplete="off"
+                        onChange={(e) => setText(e.target.value)}
+                        onFocus={(e) => {
+                            onFocus?.(e);
+                            setOpen(true);
+                        }}
+                        onClick={(e) => {
+                            onClick?.(e);
+                            // 输入框已聚焦时不会再触发 focus，这里补一次展开
+                            setOpen(true);
+                        }}
+                        onBlur={(e) => {
+                            onBlur?.(e);
                             commitText();
-                            setOpen(false);
-                        }
-                    }}
-                />
-            </Popover.Anchor>
+                        }}
+                        onKeyDown={(e) => {
+                            onKeyDown?.(e);
+                            if (e.key === "Enter") {
+                                commitText();
+                                setOpen(false);
+                            }
+                        }}
+                    />
+                </Popover.Anchor>
+            )}
             <Popover.Content
                 className={`${CSS_NS}-popover-content`}
                 side={side}
                 align={align}
                 sideOffset={4}
-                // 点击输入框本身不应关闭面板，否则无法在展开状态下编辑文本；时间滚轮是独立浮层，同样不关闭
-                onCloseBy={(target) => !anchorRef.current?.contains(target) && !target.closest(WHEEL_LAYER_SELECTOR)}
+                // 点击触发对象本身不应关闭面板，否则无法在展开状态下继续编辑；时间滚轮是独立浮层，同样不关闭
+                onCloseBy={(target) => {
+                    const anchor = inputAnchorRef.current ?? triggerAnchorRef.current;
+                    return !anchor?.contains(target) && !target.closest(WHEEL_LAYER_SELECTOR);
+                }}
             >
                 <TimePickerPanel
                     className={panelClassName}
