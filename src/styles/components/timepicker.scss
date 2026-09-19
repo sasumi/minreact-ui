@@ -1,0 +1,302 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/misc.scss" as com;
+@use "./../mixins/icon.scss" as icon;
+
+:root {
+    --#{$ns}-time-picker-width: 17.5em;
+    --#{$ns}-time-picker-muted-color: #b9b9b9;
+    --#{$ns}-time-picker-selected-background: #fdf1e2;
+    --#{$ns}-time-picker-wheel-item-height: 1.9em;
+    --#{$ns}-time-picker-day-height: 2.3em;
+    --#{$ns}-time-picker-weekday-height: 1.9em;
+}
+
+.#{$ns}-time-picker {
+    &-anchor {
+        display: inline-block;
+        width: max-content;
+    }
+
+    &-input {
+        width: 11em;
+        height: var(--#{$ns}-element-height);
+        padding: 0 var(--#{$ns}-element-padding);
+        box-sizing: border-box;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: var(--#{$ns}-element-radius);
+        background-color: var(--#{$ns}-color-background);
+        color: inherit;
+        font: inherit;
+
+        &:focus {
+            border-color: var(--#{$ns}-color-element-border-active);
+            outline: none;
+        }
+
+        &:disabled {
+            @include com.disabled;
+        }
+
+        &::placeholder {
+            color: var(--#{$ns}-time-picker-muted-color);
+        }
+    }
+
+    // 面板自带 padding，这里清掉 popover 内容层的约束
+    &-popover-content {
+        padding: 0;
+    }
+
+    &-panel {
+        width: var(--#{$ns}-time-picker-width);
+        padding: 0.75em;
+        box-sizing: border-box;
+        color: inherit;
+        user-select: none;
+    }
+
+    &-header {
+        display: flex;
+        align-items: center;
+        gap: 0.15em;
+        margin-bottom: 0.4em;
+    }
+
+    // 点击标题逐级下钻：日期 → 年月 → 年份 → 再回到日期
+    &-title {
+        margin-right: auto;
+        padding: 0.1em 0.3em;
+        border-radius: var(--#{$ns}-element-radius);
+        font-weight: 500;
+
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+
+    &-nav {
+        @include icon.icon-button;
+        width: 1.6em;
+        height: 1.6em;
+        border-radius: var(--#{$ns}-element-radius);
+        color: var(--#{$ns}-time-picker-muted-color);
+
+        &:hover {
+            color: inherit;
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+
+        &:before {
+            font-size: 1em;
+        }
+    }
+
+    &-nav-prev:before {
+        content: "\e6104";
+    }
+
+    &-nav-next:before {
+        content: "\e839";
+    }
+
+    // 高度加在行容器上：标签自身 font-size 更小，写在标签上会让 1em ≠ 面板的 1em
+    &-weekdays {
+        height: var(--#{$ns}-time-picker-weekday-height);
+    }
+
+    &-weekdays,
+    &-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    &-weekday {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--#{$ns}-time-picker-muted-color);
+        font-size: 0.85em;
+    }
+
+    &-day {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--#{$ns}-time-picker-day-height);
+        // 常态就留出边框，避免选中时单元格尺寸跳动
+        border: 1px solid transparent;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background-color 0.1s ease-in-out;
+
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+
+    // 相邻月份的补位日期
+    &-day-outside {
+        color: var(--#{$ns}-time-picker-muted-color);
+    }
+
+    &-day-today {
+        color: var(--#{$ns}-color-hight);
+    }
+
+    &-day-selected,
+    &-day-selected:hover {
+        color: var(--#{$ns}-color-hight);
+        border-color: var(--#{$ns}-color-hight);
+        background-color: var(--#{$ns}-time-picker-selected-background);
+    }
+
+    // 年月 / 年份视图：4 列网格，高度与「周表头 + 6 行日期」对齐，切换视图时面板不跳动
+    &-months,
+    &-years {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 1fr;
+        height: calc(var(--#{$ns}-time-picker-day-height) * 6 + var(--#{$ns}-time-picker-weekday-height));
+    }
+
+    &-month,
+    &-year {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background-color 0.1s ease-in-out;
+
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+
+    // 次年补位的月份 / 十年区间外的年份
+    &-month-outside,
+    &-year-outside {
+        color: var(--#{$ns}-time-picker-muted-color);
+    }
+
+    &-month-selected,
+    &-month-selected:hover,
+    &-year-selected,
+    &-year-selected:hover {
+        color: #fff;
+        background-color: var(--#{$ns}-color-hight);
+        font-weight: 600;
+    }
+
+    &-footer {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    &-time-anchor {
+        display: flex;
+        align-items: center;
+    }
+
+    &-time {
+        display: flex;
+        align-items: center;
+        border-radius: var(--#{$ns}-element-radius);
+        background-color: var(--#{$ns}-color-background);
+    }
+
+    &-time-value {
+        min-width: 1.9em;
+        padding: 0 0.1em;
+        border-radius: 2px;
+        text-align: center;
+
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+
+    &-time-separator {
+        color: var(--#{$ns}-time-picker-muted-color);
+    }
+
+    // 时/分两列滚轮，整体是一个浮层
+    &-wheels {
+        position: relative;
+        display: flex;
+        gap: 0.3em;
+        padding: 0.35em 0.4em;
+        background-color: var(--#{$ns}-color-background);
+
+        // 中选项高亮带，压在选项下方
+        &:before {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            left: 0.4em;
+            right: 0.4em;
+            top: 50%;
+            height: var(--#{$ns}-time-picker-wheel-item-height);
+            transform: translateY(-50%);
+            border-radius: var(--#{$ns}-element-radius);
+            background-color: var(--#{$ns}-time-picker-selected-background);
+            pointer-events: none;
+        }
+    }
+
+    &-wheel {
+        position: relative;
+        z-index: 1;
+        width: 3.4em;
+        box-sizing: border-box;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        scrollbar-width: none;
+        // 拖动交给组件用 pointer 事件处理，关掉原生平移，避免两套滚动打架
+        touch-action: none;
+        cursor: grab;
+        // 上下渐隐，滚出视野的选项不抢视线（与 scroll-snap 一起构成滚轮效果）
+        -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+        mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    // 拖动中：必须关掉 scroll-snap，否则 scrollTop 会被浏览器立刻吸回最近一行
+    &-wheel-dragging {
+        scroll-snap-type: none;
+        cursor: grabbing;
+    }
+
+    &-wheel-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--#{$ns}-time-picker-wheel-item-height);
+        scroll-snap-align: center;
+        color: var(--#{$ns}-time-picker-muted-color);
+    }
+
+    &-wheel-item-active {
+        color: var(--#{$ns}-color-hight);
+        font-weight: 600;
+    }
+
+    &-actions {
+        display: flex;
+        gap: 0.45em;
+        margin-left: auto;
+    }
+
+    &-action {
+        padding: 0.25em 0.25em;
+        border-radius: var(--#{$ns}-element-radius);
+        &:hover {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+}

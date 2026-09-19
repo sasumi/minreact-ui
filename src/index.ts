@@ -138,6 +138,17 @@ export {
   HistoryInput
 } from './components/TextInput'
 
+// TimePicker utilities
+export type {
+  TimePickerFormat,
+  TimePickerPanelProps,
+  TimePickerProps
+} from './components/TimePicker'
+export {
+  TimePicker,
+  TimePickerPanel
+} from './components/TimePicker'
+
 // Tip utilities
 export {
   Tip
