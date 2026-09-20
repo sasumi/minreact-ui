@@ -142,7 +142,7 @@ const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
     return (
         <div
             className={namespace + "-menu-item"}
-            title={itemData.title}
+            title={!itemData.disabled ? itemData.title : undefined}
             aria-disabled={itemData.disabled}
             onClick={() => itemData.onClick?.(itemData)}
             tabIndex={itemData.disabled ? -1 : 0}
