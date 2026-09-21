@@ -80,7 +80,11 @@ export {
 // PhotoGallery utilities
 export type {
   PhotoGalleryApi,
+  PhotoGalleryControlsProps,
+  PhotoGalleryGalleryProps,
+  PhotoGalleryIndicatorProps,
   PhotoGalleryProps,
+  PhotoGallerySlotProps,
   PhotoGalleryState,
   PhotoGalleryTimerProps,
   UsePhotoGalleryOptions

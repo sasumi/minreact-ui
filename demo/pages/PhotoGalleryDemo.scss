@@ -1,0 +1,17 @@
+// 插槽属性演示：这些类名由调用方传入，用来验证「与组件类名合并」的效果
+.photo-gallery-demo {
+    .pg-demo-track {
+        cursor: crosshair;
+    }
+
+    .pg-demo-controls {
+        // 箭头是绝对定位，这里的 outline 只作可视标记
+        outline: 1px dashed #1a7f37;
+        outline-offset: -1px;
+        border-radius: 4px;
+    }
+
+    .pg-demo-counter {
+        background-color: rgba(26, 127, 55, 0.75);
+    }
+}

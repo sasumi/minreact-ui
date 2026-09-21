@@ -10,7 +10,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
+import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { namespace } from './../styles/namespace';
 import { SpanButton } from './Button';
 import { ImageLoader } from './Image';
@@ -19,6 +19,12 @@ const CSS_NS = namespace + '-photo-gallery';
 
 /** 把位置夹在 [0, max] 内；无图（max < 0）时固定为 0 */
 const clampIndex = (value: number, max: number) => (max < 0 ? 0 : Math.min(Math.max(value, 0), max));
+
+/** 插槽公共属性：可透传任意 div 属性；className 会与组件类名合并，同名事件先走组件内部再走传入的 */
+export type PhotoGallerySlotProps = HTMLAttributes<HTMLDivElement>;
+
+/** 拼接类名：组件自身的类名在前，调用方传入的在后 */
+const joinClass = (base: string, extra?: string) => (extra ? `${base} ${extra}` : base);
 
 /** 位置快照：随渲染更新，渲染期读它 */
 export interface PhotoGalleryState {
@@ -45,10 +51,8 @@ export interface PhotoGalleryApi {
 }
 
 export interface UsePhotoGalleryOptions {
-    /** 非受控初始下标，默认 0 */
-    defaultIndex?: number;
-    /** 受控下标；传入后内部不再自持位置，需配合 onIndexChange 回写 */
-    index?: number;
+    defaultIndex?: number; //非受控初始下标，默认 0
+    index?: number; //受控下标；传入后内部不再自持位置，需配合 onIndexChange 回写
     onIndexChange?: (index: number) => void;
 }
 
@@ -129,15 +133,29 @@ const FLING_SPEED = 0.4;
 /** 首/末张继续拖动时的阻尼，给出「拖不动」的手感而不是硬停 */
 const EDGE_RESISTANCE = 0.35;
 
-/** 画面插槽：多图时横向滑动（鼠标拖动与触摸滑动均可切换），无图时显示占位 */
-const GallerySlot = () => {
+export interface PhotoGalleryGalleryProps extends PhotoGallerySlotProps {
+    /** 是否允许鼠标拖动 / 触摸滑动切换，默认 false */
+    draggable?: boolean;
+}
+
+/** 画面插槽：横向滑动切换；开启 draggable 后支持鼠标拖动与触摸滑动，无图时显示占位 */
+const GallerySlot = ({
+    draggable = false,
+    className,
+    style,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    ...rest
+}: PhotoGalleryGalleryProps) => {
     const { photos, index, count, canPrev, canNext, goTo } = useGalleryApi();
     // progress 为拖动进度（容器宽度的倍数，向前切换为正），与 index 一起参与 transform
     const [progress, setProgress] = useState(0);
     const [dragging, setDragging] = useState(false);
     const dragRef = useRef<{ id: number; x: number; time: number; width: number } | null>(null);
 
-    const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
         const width = e.currentTarget.getBoundingClientRect().width;
         if (count < 2 || e.button !== 0 || !width || dragRef.current) return;
         dragRef.current = { id: e.pointerId, x: e.clientX, time: e.timeStamp, width };
@@ -145,7 +163,7 @@ const GallerySlot = () => {
         setDragging(true);
     };
 
-    const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
         const drag = dragRef.current;
         if (!drag || drag.id !== e.pointerId) return;
         let dx = e.clientX - drag.x;
@@ -166,24 +184,47 @@ const GallerySlot = () => {
         setDragging(false);
     };
 
-    const pointerHandlers = {
-        onPointerDown,
-        onPointerMove,
-        onPointerUp: (e: ReactPointerEvent<HTMLDivElement>) => {
-            const drag = dragRef.current;
-            const speed = drag ? Math.abs(e.clientX - drag.x) / Math.max(1, e.timeStamp - drag.time) : 0;
-            settle(e, speed > FLING_SPEED);
-        },
-        onPointerCancel: (e: ReactPointerEvent<HTMLDivElement>) => settle(e, false),
+    const handlePointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+        const drag = dragRef.current;
+        const speed = drag ? Math.abs(e.clientX - drag.x) / Math.max(1, e.timeStamp - drag.time) : 0;
+        settle(e, speed > FLING_SPEED);
     };
 
+    const handlePointerCancel = (e: ReactPointerEvent<HTMLDivElement>) => settle(e, false);
+
+    // 不开拖动时完全不接管指针事件，调用方传入的原样透传
+    // 开着拖动时先跑组件自身的处理，再跑调用方传入的
+    const pointerProps = draggable
+        ? {
+              onPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => {
+                  handlePointerDown(e);
+                  onPointerDown?.(e);
+              },
+              onPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => {
+                  handlePointerMove(e);
+                  onPointerMove?.(e);
+              },
+              onPointerUp: (e: ReactPointerEvent<HTMLDivElement>) => {
+                  handlePointerUp(e);
+                  onPointerUp?.(e);
+              },
+              onPointerCancel: (e: ReactPointerEvent<HTMLDivElement>) => {
+                  handlePointerCancel(e);
+                  onPointerCancel?.(e);
+              },
+          }
+        : { onPointerDown, onPointerMove, onPointerUp, onPointerCancel };
+
+    // 无图时只剩占位（ImageLoader 渲染的是 img，承载不了 div 属性）
     if (count === 0) return <ImageLoader />;
     return (
         <div
-            className={`${CSS_NS}-track` + (dragging ? ` ${CSS_NS}-track-dragging` : '')}
-            // 负号在插值里：首张向右拖时 index + progress 为负，写成 `-${}` 会得到非法的 `--13.98%`
-            style={{ transform: `translateX(${-(index + progress) * 100}%)` }}
-            {...pointerHandlers}
+            {...rest}
+            {...pointerProps}
+            className={joinClass(`${CSS_NS}-track`, className) + (dragging ? ` ${CSS_NS}-track-dragging` : '')}
+            // 内部 transform 是滑动的根，放在后面盖掉调用方传入的同名内联样式
+            // 负号写在插值里：首张向右拖时 index + progress 为负，`-${...}` 会得到非法的 `--13.98%`
+            style={{ ...style, transform: `translateX(${-(index + progress) * 100}%)` }}
         >
             {photos.map((src, i) => (
                 <div className={`${CSS_NS}-slide`} key={src + i}>
@@ -194,14 +235,17 @@ const GallerySlot = () => {
     );
 };
 
-/** 
- * 左右箭头插槽：单图时自动隐藏
+export type PhotoGalleryControlsProps = PhotoGallerySlotProps;
+
+/**
+ * 左右箭头插槽：无图时不渲染
  */
-const ControlsSlot = () => {
+const ControlsSlot = ({ className, ...rest }: PhotoGalleryControlsProps) => {
     const { count, canPrev, canNext, prev, next } = useGalleryApi();
     if (count === 0) return null;
     return (
-        <>
+        // 容器只为承载调用方属性：箭头是绝对定位，容器本身不参与布局
+        <div className={joinClass(`${CSS_NS}-controls`, className)} {...rest}>
             <SpanButton
                 className={`${CSS_NS}-arrow prev`}
                 title="上一张"
@@ -218,18 +262,20 @@ const ControlsSlot = () => {
                 debounce={false}
                 onClick={next}
             />
-        </>
+        </div>
     );
 };
 
-/** 
- * 「当前/总数」插槽
+export type PhotoGalleryIndicatorProps = PhotoGallerySlotProps;
+
+/**
+ * 「当前/总数」插槽：无图时不渲染
  */
-const IndicatorSlot = () => {
+const IndicatorSlot = ({ className, ...rest }: PhotoGalleryIndicatorProps) => {
     const { count, index } = useGalleryApi();
     if (count === 0) return null;
     return (
-        <div className={`${CSS_NS}-counter`}>
+        <div className={joinClass(`${CSS_NS}-counter`, className)} {...rest}>
             {index + 1}/{count}
         </div>
     );
@@ -238,7 +284,7 @@ const IndicatorSlot = () => {
 /** 自动播放默认间隔（ms） */
 const AUTO_PLAY_DURATION = 4000;
 
-export interface PhotoGalleryTimerProps {
+export interface PhotoGalleryTimerProps extends PhotoGallerySlotProps {
     /** 切换间隔（ms），同时决定环形倒计时的时长 */
     duration?: number;
 }
@@ -247,7 +293,7 @@ export interface PhotoGalleryTimerProps {
  * 定时触发器插槽：环形倒计时（12 点顺时针长满一圈后收空）跑完就切下一张，最后一张切回第一张；渲染该插槽即开启自动播放。
  * 指针移入轮播（root）时暂停并重置倒计时，移出后重新计时。
  */
-const TimerSlot = ({ duration = AUTO_PLAY_DURATION }: PhotoGalleryTimerProps) => {
+const TimerSlot = ({ duration = AUTO_PLAY_DURATION, className, ...rest }: PhotoGalleryTimerProps) => {
     const { api, paused } = useGalleryContext();
     const { count, index, goTo } = api;
 
@@ -262,7 +308,8 @@ const TimerSlot = ({ duration = AUTO_PLAY_DURATION }: PhotoGalleryTimerProps) =>
         // key 带 index / paused：切图或恢复播放时重新起画，与上面的定时器同一个起点
         <div
             key={`${index}-${paused}`}
-            className={`${CSS_NS}-timer` + (paused ? ` ${CSS_NS}-timer-paused` : '')}
+            {...rest}
+            className={joinClass(`${CSS_NS}-timer`, className) + (paused ? ` ${CSS_NS}-timer-paused` : '')}
             aria-hidden="true"
         >
             <svg viewBox="0 0 16 16">
@@ -277,6 +324,8 @@ export interface PhotoGalleryProps extends UsePhotoGalleryOptions {
     photos?: readonly string[];
     /** 复用 PhotoGallery.use 的控制器，与外部按钮共享同一份状态（此时图集以控制器为准） */
     gallery?: PhotoGalleryApi;
+    /** 默认布局的画面是否允许拖动切换（同 Gallery 插槽的 draggable），默认 false */
+    draggable?: boolean;
     /**
      * 自定义内部结构，插槽可任意取舍、任意顺序摆放：
      * `<PhotoGallery.Gallery />` 画面、`<PhotoGallery.Controls />` 箭头、`<PhotoGallery.Indicator />` 序号、
@@ -288,15 +337,15 @@ export interface PhotoGalleryProps extends UsePhotoGalleryOptions {
 
 /** 挂载在组件上的插槽与 hook */
 type PhotoGalleryStatics = {
-    Gallery: () => ReactNode;
-    Controls: () => ReactNode;
-    Indicator: () => ReactNode;
+    Gallery: (props: PhotoGalleryGalleryProps) => ReactNode;
+    Controls: (props: PhotoGalleryControlsProps) => ReactNode;
+    Indicator: (props: PhotoGalleryIndicatorProps) => ReactNode;
     Timer: (props: PhotoGalleryTimerProps) => ReactNode;
     use: typeof usePhotoGallery;
 };
 
 const PhotoGalleryRoot = forwardRef<PhotoGalleryApi, PhotoGalleryProps>(function PhotoGallery(
-    { photos, gallery, className, children, defaultIndex, index, onIndexChange },
+    { photos, gallery, className, children, draggable = false, defaultIndex, index, onIndexChange },
     ref,
 ) {
     const [internal] = usePhotoGallery(photos, { defaultIndex, index, onIndexChange });
@@ -307,13 +356,13 @@ const PhotoGalleryRoot = forwardRef<PhotoGalleryApi, PhotoGalleryProps>(function
     return (
         <PhotoGalleryContext.Provider value={{ api, paused }}>
             <div
-                className={CSS_NS + (className ? ' ' + className : '')}
+                className={joinClass(CSS_NS, className)}
                 onPointerEnter={() => setPaused(true)}
                 onPointerLeave={() => setPaused(false)}
             >
                 {children ?? (
                     <>
-                        <GallerySlot />
+                        <GallerySlot draggable={draggable} />
                         <ControlsSlot />
                         <IndicatorSlot />
                     </>

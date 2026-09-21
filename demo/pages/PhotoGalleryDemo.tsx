@@ -4,6 +4,7 @@ import { PhotoGallery } from "../../src/components/PhotoGallery";
 import type { PhotoGalleryApi } from "../../src/components/PhotoGallery";
 import { ImageLoader } from "../../src/components/Image";
 import { DemoSection } from "../DemoApp";
+import "./PhotoGalleryDemo.scss";
 
 // 示例图片（picsum.photos 占位图，seed 固定）
 const makePhotos = (count: number) =>
@@ -165,15 +166,54 @@ function AutoPlayDemo() {
     );
 }
 
+/** 插槽属性：draggable 开关 + 任意 div 属性透传（className 合并、事件先内部后外部） */
+function SlotPropsDemo() {
+    const [log, setLog] = useState<string[]>([]);
+    const record = (text: string) => setLog((prev) => [text, ...prev].slice(0, 4));
+
+    return (
+        <>
+            <div className="demo-row">
+                <div>
+                    <p style={labelStyle}>draggable + 自定义 className / role / onClick</p>
+                    <div style={boxStyle(360, 225)}>
+                        <PhotoGallery photos={PHOTOS}>
+                            <PhotoGallery.Gallery
+                                draggable
+                                className="pg-demo-track"
+                                role="region"
+                                aria-label="可拖动的图片轮播"
+                                onClick={() => record("画面插槽 onClick")}
+                                onPointerUp={() => record("画面插槽 onPointerUp（内部切换已先跑）")}
+                            />
+                            <PhotoGallery.Controls className="pg-demo-controls" role="group" aria-label="轮播控制" />
+                            <PhotoGallery.Indicator className="pg-demo-counter" />
+                        </PhotoGallery>
+                    </div>
+                </div>
+                <div>
+                    <p style={labelStyle}>不传 draggable：只能点箭头 / 调 ref</p>
+                    <div style={boxStyle(360, 225)}>
+                        <PhotoGallery photos={PHOTOS} />
+                    </div>
+                </div>
+            </div>
+            <p style={{ marginTop: "0.75rem", color: "#666", fontSize: "0.9rem" }}>
+                {log.length ? `事件日志：${log.join(" / ")}` : "左侧画面可拖动切换；点一下画面看看外部 onClick 是否触发"}
+            </p>
+        </>
+    );
+}
+
 /** 插槽组合：UI 由调用方拼装，取舍与顺序都随意 */
 function SlotCompositionDemo() {
     return (
         <div className="demo-row">
             <div>
-                <p style={labelStyle}>全套插槽（等价于默认布局）</p>
+                <p style={labelStyle}>全套插槽（等价于默认布局，画面开了 draggable）</p>
                 <div style={boxStyle(360, 225)}>
                     <PhotoGallery photos={PHOTOS}>
-                        <PhotoGallery.Gallery />
+                        <PhotoGallery.Gallery draggable />
                         <PhotoGallery.Controls />
                         <PhotoGallery.Indicator />
                     </PhotoGallery>
@@ -193,12 +233,12 @@ function SlotCompositionDemo() {
 
 function PhotoGalleryDemo() {
     return (
-        <div className="demo-page">
+        <div className="demo-page photo-gallery-demo">
             <div className="demo-page-header">
                 <h2>PhotoGallery 图片轮播</h2>
                 <p>
                     位置逻辑由 PhotoGallery.use 承担，UI 拆成 PhotoGallery.Gallery / PhotoGallery.Controls /
-                    PhotoGallery.Indicator 三个插槽；支持鼠标拖动与移动端滑动切换，不传子元素时渲染全套
+                    PhotoGallery.Indicator 三个插槽；不传子元素时渲染全套，拖动切换需显式开 draggable
                 </p>
             </div>
 
@@ -208,7 +248,7 @@ function PhotoGalleryDemo() {
             >
                 <div className="demo-row">
                     <div style={boxStyle(560, 350)}>
-                        <PhotoGallery photos={PHOTOS} />
+                        <PhotoGallery photos={PHOTOS} draggable />
                     </div>
                     <div className="demo-col" style={{ gap: "1rem" }}>
                         <div style={boxStyle(260, 160)}>
@@ -223,6 +263,13 @@ function PhotoGalleryDemo() {
 
             <DemoSection title="插槽组合" description="三个插槽任选任排；不传子元素时使用默认布局">
                 <SlotCompositionDemo />
+            </DemoSection>
+
+            <DemoSection
+                title="插槽属性"
+                description="插槽可透传任意 div 属性（className 与组件类名合并，同名事件先内部后外部）；draggable 决定能否拖动切换，默认 false"
+            >
+                <SlotPropsDemo />
             </DemoSection>
 
             <DemoSection
