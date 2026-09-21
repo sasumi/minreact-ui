@@ -127,7 +127,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
             };
             dlg.addEventListener("mousedown", onTitleMouseDown, true);
             cleanup.push(() => dlg.removeEventListener("mousedown", onTitleMouseDown, true));
-            cleanup.push(bindNodeMove(dlg, `.${TITLE_CLASS_NAME}`)); // TEMP: 复现旧行为，验证后改回 titleEl
+            cleanup.push(bindNodeMove(dlg, titleEl));
         }
         if (showTopCloser) {
             const closerEl = findOne(`.${TOP_CLOSER_CLASS_NAME}`, dlg);
