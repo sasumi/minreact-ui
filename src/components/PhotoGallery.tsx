@@ -4,6 +4,7 @@ import {
     forwardRef,
     useCallback,
     useContext,
+    useEffect,
     useImperativeHandle,
     useLayoutEffect,
     useRef,
@@ -109,14 +110,17 @@ const usePhotoGallery = (
     ];
 };
 
-const PhotoGalleryContext = createContext<PhotoGalleryApi | null>(null);
+/** 插槽上下文：控制器 + 「指针停在轮播上」的暂停标记 */
+const PhotoGalleryContext = createContext<{ api: PhotoGalleryApi; paused: boolean } | null>(null);
 
-/** 取当前轮播的控制器，仅供内部插槽使用 */
-const useGalleryApi = () => {
-    const api = useContext(PhotoGalleryContext);
-    if (!api) throw new Error('PhotoGallery 的插槽组件必须放在 <PhotoGallery> 内部');
-    return api;
+const useGalleryContext = () => {
+    const ctx = useContext(PhotoGalleryContext);
+    if (!ctx) throw new Error('PhotoGallery 的插槽组件必须放在 <PhotoGallery> 内部');
+    return ctx;
 };
+
+/** 只关心位置的插槽用这个 */
+const useGalleryApi = () => useGalleryContext().api;
 
 /** 拖动超过容器宽度的该比例即翻页 */
 const SWIPE_RATIO = 0.15;
@@ -194,12 +198,14 @@ const GallerySlot = () => {
  * 左右箭头插槽：单图时自动隐藏
  */
 const ControlsSlot = () => {
-    const { canPrev, canNext, prev, next } = useGalleryApi();
+    const { count, canPrev, canNext, prev, next } = useGalleryApi();
+    if (count === 0) return null;
     return (
         <>
             <SpanButton
                 className={`${CSS_NS}-arrow prev`}
                 title="上一张"
+                aria-label="上一张"
                 disabled={!canPrev}
                 debounce={false}
                 onClick={prev}
@@ -207,6 +213,7 @@ const ControlsSlot = () => {
             <SpanButton
                 className={`${CSS_NS}-arrow next`}
                 title="下一张"
+                aria-label="下一张"
                 disabled={!canNext}
                 debounce={false}
                 onClick={next}
@@ -220,9 +227,48 @@ const ControlsSlot = () => {
  */
 const IndicatorSlot = () => {
     const { count, index } = useGalleryApi();
+    if (count === 0) return null;
     return (
         <div className={`${CSS_NS}-counter`}>
             {index + 1}/{count}
+        </div>
+    );
+};
+
+/** 自动播放默认间隔（ms） */
+const AUTO_PLAY_DURATION = 4000;
+
+export interface PhotoGalleryTimerProps {
+    /** 切换间隔（ms），同时决定环形倒计时的时长 */
+    duration?: number;
+}
+
+/**
+ * 定时触发器插槽：环形倒计时（12 点顺时针长满一圈后收空）跑完就切下一张，最后一张切回第一张；渲染该插槽即开启自动播放。
+ * 指针移入轮播（root）时暂停并重置倒计时，移出后重新计时。
+ */
+const TimerSlot = ({ duration = AUTO_PLAY_DURATION }: PhotoGalleryTimerProps) => {
+    const { api, paused } = useGalleryContext();
+    const { count, index, goTo } = api;
+
+    useEffect(() => {
+        if (paused || count < 2) return;
+        const timer = window.setTimeout(() => goTo((index + 1) % count), duration);
+        return () => window.clearTimeout(timer);
+    }, [paused, count, index, duration, goTo]);
+
+    if (count < 2) return null;
+    return (
+        // key 带 index / paused：切图或恢复播放时重新起画，与上面的定时器同一个起点
+        <div
+            key={`${index}-${paused}`}
+            className={`${CSS_NS}-timer` + (paused ? ` ${CSS_NS}-timer-paused` : '')}
+            aria-hidden="true"
+        >
+            <svg viewBox="0 0 16 16">
+                <circle className={`${CSS_NS}-timer-track`} cx="8" cy="8" r="7" />
+                <circle className={`${CSS_NS}-timer-bar`} cx="8" cy="8" r="7" style={{ animationDuration: `${duration}ms` }} />
+            </svg>
         </div>
     );
 };
@@ -233,8 +279,8 @@ export interface PhotoGalleryProps extends UsePhotoGalleryOptions {
     gallery?: PhotoGalleryApi;
     /**
      * 自定义内部结构，插槽可任意取舍、任意顺序摆放：
-     * `<PhotoGallery.Gallery />` 画面、`<PhotoGallery.Controls />` 箭头、`<PhotoGallery.Indicator />` 序号。
-     * 不传时渲染三者组成的默认布局。
+     * `<PhotoGallery.Gallery />` 画面、`<PhotoGallery.Controls />` 箭头、`<PhotoGallery.Indicator />` 序号、
+     * `<PhotoGallery.Timer />` 自动播放倒计时。不传时渲染前三者组成的默认布局。
      */
     children?: ReactNode;
     className?: string;
@@ -245,6 +291,7 @@ type PhotoGalleryStatics = {
     Gallery: () => ReactNode;
     Controls: () => ReactNode;
     Indicator: () => ReactNode;
+    Timer: (props: PhotoGalleryTimerProps) => ReactNode;
     use: typeof usePhotoGallery;
 };
 
@@ -255,9 +302,15 @@ const PhotoGalleryRoot = forwardRef<PhotoGalleryApi, PhotoGalleryProps>(function
     const [internal] = usePhotoGallery(photos, { defaultIndex, index, onIndexChange });
     const api = gallery ?? internal;
     useImperativeHandle(ref, () => api, [api]);
+    // 指针停在轮播上就暂停自动播放（悬停箭头、拖动中也算）
+    const [paused, setPaused] = useState(false);
     return (
-        <PhotoGalleryContext.Provider value={api}>
-            <div className={CSS_NS + (className ? ' ' + className : '')}>
+        <PhotoGalleryContext.Provider value={{ api, paused }}>
+            <div
+                className={CSS_NS + (className ? ' ' + className : '')}
+                onPointerEnter={() => setPaused(true)}
+                onPointerLeave={() => setPaused(false)}
+            >
                 {children ?? (
                     <>
                         <GallerySlot />
@@ -280,6 +333,7 @@ const PhotoGalleryRoot = forwardRef<PhotoGalleryApi, PhotoGalleryProps>(function
  *     <PhotoGallery.Gallery />
  *     <PhotoGallery.Controls />
  *     <PhotoGallery.Indicator />
+ *     <PhotoGallery.Timer duration={5000} />
  * </PhotoGallery>
  * <button onClick={() => pg.current?.prev()} disabled={pg.current?.index === 0}>上一张</button>
  * ```
@@ -288,4 +342,5 @@ export const PhotoGallery = PhotoGalleryRoot as typeof PhotoGalleryRoot & PhotoG
 PhotoGallery.Gallery = GallerySlot;
 PhotoGallery.Controls = ControlsSlot;
 PhotoGallery.Indicator = IndicatorSlot;
+PhotoGallery.Timer = TimerSlot;
 PhotoGallery.use = usePhotoGallery;

@@ -82,6 +82,7 @@ export type {
   PhotoGalleryApi,
   PhotoGalleryProps,
   PhotoGalleryState,
+  PhotoGalleryTimerProps,
   UsePhotoGalleryOptions
 } from './components/PhotoGallery'
 export {

@@ -92,4 +92,66 @@
         border-radius: 1em;
         pointer-events: none;
     }
+
+    // 自动播放倒计时：白环先从 12 点顺时针长满一圈，再从 12 点顺时针收掉，合起来正好一个间隔
+    &-timer {
+        position: absolute;
+        top: 0.4em;
+        right: 0.4em;
+        box-sizing: border-box;
+        width: 1.6em;
+        height: 1.6em;
+        padding: 0.18em;
+        color: #fff;
+        border-radius: 50%;
+        pointer-events: none; // 不挡画面上的拖动
+
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            // 圆的路径起点在 3 点方向，转过 -90° 让它从 12 点开始
+            transform: rotate(-90deg);
+        }
+
+        &-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.35);
+            stroke-width: 2;
+        }
+
+        &-bar {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            // 周长 2πr（r = 7）：dashoffset +C→0→-C 就是「长满 → 收空」一个整圈轮换
+            stroke-dasharray: 43.98;
+            stroke-dashoffset: 43.98;
+            // 时长由组件按 duration 内联覆盖
+            animation: #{$ns}-photo-gallery-timer 4s linear forwards;
+        }
+    }
+
+    // 悬停暂停：不再画圈，直接停在满圈表示待命
+    &-timer-paused &-timer-bar {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes #{$ns}-photo-gallery-timer {
+    // 从 12 点起顺时针长满一圈
+    from {
+        stroke-dashoffset: 43.98;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+    }
+
+    // 再从 12 点起顺时针收空
+    to {
+        stroke-dashoffset: -43.98;
+    }
 }

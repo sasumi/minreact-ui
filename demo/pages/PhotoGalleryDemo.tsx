@@ -137,6 +137,34 @@ function ControlledDemo() {
     );
 }
 
+/** 自动播放：定时触发器插槽自带环形倒计时，指针停在轮播上即暂停 */
+function AutoPlayDemo() {
+    return (
+        <div className="demo-row">
+            <div>
+                <p style={labelStyle}>80 秒一张（鼠标移入即暂停，移出重新计时）</p>
+                <div style={boxStyle(360, 225)}>
+                    <PhotoGallery photos={PHOTOS}>
+                        <PhotoGallery.Gallery />
+                        <PhotoGallery.Controls />
+                        <PhotoGallery.Indicator />
+                        <PhotoGallery.Timer duration={80000} />
+                    </PhotoGallery>
+                </div>
+            </div>
+            <div>
+                <p style={labelStyle}>只要画面 + 倒计时（1.5 秒一张，末张回到首张）</p>
+                <div style={boxStyle(360, 225)}>
+                    <PhotoGallery photos={PHOTOS}>
+                        <PhotoGallery.Gallery />
+                        <PhotoGallery.Timer duration={1500} />
+                    </PhotoGallery>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 /** 插槽组合：UI 由调用方拼装，取舍与顺序都随意 */
 function SlotCompositionDemo() {
     return (
@@ -176,7 +204,7 @@ function PhotoGalleryDemo() {
 
             <DemoSection
                 title="基础用法"
-                description="内置左右箭头与「当前/总数」，图片可左右拖动（移动端滑动）切换；单图不显示控制条，无图时显示占位"
+                description="内置左右箭头与「当前/总数」，图片可左右拖动（移动端滑动）切换；无图时显示占位"
             >
                 <div className="demo-row">
                     <div style={boxStyle(560, 350)}>
@@ -195,6 +223,13 @@ function PhotoGalleryDemo() {
 
             <DemoSection title="插槽组合" description="三个插槽任选任排；不传子元素时使用默认布局">
                 <SlotCompositionDemo />
+            </DemoSection>
+
+            <DemoSection
+                title="自动播放"
+                description="定时触发器插槽：环形倒计时跑完切下一张，最后一张回到第一张；指针停在轮播上暂停并重置"
+            >
+                <AutoPlayDemo />
             </DemoSection>
 
             <DemoSection title="ref 命令式" description="只保留画面插槽，箭头、disabled 与位置显示全部由调用方掌握">
