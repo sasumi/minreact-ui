@@ -1,4 +1,4 @@
-import { Clickable, SpanButton } from "./Button";
+import { Clickable, NormalButton, SpanButton, SubmitButton } from "./Button";
 import "./../styles/components/inlinetexteditor.scss";
 import { namespace } from "./../styles/namespace";
 import { useEffect, useRef, useState } from "react";
@@ -54,7 +54,7 @@ export const InlineTextEditor = ({
             {state === STATE_IDLE && (
                 <span
                     tabIndex={0}
-                    className={`${CSS_NS}-text`}
+                    className={`${CSS_NS}-text ${!val ? `${CSS_NS}-text-placeholder` : ""}`}
                     onClick={() => {
                         if (readonly) {
                             return;
@@ -92,21 +92,20 @@ export const InlineTextEditor = ({
                         readOnly={state === STATE_SAVING}
                         maxLength={maxlength}
                     />
-                    <Clickable
-                        tag="input"
-                        type="submit"
-                        aria-label="submit"
+                    <SubmitButton
                         disabled={state === STATE_SAVING}
                         title="保存"
-                        onClick={() => {
+                        onClick={(event) => {
+                            // 提交统一走 requestSubmit()（校验不通过时不会派发 submit 事件），
+                            // preventDefault 是为了避免按钮自身再原生提交一次
+                            event.preventDefault();
                             if (state === STATE_SAVING) {
                                 return;
                             }
-                            setState(STATE_SAVING);
                             formRef.current?.requestSubmit();
                         }}
                     />
-                    <Clickable disabled={state === STATE_SAVING} aria-label="cancel" title="取消" onClick={() => setState(STATE_IDLE)} />
+                    <NormalButton disabled={state === STATE_SAVING} data-variant="cancel" title="取消" onClick={() => setState(STATE_IDLE)} />
                 </form>
             )}
         </div>

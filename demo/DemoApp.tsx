@@ -20,6 +20,7 @@ import ImageDemo from "./pages/ImageDemo";
 import TabsDemo from "./pages/TabsDemo";
 import SelectionDemo from "./pages/SelectionDemo";
 import TimePickerDemo from "./pages/TimePickerDemo";
+import InlineTextEditorDemo from "./pages/InlineTextEditorDemo";
 
 const components = [
     { name: "Button", label: "按钮", description: "多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等", component: ButtonDemo, category: "基础组件" },
@@ -40,6 +41,7 @@ const components = [
     { name: "Tabs", label: "标签页", description: "数据驱动的标签页切换组件，支持受控/非受控与 List / Panels 分离布局", component: TabsDemo, category: "交互组件" },
     { name: "Selection", label: "选择", description: "useSelection 多选状态 Hook 与底层 Checkbox，支持全选/半选/反选/裁剪与跨页选择", component: SelectionDemo, category: "表单组件" },
     { name: "TimePicker", label: "日期选择器", description: "支持日期、时间、日期时间三种维度的选择器，可输入也可从面板选择", component: TimePickerDemo, category: "表单组件" },
+    { name: "InlineTextEditor", label: "行内编辑", description: "把文本原地变成输入框的轻量编辑器，保存逻辑异步交给 saveHandler", component: InlineTextEditorDemo, category: "表单组件" },
 ];
 
 /** Sentinel used when the URL does not point at a specific component (the gallery). */

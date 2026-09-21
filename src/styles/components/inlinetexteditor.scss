@@ -24,7 +24,7 @@
 		gap: 0.25em;
 		align-items: center;
 
-		[aria-label="submit"] {
+		[data-variant="submit"] {
 			@include icon.icon;
 
 			&:before {
@@ -32,7 +32,7 @@
 			}
 		}
 
-		[aria-label="cancel"] {
+		[data-variant="cancel"] {
 			@include icon.icon;
 			font-size: 0.9em;
 
@@ -44,7 +44,7 @@
 
 	&[data-state="saving"] {
 		.#{$ns}-inline-text-editor-form {
-			[aria-label="submit"]:before {
+			[data-variant="submit"]:before {
 				transform-origin: center center;
 				animation: rotate360 1s linear infinite;
 				content: "\e635";

@@ -1,0 +1,75 @@
+@charset "UTF-8";
+
+// 图片轮播：尺寸由调用方容器决定
+.photo-gallery {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    &-track {
+        display: flex;
+        height: 100%;
+        transition: transform 0.28s ease;
+    }
+
+    &-slide {
+        position: relative; // 定位上下文：加载中的 img 是绝对定位
+        flex: 0 0 100%;
+        height: 100%;
+        overflow: hidden;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &-arrow {
+        position: absolute;
+        user-select: none; // 禁止选中文本
+        top: 50%;
+        width: 2em;
+        height: 2em;
+        transform: translateY(-50%);
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.35);
+        border-radius: 50%;
+        cursor: pointer;
+        transition:
+            background-color 0.2s ease,
+            opacity 0.2s ease;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        &[aria-disabled='true'] {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        &.prev {
+            left: 0.35em;
+        }
+
+        &.next {
+            right: 0.35em;
+        }
+    }
+
+    &-counter {
+        position: absolute;
+        right: 0.4em;
+        bottom: 0.4em;
+        padding: 0.05em 0.45em;
+        font-size: var(--font-small);
+        line-height: 1.5;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.45);
+        border-radius: 1em;
+        pointer-events: none;
+    }
+}

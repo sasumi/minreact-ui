@@ -1,0 +1,42 @@
+.inline-text-editor-demo {
+    &__stack {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__label {
+        min-width: 4em;
+        color: #666;
+    }
+
+    &__hint {
+        color: #888;
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    &__table {
+        border-collapse: collapse;
+        width: 100%;
+
+        th,
+        td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #fafafa;
+            color: #666;
+            font-weight: 500;
+        }
+
+        th:first-child,
+        td:first-child {
+            width: 10em;
+        }
+    }
+}
