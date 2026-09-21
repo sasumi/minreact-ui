@@ -77,6 +77,17 @@ export {
   Pagination
 } from './components/Pagination'
 
+// PhotoGallery utilities
+export type {
+  PhotoGalleryApi,
+  PhotoGalleryProps,
+  PhotoGalleryState,
+  UsePhotoGalleryOptions
+} from './components/PhotoGallery'
+export {
+  PhotoGallery
+} from './components/PhotoGallery'
+
 // Popover utilities
 export {
   Popover
