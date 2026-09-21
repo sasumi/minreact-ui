@@ -112,7 +112,11 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         if (autoFocus) {
             focusFirstElement(dlgRef.current);
         }
-        if (moveable && findOne(`.${TITLE_CLASS_NAME}`, dlg)) {
+        // 标题/关闭按钮/遮罩的选择器全站相同，查找必须限定在本对话框内：全局查找会命中 DOM 中
+        // 第一个打开的对话框，导致「拖这个对话框的标题把另一个对话框一起拖走」「点这个对话框的
+        // 关闭按钮把另一个也关掉」
+        const titleEl = findOne(`.${TITLE_CLASS_NAME}`, dlg) as HTMLElement | null;
+        if (moveable && titleEl) {
             // 在标题上按下即开始拖动，必须早于 bindNodeMove 的监听（这里挂在对话框的捕获阶段）先把当前
             // 位置落地：对话框靠 inset:0 + margin:auto 居中，只设 left/top 时 auto 边距会二次分配，位置不跟手
             const onTitleMouseDown = (event: MouseEvent) => {
@@ -123,21 +127,28 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
             };
             dlg.addEventListener("mousedown", onTitleMouseDown, true);
             cleanup.push(() => dlg.removeEventListener("mousedown", onTitleMouseDown, true));
-            cleanup.push(bindNodeMove(dlg, `.${TITLE_CLASS_NAME}`));
+            cleanup.push(bindNodeMove(dlg, `.${TITLE_CLASS_NAME}`)); // TEMP: 复现旧行为，验证后改回 titleEl
         }
         if (showTopCloser) {
-            cleanup.push(
-                bindClick(`.${TOP_CLOSER_CLASS_NAME}`, () => {
-                    setOpenRef.current(false);
-                }),
-            );
+            const closerEl = findOne(`.${TOP_CLOSER_CLASS_NAME}`, dlg);
+            if (closerEl) {
+                cleanup.push(
+                    bindClick(closerEl, () => {
+                        setOpenRef.current(false);
+                    }),
+                );
+            }
         }
         if (clickMaskerToClose) {
-            cleanup.push(
-                bindClick(`.${MASKER_CLASS_NAME}`, () => {
-                    setOpenRef.current(false);
-                }),
-            );
+            // 遮罩与对话框同级（都在 dialog-wrap 内），故在父节点里查找
+            const maskerEl = findOne(`.${MASKER_CLASS_NAME}`, dlg.parentElement ?? document);
+            if (maskerEl) {
+                cleanup.push(
+                    bindClick(maskerEl, () => {
+                        setOpenRef.current(false);
+                    }),
+                );
+            }
         }
 
         return () => {
