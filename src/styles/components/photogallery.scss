@@ -13,6 +13,10 @@
         display: flex;
         height: 100%;
         transition: transform 0.28s ease;
+    }
+
+    // 可拖时（draggable 且多图）才接管手势与光标
+    &-track-draggable {
         // 横向手势由组件用 pointer 事件处理，纵向平移留给页面滚动
         touch-action: pan-y;
         user-select: none; // 拖动时不要选中图片

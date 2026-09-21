@@ -150,6 +150,8 @@ const GallerySlot = ({
     ...rest
 }: PhotoGalleryGalleryProps) => {
     const { photos, index, count, canPrev, canNext, goTo } = useGalleryApi();
+    // 只有开了拖动且有多张图时才算「可拖」：光标/手势样式由下面的修饰类控制，免得不可拖时还显示 grab
+    const canDrag = draggable && count > 1;
     // progress 为拖动进度（容器宽度的倍数，向前切换为正），与 index 一起参与 transform
     const [progress, setProgress] = useState(0);
     const [dragging, setDragging] = useState(false);
@@ -221,7 +223,11 @@ const GallerySlot = ({
         <div
             {...rest}
             {...pointerProps}
-            className={joinClass(`${CSS_NS}-track`, className) + (dragging ? ` ${CSS_NS}-track-dragging` : '')}
+            className={
+                joinClass(`${CSS_NS}-track`, className) +
+                (canDrag ? ` ${CSS_NS}-track-draggable` : '') +
+                (dragging ? ` ${CSS_NS}-track-dragging` : '')
+            }
             // 内部 transform 是滑动的根，放在后面盖掉调用方传入的同名内联样式
             // 负号写在插值里：首张向右拖时 index + progress 为负，`-${...}` 会得到非法的 `--13.98%`
             style={{ ...style, transform: `translateX(${-(index + progress) * 100}%)` }}
