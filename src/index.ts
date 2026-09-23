@@ -217,6 +217,11 @@ export {
   useLocalStorage
 } from './hooks/useLocalStorage'
 
+// UseMergedRef utilities
+export {
+  useMergedRef
+} from './hooks/useMergedRef'
+
 // UsePortrait utilities
 export {
   usePortrait
