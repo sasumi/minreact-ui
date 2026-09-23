@@ -15,6 +15,9 @@ const CONTENT_CLASS_NAME = `${CSS_NS}-dialog-content`;
 const ACTION_CLASS_NAME = `${CSS_NS}-dialog-actions`;
 const MASKER_CLASS_NAME = `${CSS_NS}-dialog-masker`;
 
+/** 窗口尺寸变化后，拖动过的对话框与视口边缘保留的最小间距 */
+const VIEWPORT_EDGE_GAP = 8;
+
 /**
  * 对话框大小
  */
@@ -128,6 +131,12 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
             dlg.addEventListener("mousedown", onTitleMouseDown, true);
             cleanup.push(() => dlg.removeEventListener("mousedown", onTitleMouseDown, true));
             cleanup.push(bindNodeMove(dlg, titleEl));
+        }
+        if (moveable) {
+            // 窗口尺寸变化（含浏览器缩放）后把拖出视口的对话框夹回可见区域
+            const onWindowResize = () => clampDialogIntoView(dlg);
+            window.addEventListener("resize", onWindowResize);
+            cleanup.push(() => window.removeEventListener("resize", onWindowResize));
         }
         if (showTopCloser) {
             const closerEl = findOne(`.${TOP_CLOSER_CLASS_NAME}`, dlg);
@@ -702,6 +711,28 @@ const materializePosition = (dlg: HTMLDialogElement): void => {
     dlg.style.bottom = "auto";
     dlg.style.left = `${left}px`;
     dlg.style.top = `${top}px`;
+};
+
+/**
+ * 把拖动过的对话框夹回视口内（尺寸变小可能使原本合法的位置溢出）
+ * 未拖动过时靠 inset:0 + margin:auto 居中，会随视口自适应，无需处理
+ * @param dlg - 对话框元素
+ */
+const clampDialogIntoView = (dlg: HTMLDialogElement): void => {
+    if (!dlg.style.left || !dlg.style.top) {
+        return;
+    }
+    const { left, top, width, height } = dlg.getBoundingClientRect();
+    const maxLeft = Math.max(VIEWPORT_EDGE_GAP, window.innerWidth - width - VIEWPORT_EDGE_GAP);
+    const maxTop = Math.max(VIEWPORT_EDGE_GAP, window.innerHeight - height - VIEWPORT_EDGE_GAP);
+    const nextLeft = Math.min(Math.max(left, VIEWPORT_EDGE_GAP), maxLeft);
+    const nextTop = Math.min(Math.max(top, VIEWPORT_EDGE_GAP), maxTop);
+    if (nextLeft !== left) {
+        dlg.style.left = `${nextLeft}px`;
+    }
+    if (nextTop !== top) {
+        dlg.style.top = `${nextTop}px`;
+    }
 };
 
 /**
