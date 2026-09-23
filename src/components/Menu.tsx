@@ -154,39 +154,69 @@ const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
     );
 };
 
-/**
- * 焦点在触发器上时按下 Tab，把焦点移入弹层内的第一个可聚焦元素，让后续 Tab 落在弹层内部。
- * 弹层根节点是 tabIndex=-1，聚焦它后浏览器会按 DOM 顺序把下一次 Tab 交给菜单项；
- * 弹层未展开时内容不挂载（ref 为空），此时放行默认 Tab 行为。
- */
-const focusLayerOnTab = (event: React.KeyboardEvent, layerRef: React.RefObject<HTMLElement | null>) => {
-    if (event.key !== "Tab" || event.shiftKey || !layerRef.current) {
-        return;
-    }
-    event.preventDefault();
-    layerRef.current.focus();
-};
-
 /** 可用 Tab 聚焦的元素（与 Radix 判定 tabbable 的范围保持一致即可） */
 const TABBABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** 容器内可聚焦的元素（弹层根节点自身是 tabIndex=-1，不会被算进来） */
+const tabbablesIn = (container: HTMLElement | null | undefined) => (container ? Array.from(container.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR)) : []);
+
 /**
- * 菜单首/尾的可聚焦项上再按 Tab 越界时，同步把焦点交还触发器：
- * 不阻止默认行为，浏览器就会从触发器继续把 Tab 走到页面上它后面的元素（弹层在 body 末尾，自己走不出去）。
- * 必须同步且不能 preventDefault —— Radix Popover 的 FocusScope 写死 loop，它只比较 document.activeElement
- * 是不是内容区首/尾项，是就把焦点循环回去，所以要在它之前把焦点移出内容区。
- * 标记 tabExitRef 供关闭时跳过「把焦点拉回触发器」，否则会把浏览器已经移走的焦点又拽回来。
+ * 焦点在触发器上时按 Tab / ↓：把焦点交给弹层内第一个可聚焦元素（菜单项；组合框是搜索框）。
+ * 弹层未展开时 Tab 放行默认行为（继续在页面上移动），↓ 则先展开，等内容挂载后再由调用方补一次聚焦。
  */
-const exitMenuOnTab = (event: React.KeyboardEvent<HTMLDivElement>, triggerRef: React.RefObject<HTMLElement | null>, tabExitRef: { current: boolean }) => {
+const focusIntoLayer = (event: React.KeyboardEvent, container: HTMLElement | null, expand: () => void) => {
+    if (event.key !== "ArrowDown" && (event.key !== "Tab" || event.shiftKey)) {
+        return;
+    }
+    const first = tabbablesIn(container)[0];
+    if (first) {
+        event.preventDefault();
+        first.focus();
+    } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        expand();
+    }
+};
+
+/**
+ * ↑/↓ 在菜单内把焦点移到上/下一个可聚焦项，不循环：最后一项按 ↓、第一项按 ↑ 都不生效。
+ * 焦点不在容器内（组合框的搜索框）时按 ↓ 落在第一项。
+ */
+const moveFocusOnArrow = (event: React.KeyboardEvent, container: HTMLElement | null) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+        return;
+    }
+    const items = tabbablesIn(container);
+    if (!items.length) {
+        return;
+    }
+    const current = items.indexOf(document.activeElement as HTMLElement); // 不在容器内时为 -1
+    const next = Math.min(Math.max(event.key === "ArrowDown" ? current + 1 : current - 1, 0), items.length - 1);
+    event.preventDefault();
+    items[next].focus();
+};
+
+/**
+ * 菜单首/尾的可聚焦项上再按 Tab 越界时，把焦点交还触发器并关掉弹层，让浏览器把默认的 Tab 继续走到页面上触发器之后/之前的元素。
+ * 三个必须动作的原因：
+ * 1. 弹层是 portal（DOM 上排在 body 末尾），且卸载被 Radix Presence 延后，所以不 inert 的话默认 Tab 会直接落回弹层里；
+ * 2. Radix Popover 的 FocusScope 写死 loop，它只比较 document.activeElement 是不是内容区首/尾项，是就把焦点循环回去，
+ *    所以要先（同步）把焦点移出内容区；
+ * 3. tabExitRef 供 onCloseAutoFocus 跳过「把焦点拉回触发器」，否则会把浏览器已经移走的焦点又拽回来。
+ */
+const exitMenuOnTab = (event: React.KeyboardEvent<HTMLDivElement>, triggerRef: React.RefObject<HTMLElement | null>, tabExitRef: { current: boolean }, close: () => void) => {
     if (event.key !== "Tab" || !triggerRef.current) {
         return;
     }
-    const tabbables = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(TABBABLE_SELECTOR));
+    const tabbables = tabbablesIn(event.currentTarget);
     const edge = event.shiftKey ? tabbables[0] : tabbables[tabbables.length - 1];
-    if (edge && document.activeElement === edge) {
-        tabExitRef.current = true;
-        triggerRef.current.focus();
+    if (!edge || document.activeElement !== edge) {
+        return;
     }
+    event.currentTarget.closest<HTMLElement>("." + namespace + "-popover-content-wrap")?.setAttribute("inert", "");
+    tabExitRef.current = true;
+    close();
+    triggerRef.current.focus();
 };
 
 export const DropdownMenu = ({
@@ -210,6 +240,17 @@ export const DropdownMenu = ({
     const triggerRef = useRef<HTMLElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const tabExitRef = useRef(false);
+    const pendingFocusRef = useRef(false); // 未展开时按了 ↓：展开后补一次聚焦
+
+    /** 未展开时按 ↓：展开菜单（禁用时 Popover 恒为关闭状态） */
+    const expandByKeyboard = () => {
+        if (disabled) {
+            return;
+        }
+        pendingFocusRef.current = true;
+        setOpen(true);
+    };
+
     return (
         <Popover
             open={open}
@@ -222,12 +263,19 @@ export const DropdownMenu = ({
                 ref={triggerRef}
                 className={namespace + "-dropdown-menu-trigger"}
                 aria-disabled={disabled}
-                onKeyDown={(event) => focusLayerOnTab(event, menuRef)}
+                onKeyDown={(event) => focusIntoLayer(event, menuRef.current, expandByKeyboard)}
             >
                 {trigger}
             </Popover.Trigger>
             <Popover.Content
                 className={namespace + "-dropdown-menu-content"}
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault(); // 默认不抢走触发器的焦点
+                    if (pendingFocusRef.current) {
+                        pendingFocusRef.current = false;
+                        tabbablesIn(menuRef.current)[0]?.focus(); // 未展开时按 ↓ 展开：焦点交给第一个菜单项
+                    }
+                }}
                 onCloseAutoFocus={(event) => {
                     if (tabExitRef.current) {
                         tabExitRef.current = false;
@@ -237,7 +285,10 @@ export const DropdownMenu = ({
             >
                 <MenuImpl
                     ref={menuRef}
-                    onKeyDown={(event) => exitMenuOnTab(event, triggerRef, tabExitRef)}
+                    onKeyDown={(event) => {
+                        exitMenuOnTab(event, triggerRef, tabExitRef, () => setOpen(false));
+                        moveFocusOnArrow(event, event.currentTarget);
+                    }}
                     items={items}
                     onChange={(val) => {
                         onChange?.(val);
@@ -285,10 +336,21 @@ export const ComboboxMenu = ({
 }) => {
     const [searchText, setSearchText] = useState("");
     const [open, setOpen] = useState(false);
-    // Tab 进入弹层的落点是搜索框（弹层内第一个可聚焦元素），再按 Tab 才会到菜单项
+    // Tab / ↓ 进入弹层的落点是搜索框（弹层内第一个可聚焦元素），再按 Tab 才会到菜单项
     const searchRef = useRef<HTMLInputElement>(null);
     const triggerRef = useRef<HTMLElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
     const tabExitRef = useRef(false);
+    const pendingFocusRef = useRef(false); // 未展开时按了 ↓：展开后补一次聚焦
+
+    /** 未展开时按 ↓：展开面板（禁用时 Popover 恒为关闭状态） */
+    const expandByKeyboard = () => {
+        if (disabled) {
+            return;
+        }
+        pendingFocusRef.current = true;
+        setOpen(true);
+    };
 
     const filteredItems = items.filter((item) => {
         if (isMenuDivider(item) || isMenuCaption(item)) {
@@ -309,12 +371,19 @@ export const ComboboxMenu = ({
                 ref={triggerRef}
                 className={namespace + "-combobox-menu-trigger"}
                 aria-disabled={disabled}
-                onKeyDown={(event) => focusLayerOnTab(event, searchRef)}
+                onKeyDown={(event) => focusIntoLayer(event, searchRef.current, expandByKeyboard)}
             >
                 {trigger}
             </Popover.Trigger>
             <Popover.Content
                 className={namespace + "-combobox-menu-content"}
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault(); // 默认不抢走触发器的焦点
+                    if (pendingFocusRef.current) {
+                        pendingFocusRef.current = false;
+                        searchRef.current?.focus(); // 未展开时按 ↓ 展开：焦点交给搜索框
+                    }
+                }}
                 onCloseAutoFocus={(event) => {
                     if (tabExitRef.current) {
                         tabExitRef.current = false;
@@ -330,10 +399,18 @@ export const ComboboxMenu = ({
                         placeholder={placeholder}
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={(event) => {
+                            // ↓ 从搜索框进入列表
+                            if (event.key === "ArrowDown") moveFocusOnArrow(event, menuRef.current);
+                        }}
                     />
                     <MenuImpl
+                        ref={menuRef}
                         items={filteredItems}
-                        onKeyDown={(event) => exitMenuOnTab(event, triggerRef, tabExitRef)}
+                        onKeyDown={(event) => {
+                            exitMenuOnTab(event, triggerRef, tabExitRef, () => setOpen(false));
+                            moveFocusOnArrow(event, event.currentTarget);
+                        }}
                         onChange={(val) => {
                             onChange?.(val);
                             if (hideOnClick) {
