@@ -14,7 +14,7 @@ pnpm install
 pnpm dev
 ```
 
-然后在浏览器中访问：`http://localhost:5173/demo.html`
+然后在浏览器中访问：`http://localhost:5180/demo.html`
 
 ### 构建
 

@@ -18,6 +18,12 @@ export default defineConfig(({ command }) => ({
                     : "minutool",
         },
     },
+    server: {
+        port: 5180,
+    },
+    preview: {
+        port: 5180,
+    },
     build: {
         sourcemap: true,
         lib: {

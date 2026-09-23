@@ -171,10 +171,19 @@ export const Clickable = memo(function ({ tag = "span", children, ...props }: Cl
 
     let attrs: Record<string, any> = { ...props };
     delete attrs.onClick;
+    delete attrs.onKeyDown; // 由下面组合后的 onKeyDown 处理，避免覆盖掉外部传入的键盘处理（如 Popover Trigger 的 Tab 焦点转移）
     delete attrs.debounce;
     return (
         // role="button" 即可表达按钮语义；aria-role 是非法属性（合法的是 role），会造成 React 每次渲染报 Invalid aria prop 警告
-        <TagEl {...attrs} tabIndex={props.disabled ? -1 : props.tabIndex || 0} onClick={callback} onKeyDown={callback}>
+        <TagEl
+            {...attrs}
+            tabIndex={props.disabled ? -1 : props.tabIndex || 0}
+            onClick={callback}
+            onKeyDown={(e: React.KeyboardEvent) => {
+                props.onKeyDown?.(e);
+                callback(e);
+            }}
+        >
             {children}
         </TagEl>
     );

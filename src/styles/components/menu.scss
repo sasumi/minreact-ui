@@ -73,6 +73,10 @@
         &:hover {
             background-color: var(--#{$ns}-color-background-hover);
         }
+
+        &:focus {
+            background-color: var(--#{$ns}-color-background-hover);
+        }
     }
 }
 
