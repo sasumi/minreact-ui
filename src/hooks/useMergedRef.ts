@@ -1,25 +1,22 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
-type PossibleRef<T> = React.Ref<T> | undefined;
-
-function setRef<T>(ref: PossibleRef<T>, value: T | null) {
-    if (typeof ref === "function") {
-        ref(value);
-    } else if (ref != null) {
-        (ref as React.MutableRefObject<T | null>).current = value;
-    }
-}
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /**
- * 合并多个 ref，返回一个 callback ref。
- * 支持 object ref、function ref 以及 undefined/null。
+ * Merges multiple React refs into a single ref callback.
+ * This is useful when you need to assign multiple refs to the same element.
  */
-export function useMergedRef<T>(...refs: PossibleRef<T>[]): (node: T | null) => void {
-    // 用 ref 保存最新的 refs，避免每次渲染都重新创建 callback
+export function useMergedRef<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
     const refsRef = useRef(refs);
-    refsRef.current = refs;
+
+    useIsomorphicLayoutEffect(() => {
+        refsRef.current = refs;
+    });
 
     return useCallback((node: T | null) => {
-        refsRef.current.forEach((ref) => setRef(ref, node));
+        refsRef.current.forEach((ref) => {
+            if (typeof ref === "function") ref(node);
+            else if (ref != null) (ref as React.MutableRefObject<T | null>).current = node;
+        });
     }, []);
 }
