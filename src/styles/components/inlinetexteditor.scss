@@ -3,14 +3,25 @@
 @use "./../mixins/icon.scss" as icon;
 
 .#{$ns}-inline-text-editor {
+    // 文本与编辑按钮同行：按钮始终贴在文本末尾（文本被使用方省略成多行时贴最后一行）
+    display: flex;
+    align-items: flex-end;
+    gap: 0.25em;
+
     &:hover,
     &:focus-within {
         .#{$ns}-inline-text-editor-edit-button {
             opacity: 0.5;
         }
     }
+    &-text {
+        // 宽度跟随文本内容（短文本时按钮紧贴其后），过长由使用方的省略样式控制
+        flex: 0 1 auto;
+        min-width: 0;
+    }
     &-edit-button {
         @include icon.icon;
+        flex: none;
         width: var(--#{$ns}-element-height);
         height: var(--#{$ns}-element-height);
         opacity: 0.2;
@@ -20,6 +31,8 @@
     }
 
     &-form {
+        flex: 1 1 auto;
+        min-width: 0;
         display: flex;
         gap: 0.25em;
         align-items: center;
