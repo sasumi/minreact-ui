@@ -1,31 +1,23 @@
 @charset "UTF-8";
 @use "./../namespace" as *;
 
-@mixin icon {
+@mixin icon($icon: var(--icon), $size: 1.6em) {
+    font-family: var(--#{$ns}-font-icon);
+    font-style: normal;
+    font-weight: normal;
+    speak-as: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    line-height: 1;
+    font-variant: normal;
+    text-transform: none;
+    width: $size;
+    height: $size;
+    min-height: 0;
+    font-size: 1.2em;
 
     &:before {
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        transform-origin: center center;
-        display: inline-block;
-        font-family: var(--#{$ns}-font-icon);
-        font-size: 1.25em;
-        width: 1em;
-        height: 1em;
-        vertical-align: middle;
-        font-style: normal;
-        font-weight: normal;
-        text-decoration: inherit;
-        text-align: center;
-        text-transform: none;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        content: $icon;
     }
 }
 
