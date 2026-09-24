@@ -12,7 +12,6 @@
     overflow: auto;
     padding: 0.5em 0;
     max-height: var(--#{$ns}-menu-max-height);
-    max-width: fit-content;
 
     //分隔线
     &-divider {
