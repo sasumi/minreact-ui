@@ -2,6 +2,7 @@ import { Clickable, NormalButton, SpanButton, SubmitButton } from "./Button";
 import "./../styles/components/inlinetexteditor.scss";
 import { namespace } from "./../styles/namespace";
 import { useEffect, useRef, useState } from "react";
+import { Icons } from "react-toastify";
 
 const CSS_NS = `${namespace}-inline-text-editor`;
 const STATE_IDLE = "idle";
@@ -50,20 +51,24 @@ export const InlineTextEditor = ({
     }
 
     return (
-        <div className={`${CSS_NS}`} data-state={state}>
+        <div
+            className={`${CSS_NS}`}
+            data-state={state}
+            onClick={() => {
+                if (readonly || state !== STATE_IDLE) {
+                    return;
+                }
+                setState(STATE_EDITING);
+            }}
+            title={state === STATE_IDLE && !readonly ? "编辑" : undefined}
+        >
             {state === STATE_IDLE && (
-                <span
-                    tabIndex={0}
-                    className={`${CSS_NS}-text ${!val ? `${CSS_NS}-text-placeholder` : ""}`}
-                    onClick={() => {
-                        if (readonly) {
-                            return;
-                        }
-                        setState(STATE_EDITING);
-                    }}
-                >
-                    {val || placeholder}
-                </span>
+                <>
+                    <span tabIndex={0} className={`${CSS_NS}-text ${!val ? `${CSS_NS}-text-placeholder` : ""}`}>
+                        {val || placeholder}
+                    </span>
+                    <span className={`${CSS_NS}-edit-button`}></span>
+                </>
             )}
 
             {[STATE_EDITING, STATE_SAVING].includes(state) && (
@@ -91,13 +96,16 @@ export const InlineTextEditor = ({
                         autoFocus={true}
                         readOnly={state === STATE_SAVING}
                         maxLength={maxlength}
+                        onKeyDown={(e) => {
+                            if (e.key === "Escape") {
+                                setState(STATE_IDLE);
+                            }
+                        }}
                     />
                     <SubmitButton
                         disabled={state === STATE_SAVING}
                         title="保存"
                         onClick={(event) => {
-                            // 提交统一走 requestSubmit()（校验不通过时不会派发 submit 事件），
-                            // preventDefault 是为了避免按钮自身再原生提交一次
                             event.preventDefault();
                             if (state === STATE_SAVING) {
                                 return;
@@ -105,7 +113,15 @@ export const InlineTextEditor = ({
                             formRef.current?.requestSubmit();
                         }}
                     />
-                    <NormalButton disabled={state === STATE_SAVING} data-variant="cancel" title="取消" onClick={() => setState(STATE_IDLE)} />
+                    <NormalButton
+                        disabled={state === STATE_SAVING}
+                        data-variant="cancel"
+                        title="取消"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setState(STATE_IDLE);
+                        }}
+                    />
                 </form>
             )}
         </div>
