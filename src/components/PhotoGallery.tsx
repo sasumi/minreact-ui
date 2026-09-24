@@ -368,14 +368,12 @@ const NavSlot = ({ step, draggable = true, className, ...rest }: PhotoGalleryNav
             dragRef.current = null;
             setDragging(false);
         };
-        window.addEventListener('pointermove', onMove);
-        window.addEventListener('pointerup', onEnd);
-        window.addEventListener('pointercancel', onEnd);
-        return () => {
-            window.removeEventListener('pointermove', onMove);
-            window.removeEventListener('pointerup', onEnd);
-            window.removeEventListener('pointercancel', onEnd);
-        };
+        const unbind = [
+            bindDomEvent<PointerEvent>(window, 'pointermove', onMove),
+            bindDomEvent<PointerEvent>(window, 'pointerup', onEnd),
+            bindDomEvent<PointerEvent>(window, 'pointercancel', onEnd),
+        ];
+        return () => unbind.forEach((off) => off());
     }, [dragging]);
 
     const scrollByStep = (direction: 1 | -1) => {
@@ -388,9 +386,10 @@ const NavSlot = ({ step, draggable = true, className, ...rest }: PhotoGalleryNav
 
     const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
         const el = viewportRef.current;
-        // 没开拖动、非左键、已有拖动进行中、或者压根没溢出：不接管，交给默认行为（点击切图等）
-        if (!draggable || !el || e.button !== 0 || dragRef.current) return;
+        // 没开拖动、非左键、或者压根没溢出：不接管，交给默认行为（点击切图等）
+        if (!draggable || !el || e.button !== 0) return;
         if (el.scrollWidth <= el.clientWidth + 1) return;
+        // 直接顶替进行中的拖动记录：多指时以后按下的为准，上一次 up 丢了也不会卡住（id 不匹配的 move/up 会被忽略）
         dragRef.current = { id: e.pointerId, x: e.clientX, scrollLeft: el.scrollLeft };
         draggedRef.current = false;
         setDragging(true); // 后续 move/up 由上方的 window 监听接手

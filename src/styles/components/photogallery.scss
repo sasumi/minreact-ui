@@ -139,7 +139,10 @@
     &-nav-track {
         display: flex;
         gap: 0.3em;
-        width: max-content; // 内容多宽就多宽，不被 flex 压扁
+        // 内容多宽就多宽，不被 flex 压扁
+        width: max-content;
+        // 宽屏 + 图片少时居中；溢出时 auto 外边距按 CSS 规则归零，仍从左侧开始滚，不会切掉左边
+        margin: 0 auto;
     }
 
     &-nav-item {
