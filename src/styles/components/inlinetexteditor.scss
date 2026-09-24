@@ -26,7 +26,8 @@
 
 		[data-variant="submit"] {
 			@include icon.icon;
-
+			width:var(--#{$ns}-element-height);
+			height:var(--#{$ns}-element-height);
 			&:before {
 				content: "\e61e";
 			}
@@ -34,8 +35,8 @@
 
 		[data-variant="cancel"] {
 			@include icon.icon;
-			font-size: 0.9em;
-
+			width:var(--#{$ns}-element-height);
+			height:var(--#{$ns}-element-height);
 			&:before {
 				content: "\e6e0";
 			}
