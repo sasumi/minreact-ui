@@ -83,6 +83,7 @@ export type {
   PhotoGalleryControlsProps,
   PhotoGalleryGalleryProps,
   PhotoGalleryIndicatorProps,
+  PhotoGalleryNavProps,
   PhotoGalleryProps,
   PhotoGallerySlotProps,
   PhotoGalleryState,

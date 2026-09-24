@@ -12,6 +12,8 @@ const makePhotos = (count: number) =>
 
 const PHOTOS = makePhotos(5);
 const ONE_PHOTO = makePhotos(1);
+// 缩略图导航要能看出滚动效果，图多一点
+const MANY_PHOTOS = makePhotos(12);
 
 const boxStyle = (width: number, height: number): CSSProperties => ({
     width,
@@ -231,6 +233,35 @@ function SlotCompositionDemo() {
     );
 }
 
+/** 缩略图导航：点缩略图切图，当前图高亮并自动滚入视野；缩略图条可拖动，两侧箭头按屏滚动 */
+function NavDemo() {
+    return (
+        <div className="demo-row">
+            <div>
+                <p style={labelStyle}>缩略图导航 + 箭头 + 序号（缩略图条可左右拖动，切到最后一张时箭头同步置灰）</p>
+                <div style={boxStyle(560, 350)}>
+                    <PhotoGallery photos={MANY_PHOTOS}>
+                        <PhotoGallery.Gallery draggable />
+                        <PhotoGallery.Controls />
+                        {/* 序号与导航条同在底部，用 style 抬高一点避免叠在一起 */}
+                        <PhotoGallery.Indicator style={{ bottom: "3.6em" }} />
+                        <PhotoGallery.Nav />
+                    </PhotoGallery>
+                </div>
+            </div>
+            <div>
+                <p style={labelStyle}>只要画面 + 导航（一次滚 3 张，并关掉拖动）</p>
+                <div style={boxStyle(360, 225)}>
+                    <PhotoGallery photos={MANY_PHOTOS}>
+                        <PhotoGallery.Gallery />
+                        <PhotoGallery.Nav step={3} draggable={false} />
+                    </PhotoGallery>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function PhotoGalleryDemo() {
     return (
         <div className="demo-page photo-gallery-demo">
@@ -238,7 +269,7 @@ function PhotoGalleryDemo() {
                 <h2>PhotoGallery 图片轮播</h2>
                 <p>
                     位置逻辑由 PhotoGallery.use 承担，UI 拆成 PhotoGallery.Gallery / PhotoGallery.Controls /
-                    PhotoGallery.Indicator 三个插槽；不传子元素时渲染全套，拖动切换需显式开 draggable
+                    PhotoGallery.Indicator / PhotoGallery.Nav 等插槽；不传子元素时渲染默认布局，拖动切换需显式开 draggable
                 </p>
             </div>
 
@@ -263,6 +294,13 @@ function PhotoGalleryDemo() {
 
             <DemoSection title="插槽组合" description="三个插槽任选任排；不传子元素时使用默认布局">
                 <SlotCompositionDemo />
+            </DemoSection>
+
+            <DemoSection
+                title="缩略图导航"
+                description="PhotoGallery.Nav 列出全部图片：点缩略图直接切到该张，当前图高亮并随切换自动滚入视野（与 Controls 共用同一份位置，箭头禁用状态实时联动）；缩略图条可鼠标 / 触摸左右拖动，两侧箭头按 step 张滚动一屏"
+            >
+                <NavDemo />
             </DemoSection>
 
             <DemoSection

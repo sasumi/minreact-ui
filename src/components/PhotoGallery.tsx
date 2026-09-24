@@ -10,10 +10,11 @@ import {
     useRef,
     useState,
 } from 'react';
-import type { HTMLAttributes, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
+import type { HTMLAttributes, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { namespace } from './../styles/namespace';
 import { SpanButton } from './Button';
 import { ImageLoader } from './Image';
+import { bindDomEvent } from 'minutool';
 
 const CSS_NS = namespace + '-photo-gallery';
 
@@ -272,6 +273,187 @@ const ControlsSlot = ({ className, ...rest }: PhotoGalleryControlsProps) => {
     );
 };
 
+/** 活动缩略图带入视野时与视口边缘保留的留白（px） */
+const NAV_SCROLL_PADDING = 4;
+
+/**
+ * 相邻缩略图的跨度（项宽 + 间距）：取相邻两项左偏移之差，比只看宽度更贴近真实步长；
+ * 只有一项时退化为该项宽度，量不到就返回 0（调用方按 0 跳过滚动）
+ */
+const navStride = (viewport: HTMLElement | null) => {
+    const track = viewport?.firstElementChild;
+    const first = track?.children[0] as HTMLElement | undefined;
+    if (!first) return 0;
+    const second = track?.children[1] as HTMLElement | undefined;
+    return second ? second.offsetLeft - first.offsetLeft : first.offsetWidth;
+};
+
+/** 拖动超过该距离（px）才算拖动，否则当成点击，免得轻微的位移把切图抢掉 */
+const NAV_DRAG_THRESHOLD = 4;
+
+export interface PhotoGalleryNavProps extends PhotoGallerySlotProps {
+    /** 箭头一次滚动的缩略图个数；默认按视口内能完整放下的个数（至少 1 张） */
+    step?: number;
+    /** 缩略图条是否可鼠标 / 触摸左右拖动，默认 true（没溢出时自动不接管） */
+    draggable?: boolean;
+}
+
+/**
+ * 缩略图导航插槽：列出全部图片，点击缩略图即切到该张；当前图高亮并随位置变化自动滚入视野
+ * （箭头、拖动、自动播放引起的切换同样生效），与 Controls / Indicator 共用同一份位置，天生联动。
+ * 缩略图条可鼠标 / 触摸左右拖动（draggable，默认开），两侧箭头按 step 张滚动一屏，
+ * 滚到两头时对应箭头禁用；无图时不渲染。
+ */
+const NavSlot = ({ step, draggable = true, className, ...rest }: PhotoGalleryNavProps) => {
+    const { photos, index, count, goTo } = useGalleryApi();
+    const viewportRef = useRef<HTMLDivElement>(null);
+    // null = 还没量过：先不锁死箭头，量出来（下一帧）再修正，避免先灰后亮
+    const [scrollable, setScrollable] = useState<{ prev: boolean; next: boolean } | null>(null);
+    // 开了 draggable 就先当可拖（量出「确实没溢出」之前不预先否定，免得首帧光标闪一下）；
+    // 真按下时还会用 DOM 复核一次，所以能不能拖不依赖这里的测量时机
+    const canDrag = draggable && (!scrollable || scrollable.prev || scrollable.next);
+    const [dragging, setDragging] = useState(false);
+    const dragRef = useRef<{ id: number; x: number; scrollLeft: number } | null>(null);
+    // 拖动后跟着的那次 click 要吃掉，否则松手会顺手切到别的图
+    const draggedRef = useRef(false);
+
+    const syncScrollable = useCallback(() => {
+        const el = viewportRef.current;
+        if (!el) return;
+        const next = { prev: el.scrollLeft > 1, next: el.scrollLeft + el.clientWidth < el.scrollWidth - 1 };
+        // 拖动/滚动会高频回调，状态没变就不要 setState（否则整条缩略图白重渲染一遍）
+        setScrollable((prev) => (prev && prev.prev === next.prev && prev.next === next.next ? prev : next));
+    }, []);
+
+    // 视口尺寸与图片张数（会改 scrollWidth）都会影响可滚性；ResizeObserver 注册时会先回调一次
+    useLayoutEffect(() => {
+        const el = viewportRef.current;
+        if (!el) return;
+        const observer = new ResizeObserver(syncScrollable);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [syncScrollable, count]);
+
+    // 位置变化时把活动缩略图带入视野；已经看得见就不动，免得手动滚动被拽回去
+    useEffect(() => {
+        const el = viewportRef.current;
+        const item = el?.firstElementChild?.children[index] as HTMLElement | undefined;
+        if (!el || !item) return;
+        const view = el.getBoundingClientRect();
+        const rect = item.getBoundingClientRect();
+        if (rect.left < view.left + NAV_SCROLL_PADDING) {
+            el.scrollBy({ left: rect.left - view.left - NAV_SCROLL_PADDING, behavior: 'smooth' });
+        } else if (rect.right > view.right - NAV_SCROLL_PADDING) {
+            el.scrollBy({ left: rect.right - view.right + NAV_SCROLL_PADDING, behavior: 'smooth' });
+        }
+    }, [index]);
+
+    // 拖动期间在 window 上收 move/up：指针移出缩略图条也不会丢，且不用抢指针捕获
+    // （一旦 setPointerCapture，click 会被改写目标到捕获元素，点击缩略图切图就失效了）
+    useEffect(() => {
+        if (!dragging) return;
+        const onMove = (e: PointerEvent) => {
+            const drag = dragRef.current;
+            const el = viewportRef.current;
+            if (!drag || !el || drag.id !== e.pointerId) return;
+            const dx = e.clientX - drag.x;
+            // 还没过阈值：继续当作点击，不抢掉缩略图的切图动作
+            if (!draggedRef.current && Math.abs(dx) < NAV_DRAG_THRESHOLD) return;
+            draggedRef.current = true;
+            // 直接改 scrollLeft：滚动位置与 pointer 位移同源，不需要额外的 transform
+            el.scrollLeft = drag.scrollLeft - dx;
+        };
+        const onEnd = (e: PointerEvent) => {
+            if (dragRef.current?.id !== e.pointerId) return;
+            dragRef.current = null;
+            setDragging(false);
+        };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onEnd);
+        window.addEventListener('pointercancel', onEnd);
+        return () => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onEnd);
+            window.removeEventListener('pointercancel', onEnd);
+        };
+    }, [dragging]);
+
+    const scrollByStep = (direction: 1 | -1) => {
+        const el = viewportRef.current;
+        const stride = navStride(el);
+        if (!el || !stride) return;
+        const pages = step ?? Math.max(1, Math.floor(el.clientWidth / stride));
+        el.scrollBy({ left: direction * pages * stride, behavior: 'smooth' });
+    };
+
+    const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+        const el = viewportRef.current;
+        // 没开拖动、非左键、已有拖动进行中、或者压根没溢出：不接管，交给默认行为（点击切图等）
+        if (!draggable || !el || e.button !== 0 || dragRef.current) return;
+        if (el.scrollWidth <= el.clientWidth + 1) return;
+        dragRef.current = { id: e.pointerId, x: e.clientX, scrollLeft: el.scrollLeft };
+        draggedRef.current = false;
+        setDragging(true); // 后续 move/up 由上方的 window 监听接手
+    };
+
+    const handleClickCapture = (e: ReactMouseEvent<HTMLDivElement>) => {
+        if (!draggedRef.current) return;
+        draggedRef.current = false;
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    if (count === 0) return null;
+    return (
+        // 容器就是贴底的那一条：箭头固定在两端，中间留给可滚动的缩略图条
+        <div className={joinClass(`${CSS_NS}-nav`, className)} {...rest}>
+            <SpanButton
+                className={`${CSS_NS}-nav-arrow prev`}
+                title="向前浏览缩略图"
+                aria-label="向前浏览缩略图"
+                disabled={scrollable?.prev === false}
+                debounce={false}
+                onClick={() => scrollByStep(-1)}
+            />
+            <div
+                className={
+                    `${CSS_NS}-nav-viewport` +
+                    (canDrag ? ` ${CSS_NS}-nav-draggable` : '') +
+                    (dragging ? ` ${CSS_NS}-nav-dragging` : '')
+                }
+                ref={viewportRef}
+                onScroll={syncScrollable}
+                onPointerDown={handlePointerDown}
+                onClickCapture={handleClickCapture}
+            >
+                <div className={`${CSS_NS}-nav-track`}>
+                    {photos.map((src, i) => (
+                        <SpanButton
+                            key={src + i}
+                            className={`${CSS_NS}-nav-item`}
+                            title={`第 ${i + 1} 张`}
+                            aria-label={`切换到第 ${i + 1} 张`}
+                            aria-current={i === index}
+                            debounce={false}
+                            onClick={() => goTo(i)}
+                        >
+                            <ImageLoader src={src} alt="" draggable={false} />
+                        </SpanButton>
+                    ))}
+                </div>
+            </div>
+            <SpanButton
+                className={`${CSS_NS}-nav-arrow next`}
+                title="向后浏览缩略图"
+                aria-label="向后浏览缩略图"
+                disabled={scrollable?.next === false}
+                debounce={false}
+                onClick={() => scrollByStep(1)}
+            />
+        </div>
+    );
+};
+
 export type PhotoGalleryIndicatorProps = PhotoGallerySlotProps;
 
 /**
@@ -335,7 +517,8 @@ export interface PhotoGalleryProps extends UsePhotoGalleryOptions {
     /**
      * 自定义内部结构，插槽可任意取舍、任意顺序摆放：
      * `<PhotoGallery.Gallery />` 画面、`<PhotoGallery.Controls />` 箭头、`<PhotoGallery.Indicator />` 序号、
-     * `<PhotoGallery.Timer />` 自动播放倒计时。不传时渲染前三者组成的默认布局。
+     * `<PhotoGallery.Nav />` 缩略图导航、`<PhotoGallery.Timer />` 自动播放倒计时。
+     * 不传时渲染前三者组成的默认布局（不含 Nav / Timer）。
      */
     children?: ReactNode;
     className?: string;
@@ -346,6 +529,7 @@ type PhotoGalleryStatics = {
     Gallery: (props: PhotoGalleryGalleryProps) => ReactNode;
     Controls: (props: PhotoGalleryControlsProps) => ReactNode;
     Indicator: (props: PhotoGalleryIndicatorProps) => ReactNode;
+    Nav: (props: PhotoGalleryNavProps) => ReactNode;
     Timer: (props: PhotoGalleryTimerProps) => ReactNode;
     use: typeof usePhotoGallery;
 };
@@ -388,6 +572,7 @@ const PhotoGalleryRoot = forwardRef<PhotoGalleryApi, PhotoGalleryProps>(function
  *     <PhotoGallery.Gallery />
  *     <PhotoGallery.Controls />
  *     <PhotoGallery.Indicator />
+ *     <PhotoGallery.Nav />
  *     <PhotoGallery.Timer duration={5000} />
  * </PhotoGallery>
  * <button onClick={() => pg.current?.prev()} disabled={pg.current?.index === 0}>上一张</button>
@@ -397,5 +582,6 @@ export const PhotoGallery = PhotoGalleryRoot as typeof PhotoGalleryRoot & PhotoG
 PhotoGallery.Gallery = GallerySlot;
 PhotoGallery.Controls = ControlsSlot;
 PhotoGallery.Indicator = IndicatorSlot;
+PhotoGallery.Nav = NavSlot;
 PhotoGallery.Timer = TimerSlot;
 PhotoGallery.use = usePhotoGallery;
