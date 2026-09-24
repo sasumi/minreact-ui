@@ -35,6 +35,7 @@ export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
             <img
                 {...rest}
                 className={CSS_NS + " " + (rest.className || "")}
+                loading={rest.loading || "lazy"} // 默认使用懒加载
                 ref={ref}
                 data-state={state}
                 onLoad={(e) => {
