@@ -4,6 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import type { DependencyList, ReactNode } from "react";
 import { Pagination } from "./Pagination";
 
+//通用异步状态
+export const ASYNC_STATE_INIT = Symbol("ASYNC_STATE_INIT");
+export const ASYNC_STATE_LOADING = Symbol("ASYNC_STATE_LOADING");
+export const ASYNC_STATE_SUCCESS = Symbol("ASYNC_STATE_SUCCESS");
+export const ASYNC_STATE_ERROR = Symbol("ASYNC_STATE_ERROR");
+export type ASYNC_STATE_TYPE = typeof ASYNC_STATE_INIT | typeof ASYNC_STATE_LOADING | typeof ASYNC_STATE_SUCCESS | typeof ASYNC_STATE_ERROR;
+
 export type AsyncState<T> = {
     idle?: boolean;
     loading?: boolean;
