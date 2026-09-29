@@ -1,7 +1,7 @@
 import "./../styles/components/icon.scss";
 import { namespace } from "./../styles/namespace";
 
-export const Spinner = ({ run = false }) => {
+export const Spinner = ({ run = false, color = "currentColor" }) => {
     return (
         <svg
             className={namespace + "-spinner"}
@@ -17,7 +17,7 @@ export const Spinner = ({ run = false }) => {
         >
             <path
                 d="M512 882.3125c-23.29875 0-42.1875-18.88875-42.1875-42.1875s18.88875-42.1875 42.1875-42.1875c157.918125 0 285.9375-128.019375 285.9375-285.9375S669.918125 226.0625 512 226.0625 226.0625 354.081875 226.0625 512c0 23.29875-18.88875 42.1875-42.1875 42.1875S141.6875 535.29875 141.6875 512c0-204.5175 165.795-370.3125 370.3125-370.3125S882.3125 307.4825 882.3125 512 716.5175 882.3125 512 882.3125z"
-                fill="currentColor"
+                fill={color}
                 p-id="8610"
             ></path>
         </svg>
