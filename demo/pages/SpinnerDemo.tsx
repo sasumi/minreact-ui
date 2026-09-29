@@ -12,7 +12,7 @@ function SpinnerDemo() {
       <DemoSection title="基础用法" description="通过 run 属性控制旋转动画">
         <div className="demo-row">
           <div style={{ width: "48px", height: "48px" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "48px", height: "48px" }}>
             <Spinner run={false} />
@@ -24,16 +24,16 @@ function SpinnerDemo() {
       <DemoSection title="不同尺寸" description="通过设置容器尺寸来调整 Spinner 大小">
         <div className="demo-row" style={{ alignItems: "center" }}>
           <div style={{ width: "24px", height: "24px" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "32px", height: "32px" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "48px", height: "48px" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "64px", height: "64px" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
         </div>
         <p style={{ marginTop: "1rem", color: "#666" }}>24px / 32px / 48px / 64px</p>
@@ -42,16 +42,16 @@ function SpinnerDemo() {
       <DemoSection title="不同颜色" description="通过 CSS 的 color 属性改变颜色">
         <div className="demo-row" style={{ alignItems: "center" }}>
           <div style={{ width: "48px", height: "48px", color: "#1976d2" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "48px", height: "48px", color: "#4caf50" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "48px", height: "48px", color: "#f44336" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <div style={{ width: "48px", height: "48px", color: "#ff9800" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
         </div>
         <p style={{ marginTop: "1rem", color: "#666" }}>蓝色 / 绿色 / 红色 / 橙色</p>
@@ -70,7 +70,7 @@ function SpinnerDemo() {
           }}
         >
           <div style={{ width: "48px", height: "48px", marginBottom: "1rem" }}>
-            <Spinner run={true} />
+            <Spinner/>
           </div>
           <p style={{ color: "#666", margin: 0 }}>加载中...</p>
         </div>

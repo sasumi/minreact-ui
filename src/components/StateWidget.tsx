@@ -9,7 +9,7 @@ export const LoadingHolder = ({ text, ...props }: { text?: string; [key: string]
     props.className = className;
     return (
         <div className={className} {...props}>
-            <Spinner run={true} />
+            <Spinner/>
             {text}
         </div>
     );

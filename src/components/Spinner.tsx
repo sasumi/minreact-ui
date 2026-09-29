@@ -1,7 +1,7 @@
 import "./../styles/components/icon.scss";
 import { namespace } from "./../styles/namespace";
 
-export const Spinner = ({ run = false, color = "currentColor" }) => {
+export const Spinner = ({ run = true, color = "currentColor" }: { run?: boolean; color?: string }) => {
     return (
         <svg
             className={namespace + "-spinner"}
