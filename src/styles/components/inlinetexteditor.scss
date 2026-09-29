@@ -3,7 +3,8 @@
 @use "./../mixins/icon.scss" as icon;
 
 .#{$ns}-inline-text-editor {
-    // 文本与编辑按钮同行：按钮始终贴在文本末尾（文本被使用方省略成多行时贴最后一行）
+    // 文本与编辑按钮同行：按钮始终贴在文本末尾（文本被使用方省略成多行时贴最后一行）。
+    // 纵向同样由组件内 JS 按最后一行的字形中心对齐（行高与按钮高度不等，只靠 flex 底对齐会偏上）
     display: flex;
     align-items: flex-end;
     gap: 0.25em;

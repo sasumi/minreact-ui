@@ -56,7 +56,8 @@ export const InlineTextEditor = ({
         }
     }, [value]);
 
-    // 编辑按钮贴到文本最后一行的末尾：文本换行 / 被省略时不再悬在整块右侧
+    // 编辑按钮摆到文本最后一行的末尾：横向贴住该行文字（被省略时让出「…」），
+    // 纵向与该行对齐（多行时不能只靠 flex 的底对齐，行高与按钮高度并不相等）
     useLayoutEffect(() => {
         const alignEditButton = () => {
             const text = textRef.current;
@@ -75,8 +76,12 @@ export const InlineTextEditor = ({
             // 被省略时省略号画在最后一个可见字符之后，要把它让出来
             const truncated = text.scrollHeight > text.clientHeight + 1;
             const end = lastLine.right + (truncated ? measureEllipsisWidth(text) : 0);
-            const shift = end - box.right;
-            if (shift < -0.5) button.style.transform = `translateX(${shift}px)`;
+            const shiftX = end - box.right < -0.5 ? end - box.right : 0;
+            // 纵向：按钮（含图标字形）中心对齐最后一行的字形中心
+            const lineCenter = lastLine.top + lastLine.height / 2;
+            const buttonBox = button.getBoundingClientRect();
+            const shiftY = lineCenter - (buttonBox.top + buttonBox.height / 2);
+            button.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
         };
 
         alignEditButton();

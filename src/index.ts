@@ -124,9 +124,9 @@ export {
 
 // StateWidget utilities
 export {
-  DataEmpty,
-  DataLoading,
-  RequestError
+  EmptyHolder,
+  ErrorHolder,
+  LoadingHolder
 } from './components/StateWidget'
 
 // StepInput utilities

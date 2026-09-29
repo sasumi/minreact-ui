@@ -1,4 +1,4 @@
-import { DataEmpty, DataLoading, RequestError } from "./../modules/StateWidget";
+import { EmptyHolder, LoadingHolder, ErrorHolder } from "./StateWidget";
 import type { AbortablePromise } from "minutool";
 import { useEffect, useRef, useState } from "react";
 import type { DependencyList, ReactNode } from "react";
@@ -55,9 +55,9 @@ export const AsyncPagination = ({
     fetcher,
     children,
     pageSize = 10,
-    loading = DataLoading,
-    error = RequestError,
-    empty = DataEmpty,
+    loading = LoadingHolder,
+    error = ErrorHolder,
+    empty = EmptyHolder,
     keepPreviousData = false,
 }: {
     fetcher: (page: number, pageSize: number) => AbortablePromise<[any[], number]> | Promise<[any[], number]>;
@@ -120,9 +120,9 @@ export const AsyncPagination = ({
  */
 export function CommonListAsyncRenderer<T>({
     state,
-    loading = DataLoading,
-    error = RequestError,
-    empty = DataEmpty,
+    loading = LoadingHolder,
+    error = ErrorHolder,
+    empty = EmptyHolder,
     children,
     keepPreviousData = false,
 }: {
@@ -152,8 +152,8 @@ export function CommonListAsyncRenderer<T>({
  */
 export function CommonAsyncRenderer<T>({
     state,
-    loading = DataLoading,
-    error = RequestError,
+    loading = LoadingHolder,
+    error = ErrorHolder,
     children,
     keepPreviousData = false,
 }: {

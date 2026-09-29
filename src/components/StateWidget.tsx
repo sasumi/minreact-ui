@@ -1,9 +1,6 @@
 import { Spinner } from "./Spinner";
 
-/**
- * DataLoading 数据加载中提示组件
- */
-export const DataLoading = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
+export const LoadingHolder = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
     const className = ["loading", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
@@ -14,10 +11,7 @@ export const DataLoading = ({ text, ...props }: { text?: string; [key: string]: 
     );
 };
 
-/**
- * DataEmpty 数据为空提示组件
- */
-export const DataEmpty = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
+export const EmptyHolder = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
     const className = ["empty", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
@@ -27,10 +21,7 @@ export const DataEmpty = ({ text, ...props }: { text?: string; [key: string]: an
     );
 };
 
-/**
- * RequestError 请求错误提示组件
- */
-export const RequestError = ({ error, ...props }: { error?: string; [key: string]: any } = {}) => {
+export const ErrorHolder = ({ error, ...props }: { error?: string; [key: string]: any } = {}) => {
     const className = ["request-error", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
