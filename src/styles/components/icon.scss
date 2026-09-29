@@ -1,0 +1,20 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/animate.scss" as animate;
+
+.#{$ns}-icon {
+    display: inline-flex;
+    width: 1em;
+    height: 1em;
+    &:before {
+    }
+}
+
+.#{$ns}-spinner {
+    --spinner-size: calc(var(--#{$ns}-element-height, 1em) * 0.7);
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    &[data-running="true"] {
+        animation: rotate360 3s linear infinite;
+    }
+}

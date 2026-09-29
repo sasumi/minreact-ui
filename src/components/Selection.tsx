@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-/* ============================================================
+/**
  * 底层 Checkbox —— 支持 indeterminate
- * ============================================================ */
+ */
 export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "checked" | "onChange" | "type" | "value"> {
     checked?: boolean;
     indeterminate?: boolean;
@@ -32,9 +32,6 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
     return <input ref={setRef} type="checkbox" checked={checked} onChange={(e) => onChange?.(e.target.checked, e)} {...rest} />;
 });
 
-/* ============================================================
- * useSelection
- * ============================================================ */
 export interface UseSelectionOptions<T> {
     defaultSelected?: Iterable<T>;
     disabled?: boolean;
