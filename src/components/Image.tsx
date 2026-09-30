@@ -22,7 +22,7 @@ const STATE_TITLE_MAP = {
  * @param props 图片属性
  * @returns React 元素
  */
-export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(({ ...rest }, ref) => {
+export const ImageLoader = ({ ref, ...rest }: React.ImgHTMLAttributes<HTMLImageElement> & { ref?: React.Ref<HTMLImageElement> }) => {
     const [state, setState] = useState(!rest.src ? STATE_EMPTY : STATE_LOADING);
 
     // src 变化时重置加载状态，避免切换图片后仍停留在旧的 loading/error 状态
@@ -33,11 +33,12 @@ export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
     return (
         <>
             <img
-                {...rest}
                 className={CSS_NS + " " + (rest.className || "")}
-                loading={rest.loading || "lazy"} // 默认使用懒加载
+                loading="lazy" // 默认使用懒加载
                 ref={ref}
                 data-state={state}
+                referrerPolicy="no-referrer" //默认不发送referrer
+                {...rest}
                 onLoad={(e) => {
                     setState(STATE_NORMAL);
                     rest.onLoad?.(e);
@@ -50,7 +51,7 @@ export const ImageLoader = forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
             <span className={CSS_NS + "__holder"} data-state={state} title={STATE_TITLE_MAP[state]} />
         </>
     );
-});
+};
 
 /**
  * 函数版图片加载器，返回 HTML 字符串
