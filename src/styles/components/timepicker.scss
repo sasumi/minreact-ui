@@ -100,6 +100,21 @@
         content: "\e839";
     }
 
+    // 快速回到今日，只在当前草稿不是今天时出现
+    &-today {
+        padding: 0.1em 0.5em;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: var(--#{$ns}-element-radius);
+        color: var(--#{$ns}-color-hight);
+        font-size: 0.85em;
+        line-height: 1.6;
+
+        &:hover {
+            border-color: var(--#{$ns}-color-hight);
+            background-color: var(--#{$ns}-time-picker-selected-background);
+        }
+    }
+
     // 高度加在行容器上：标签自身 font-size 更小，写在标签上会让 1em ≠ 面板的 1em
     &-weekdays {
         height: var(--#{$ns}-time-picker-weekday-height);
@@ -298,5 +313,10 @@
         &:hover {
             background-color: var(--#{$ns}-color-background-hover);
         }
+    }
+
+    // 年月 / 年份视图下确定不可用（Clickable 已用 pointer-events: none 屏蔽交互，这里只做视觉态）
+    &-action[aria-disabled="true"] {
+        color: var(--#{$ns}-time-picker-muted-color);
     }
 }

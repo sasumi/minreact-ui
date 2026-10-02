@@ -107,7 +107,13 @@ const parseValue = (value?: string | Date | null): Date | null => {
 
     const parsed = new Date(year, month, date, hour, minute);
     // Date 会静默进位（2026-02-30 → 2026-03-02），反查一次以拒绝非法输入
-    return parsed.getFullYear() === year && parsed.getMonth() === month && parsed.getDate() === date && parsed.getHours() === hour && parsed.getMinutes() === minute ? parsed : null;
+    return parsed.getFullYear() === year &&
+        parsed.getMonth() === month &&
+        parsed.getDate() === date &&
+        parsed.getHours() === hour &&
+        parsed.getMinutes() === minute
+        ? parsed
+        : null;
 };
 
 /**
@@ -206,11 +212,25 @@ const scrollToWheelIndex = (list: HTMLDivElement | null, index: number, behavior
  * @param value 当前选中的选项
  * @param onChange 选中项变化回调
  */
-const TimePickerWheel = ({ label, options, value, onChange, className }: { label: string; options: string[]; value: string; onChange?: (value: string) => void; className?: string }) => {
+const TimePickerWheel = ({
+    label,
+    options,
+    value,
+    onChange,
+    className,
+}: {
+    label: string;
+    options: string[];
+    value: string;
+    onChange?: (value: string) => void;
+    className?: string;
+}) => {
     const listRef = useRef<HTMLDivElement>(null);
     const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     /** 拖动过程的采样：按下位置、起始滚动量与最近两次采样的时间/位置（算速度用） */
-    const dragRef = useRef<{ pointerId: number; startY: number; startTop: number; lastY: number; lastTime: number; velocity: number; moved: boolean } | null>(null);
+    const dragRef = useRef<{ pointerId: number; startY: number; startTop: number; lastY: number; lastTime: number; velocity: number; moved: boolean } | null>(
+        null,
+    );
     const [dragging, setDragging] = useState(false);
     /** 刚完成一次拖动，用于吞掉随之而来的 click，避免误选终止位置的选项 */
     const draggedRef = useRef(false);
@@ -261,7 +281,15 @@ const TimePickerWheel = ({ label, options, value, onChange, className }: { label
             return;
         }
         draggedRef.current = false;
-        dragRef.current = { pointerId: event.pointerId, startY: event.clientY, startTop: listRef.current?.scrollTop ?? 0, lastY: event.clientY, lastTime: event.timeStamp, velocity: 0, moved: false };
+        dragRef.current = {
+            pointerId: event.pointerId,
+            startY: event.clientY,
+            startTop: listRef.current?.scrollTop ?? 0,
+            lastY: event.clientY,
+            lastTime: event.timeStamp,
+            velocity: 0,
+            moved: false,
+        };
     };
 
     /** 移动：把纵向位移转成滚动；过程中必须关掉 scroll-snap，否则赋值会被立刻吸回最近一行 */
@@ -367,6 +395,8 @@ export interface TimePickerPanelProps {
     hourLabel?: string;
     /** 分钟输入框的无障碍标签 */
     minuteLabel?: string;
+    /** 【今日】按钮文案 */
+    todayText?: string;
     className?: string;
 }
 
@@ -382,6 +412,7 @@ export const TimePickerPanel = ({
     confirmText = "确定",
     hourLabel = "小时",
     minuteLabel = "分钟",
+    todayText = "今日",
     className,
 }: TimePickerPanelProps) => {
     const showDate = format !== FORMAT_TIME;
@@ -415,6 +446,8 @@ export const TimePickerPanel = ({
 
     const days = useMemo(() => buildDays(draft.year, draft.month), [draft.year, draft.month]);
     const today = new Date();
+    /** 草稿已经选中今天时不必再给「今日」入口 */
+    const isToday = isSameDay(draft.selected, today);
 
     /** 通过 ˄ ˅ 或滚轮按当前视图的粒度前后切换 */
     const stepView = (step: number) => updateDraft((prev) => stepViewDraft(prev, view, step));
@@ -427,13 +460,25 @@ export const TimePickerPanel = ({
 
     /** 选中某个月后回到日期视图，保留原来的“日”（目标月没有该日时取当月最后一天） */
     const selectMonth = (year: number, month: number) => {
-        updateDraft((prev) => ({ ...prev, selected: new Date(year, month, Math.min(prev.selected.getDate(), new Date(year, month + 1, 0).getDate())), year, month }));
+        updateDraft((prev) => ({
+            ...prev,
+            selected: new Date(year, month, Math.min(prev.selected.getDate(), new Date(year, month + 1, 0).getDate())),
+            year,
+            month,
+        }));
         setView(VIEW_DATE);
     };
 
     /** 选中某天，跨月补位日期同时切换展示月份 */
     const selectDay = (day: Date) => {
         updateDraft((prev) => ({ ...prev, selected: day, year: day.getFullYear(), month: day.getMonth() }));
+    };
+
+    /** 一键选中今天并回到日期视图，仍然要点确定才提交 */
+    const selectToday = () => {
+        const now = new Date();
+        selectDay(now);
+        setView(VIEW_DATE);
     };
 
     /** 更新草稿里的小时 / 分钟 */
@@ -454,6 +499,7 @@ export const TimePickerPanel = ({
         onCancel?.();
     };
 
+    const inDateView = view === VIEW_DATE;
     const inMonthView = view === VIEW_MONTH;
     const inYearView = view === VIEW_YEAR;
     /** 年月视图与年份视图共用 draft.year 作为「正在浏览的年份」 */
@@ -461,7 +507,11 @@ export const TimePickerPanel = ({
     /** 年份网格的首个年份 */
     const yearFirst = decadeStart - 2;
 
-    const titleText = inYearView ? `${decadeStart} - ${decadeStart + DECADE_SIZE - 1}` : inMonthView ? `${draft.year}年` : `${draft.year}年${draft.month + 1}月`;
+    const titleText = inYearView
+        ? `${decadeStart} - ${decadeStart + DECADE_SIZE - 1}`
+        : inMonthView
+          ? `${draft.year}年`
+          : `${draft.year}年${draft.month + 1}月`;
     /** 标题点击逐级下钻：日期 → 年月 → 年份 → 再回到日期，避免用户卡在深层视图 */
     const titleHint = inYearView ? "返回日期" : inMonthView ? "切换年份" : "切换年月";
     const titleNextView = inYearView ? VIEW_DATE : inMonthView ? VIEW_YEAR : VIEW_MONTH;
@@ -504,6 +554,11 @@ export const TimePickerPanel = ({
                         <Clickable className={`${CSS_NS}-title`} title={titleHint} aria-label={titleHint} onClick={() => setView(titleNextView)}>
                             {titleText}
                         </Clickable>
+                        {!isToday && (
+                            <Clickable className={`${CSS_NS}-today`} onClick={selectToday}>
+                                {todayText}
+                            </Clickable>
+                        )}
                         <Clickable className={`${CSS_NS}-nav ${CSS_NS}-nav-prev`} title={prevHint} aria-label={prevHint} onClick={() => stepView(-1)} />
                         <Clickable className={`${CSS_NS}-nav ${CSS_NS}-nav-next`} title={nextHint} aria-label={nextHint} onClick={() => stepView(1)} />
                     </div>
@@ -604,7 +659,12 @@ export const TimePickerPanel = ({
                         >
                             <div className={`${CSS_NS}-wheels`}>
                                 <TimePickerWheel label={hourLabel} options={HOUR_OPTIONS} value={draft.hour} onChange={(next) => setTimeValue("hour", next)} />
-                                <TimePickerWheel label={minuteLabel} options={MINUTE_OPTIONS} value={draft.minute} onChange={(next) => setTimeValue("minute", next)} />
+                                <TimePickerWheel
+                                    label={minuteLabel}
+                                    options={MINUTE_OPTIONS}
+                                    value={draft.minute}
+                                    onChange={(next) => setTimeValue("minute", next)}
+                                />
                             </div>
                         </Popover.Content>
                     </Popover>
@@ -613,7 +673,8 @@ export const TimePickerPanel = ({
                     <Clickable className={`${CSS_NS}-action`} onClick={handleCancel}>
                         {cancelText}
                     </Clickable>
-                    <Clickable className={`${CSS_NS}-action ${CSS_NS}-action-confirm`} onClick={handleConfirm}>
+                    {/* 年月 / 年份视图还没确定具体日期，此时不允许提交 */}
+                    <Clickable className={`${CSS_NS}-action ${CSS_NS}-action-confirm`} disabled={!inDateView} onClick={handleConfirm}>
                         {confirmText}
                     </Clickable>
                 </div>
@@ -648,6 +709,8 @@ export interface TimePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
     cancelText?: string;
     /** 确定按钮文案，透传给面板 */
     confirmText?: string;
+    /** 【今日】按钮文案，透传给面板 */
+    todayText?: string;
 }
 
 /**
@@ -671,6 +734,7 @@ export const TimePicker = ({
     trigger,
     cancelText,
     confirmText,
+    todayText,
     className,
     ...inputProps
 }: TimePickerProps) => {
@@ -784,6 +848,7 @@ export const TimePicker = ({
                     value={value}
                     cancelText={cancelText}
                     confirmText={confirmText}
+                    todayText={todayText}
                     onChange={(next) => {
                         setText(next);
                         onChange?.(next);
