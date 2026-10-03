@@ -23,7 +23,8 @@ export {
   PrimaryButton,
   ReloadButton,
   SpanButton,
-  SubmitButton
+  SubmitButton,
+  SwitchButton
 } from './components/Button'
 
 // Dialog utilities

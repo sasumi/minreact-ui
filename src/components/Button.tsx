@@ -1,4 +1,5 @@
 import "./../styles/common.module.scss";
+import "./../styles/components/form.scss";
 import { namespace } from "./../styles/namespace";
 import { lockElementInteraction } from "minutool";
 import { memo, useState } from "react";
@@ -127,6 +128,37 @@ export const ReloadButton = ({
             {state === STATE_SUCCESS && <span className="icon icon-check"></span>}
         </SpanButton>
     );
+};
+
+/**
+ * 开关按钮：span / label 包裹原生 input[type=checkbox]，外观由 .switch-button 样式绘制
+ * asLabel=true 时根元素为 label，点开关任意位置都能切换；默认 span，可被外部 label 包裹后由外部标签触发
+ */
+export const SwitchButton = ({
+    checked,
+    onChange,
+    className,
+    name,
+    value,
+    type = "checkbox",
+    asLabel = false,
+    ...props
+}: {
+    checked: boolean; // 是否开启
+    onChange: (checked: boolean) => void;
+    className?: string;
+    name?: string;
+    value?: string;
+    type?: "checkbox" | "radio";
+    asLabel?: boolean; // 用 label 作根元素
+} & Record<string, any>) => {
+    const rootProps: Record<string, any> = {
+        className: `${namespace}-switch-button ` + (className ?? ""),
+        "data-on": checked ? "true" : "false",
+        ...props,
+    };
+    const checkbox = <input name={name} type={type} value={value} checked={checked} onChange={(e) => onChange(e.currentTarget.checked)} />;
+    return asLabel ? <label {...rootProps}>{checkbox}</label> : <span {...rootProps}>{checkbox}</span>;
 };
 
 /**

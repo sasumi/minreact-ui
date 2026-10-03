@@ -33,6 +33,7 @@ demo/
 ├── DemoApp.scss       # Demo 样式
 └── pages/             # 各组件的 Demo 页面
     ├── ButtonDemo.tsx
+    ├── SwitchButtonDemo.tsx
     ├── SpinnerDemo.tsx
     ├── CounterDemo.tsx
     ├── DialogDemo.tsx
@@ -51,6 +52,7 @@ demo/
 
 ### 基础组件
 - **Button** - 多种样式的按钮组件
+- **SwitchButton** - 开关按钮，基于原生 checkbox / radio
 - **Spinner** - 旋转加载动画
 - **Counter** - 字符计数器
 

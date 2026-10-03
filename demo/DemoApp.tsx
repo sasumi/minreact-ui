@@ -3,6 +3,7 @@ import "./DemoApp.scss";
 
 // Import all demo pages
 import ButtonDemo from "./pages/ButtonDemo";
+import SwitchButtonDemo from "./pages/SwitchButtonDemo";
 import SpinnerDemo from "./pages/SpinnerDemo";
 import CounterDemo from "./pages/CounterDemo";
 import DialogDemo from "./pages/DialogDemo";
@@ -26,6 +27,7 @@ import InlineTextEditorDemo from "./pages/InlineTextEditorDemo";
 const components = [
     { name: "Button", label: "按钮", description: "多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等", component: ButtonDemo, category: "基础组件" },
     { name: "Spinner", label: "加载器", description: "旋转加载动画组件", component: SpinnerDemo, category: "基础组件" },
+    { name: "SwitchButton", label: "开关", description: "开关按钮，基于原生 checkbox / radio，支持受控与 label 触发", component: SwitchButtonDemo, category: "基础组件" },
     { name: "Counter", label: "字符计数器", description: "显示输入框字符数量的计数器组件", component: CounterDemo, category: "基础组件" },
     { name: "Dialog", label: "对话框", description: "可配置的模态对话框组件", component: DialogDemo, category: "交互组件" },
     { name: "StepInput", label: "步进输入", description: "带加减按钮的数字输入组件", component: StepInputDemo, category: "表单组件" },

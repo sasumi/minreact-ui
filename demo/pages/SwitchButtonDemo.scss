@@ -1,0 +1,61 @@
+/* demo/pages/SwitchButtonDemo.scss — SwitchButton 演示页专用样式 */
+
+// 文字与开关一起构成点击区域（依赖 label 的原生行为）
+.switch-demo-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+
+    & + & {
+        margin-left: 1.5rem;
+    }
+}
+
+.switch-demo-tip {
+    margin-top: 0.75rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.switch-demo-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.switch-demo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+// 自定义配色：覆盖默认的开启态颜色
+.switch-demo-danger.minreactui-switch-button {
+    &:has(input:checked) {
+        background-color: #ef4444;
+    }
+
+    &:has(input:focus-visible) {
+        outline-color: #ef4444;
+    }
+}
+
+// 自定义形状：方形开关
+.switch-demo-square.minreactui-switch-button {
+    border-radius: 4px;
+
+    &::after {
+        border-radius: 2px;
+    }
+}
