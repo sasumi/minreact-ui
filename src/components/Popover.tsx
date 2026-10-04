@@ -3,8 +3,10 @@ import { createContext, forwardRef, useContext, useMemo, useRef } from "react";
 import "./../styles/common.module.scss";
 import "./../styles/components/popover.scss";
 import { namespace } from "./../styles/namespace";
+import { Clickable } from "./Button";
 
 const CSS_NS = namespace;
+const TOP_CLOSER_CLASS_NAME = `${CSS_NS}-popover-close-btn`;
 
 interface PopoverContextValue {
     // 用于在 Popover 树内共享 trigger 的 DOM ref
@@ -15,6 +17,9 @@ interface PopoverContextValue {
 
     // 控制 Content 是否渲染箭头
     showArrow?: boolean;
+
+    // 控制 Content 右上角是否渲染主动关闭按钮
+    showTopCloser?: boolean;
 }
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
@@ -23,6 +28,7 @@ type PopoverProps = React.ComponentProps<typeof ReactPopover.Root> & {
     className?: string;
     showArrow?: boolean;
     disabled?: boolean;
+    showTopCloser?: boolean;
 };
 
 const PopoverAnchor = ReactPopover.Anchor;
@@ -59,9 +65,10 @@ type PopoverContentProps = React.ComponentProps<typeof ReactPopover.Content> & {
  * 使用 forwardRef 转发 ref，并从 context 获取 trigger 的 DOM 元素 ref，用于判断点击是否在 trigger 内部
  * 支持 onCloseBy 回调函数，返回 false 可阻止关闭
  * 支持 onOpenAutoFocus 回调函数，默认阻止自动聚焦
+ * 是否渲染右上角关闭按钮由 Popover 的 showTopCloser 控制
  */
 const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ children, className, onCloseBy, align = "start", onOpenAutoFocus, ...rest }, ref) => {
-    const { triggerRef, wrapperClassName, showArrow = false } = useContext(PopoverContext) ?? {};
+    const { triggerRef, wrapperClassName, showArrow = false, showTopCloser = false } = useContext(PopoverContext) ?? {};
     const contentRef = useRef<HTMLDivElement>(null);
     const DIALOG_WRAP_SELECTOR = ".dialog-wrap";
 
@@ -122,7 +129,15 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
                 onOpenAutoFocus={handleOpenAutoFocus}
                 {...rest}
             >
-                <div className={CSS_NS + "-popover-content" + (className ? " " + className : "")}>{children}</div>
+                <div className={CSS_NS + "-popover-content" + (className ? " " + className : "")}>
+                    {showTopCloser && (
+                        // Radix 的 Close 负责关闭浮层，asChild 让按钮本身承担鼠标/键盘交互
+                        <ReactPopover.Close asChild>
+                            <Clickable className={TOP_CLOSER_CLASS_NAME} aria-label="关闭" />
+                        </ReactPopover.Close>
+                    )}
+                    {children}
+                </div>
                 {showArrow && <ReactPopover.Arrow className={CSS_NS + "-popover-arrow"} width={20} height={10} offset={5} />}
             </ReactPopover.Content>
         </ReactPopover.Portal>
@@ -130,9 +145,12 @@ const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({ childr
 });
 
 export const Popover = Object.assign(
-    ({ children, className, showArrow, disabled, open, onOpenChange, ...rest }: PopoverProps) => {
+    ({ children, className, showArrow, showTopCloser, disabled, open, onOpenChange, ...rest }: PopoverProps) => {
         const triggerRef = useRef<any>(null);
-        const contextValue = useMemo(() => ({ triggerRef, wrapperClassName: className, showArrow }), [className, showArrow]);
+        const contextValue = useMemo(
+            () => ({ triggerRef, wrapperClassName: className, showArrow, showTopCloser }),
+            [className, showArrow, showTopCloser],
+        );
         return (
             <PopoverContext.Provider value={contextValue}>
                 <ReactPopover.Root

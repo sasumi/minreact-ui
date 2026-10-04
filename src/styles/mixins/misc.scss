@@ -67,3 +67,15 @@
     outline: 2px solid var(--#{$ns}-color-info);
     outline-offset: 2px;
 }
+
+@mixin biggerClickZone($size: 1.5em) {
+    position: relative;
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 50%;
+        min-width: $size;
+        min-height: $size;
+        transform: translate(-50%, -50%);
+    }
+}

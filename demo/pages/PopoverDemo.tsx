@@ -30,6 +30,20 @@ function PopoverDemo() {
                 </Popover>
             </DemoSection>
 
+            <DemoSection title="右上角关闭按钮" description="通过 showTopCloser 在内容右上角显示主动关闭按钮">
+                <Popover showTopCloser>
+                    <Popover.Trigger>
+                        <NormalButton>点击打开</NormalButton>
+                    </Popover.Trigger>
+                    <Popover.Content side="bottom">
+                        <div style={{ padding: "1rem" }}>
+                            <h4 style={{ margin: "0 0 0.5rem" }}>带关闭按钮</h4>
+                            <p style={{ margin: 0 }}>点击右上角按钮可主动关闭浮层</p>
+                        </div>
+                    </Popover.Content>
+                </Popover>
+            </DemoSection>
+
             <DemoSection title="禁用状态" description="通过 disabled 属性禁用 Popover，点击不会打开">
                 <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                     <Popover disabled={disabled}>
@@ -256,6 +270,7 @@ function PopoverDemo() {
                         <li>自动处理边界碰撞</li>
                         <li>点击外部区域自动关闭</li>
                         <li>支持自定义关闭逻辑（onCloseBy）</li>
+                        <li>支持右上角主动关闭按钮（showTopCloser）</li>
                         <li>内置箭头指示器</li>
                     </ul>
                 </div>

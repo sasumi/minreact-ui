@@ -1,82 +1,105 @@
 @charset "UTF-8";
 @use "./../mixins/misc.scss" as com;
 @use "./../mixins/animate.scss" as *;
+@use "./../mixins/icon.scss" as icon;
 @use "./../common.module.scss" as *;
 
 :root {
-	--#{$ns}-popover-arrow-size: 0.5em;
-	--#{$ns}-popover-zindex: calc(var(--#{$ns}-dialog-zindex) + 1);
+    --#{$ns}-popover-arrow-size: 0.5em;
+    --#{$ns}-popover-zindex: calc(var(--#{$ns}-dialog-zindex) + 1);
 }
 
 .#{$ns}-popover-content-wrap {
-	animation-duration: 0.6s;
-	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-	filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.2));
-	z-index: var(--#{$ns}-popover-zindex) !important;
-	--popover-background-color: var(--#{$ns}-color-background);
+    animation-duration: 0.6s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.2));
+    z-index: var(--#{$ns}-popover-zindex) !important;
+    --popover-background-color: var(--#{$ns}-color-background);
 
-	.#{$ns}-popover-content {
-		background-color: var(--popover-background-color);
-		border-radius: var(--#{$ns}-element-radius);
-		clip-path: inset(0 round var(--#{$ns}-element-radius));
-		max-width: min(30em, 100vw);
-		width: max-content; // 避免被父容器收缩，仍受 max-width 限制
-		text-align: left;
+    .#{$ns}-popover-content {
+        background-color: var(--popover-background-color);
+        border-radius: var(--#{$ns}-element-radius);
+        clip-path: inset(0 round var(--#{$ns}-element-radius));
+        max-width: min(30em, 100vw);
+        width: max-content; // 避免被父容器收缩，仍受 max-width 限制
+        text-align: left;
+        position: relative; // 供右上角关闭按钮定位
 
-		// 预留：如需隔离内容可在此添加局部 reset
-		&:has(>.menu),
-		&:has(>menu) {
-			padding: 0;
-		}
-	}
+        // 预留：如需隔离内容可在此添加局部 reset
+        &:has(> .menu),
+        &:has(> menu) {
+            padding: 0;
+        }
+    }
 
-	&[data-side="top"] {
-		animation-name: slideUp;
-	}
+    .#{$ns}-popover-close-btn {
+        @include icon.icon-button;
+        @include com.biggerClickZone(1.5em);
+        line-height: 1;
+        font-size: 1em;
+        width: 1em;
+        height: 1em;
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        z-index: 1;
+        opacity: 0.55;
+        transition: opacity 0.1s ease-in-out;
+        &:hover {
+            opacity: 1;
+        }
+        &:before {
+            content: "\e625";
+        }
+    }
 
-	&[data-side="bottom"] {
-		.#{$ns}-popover-arrow {
-			margin-top: -1px;
-		}
+    &[data-side="top"] {
+        animation-name: slideUp;
+    }
 
-		animation-name: slideDown;
-	}
+    &[data-side="bottom"] {
+        .#{$ns}-popover-arrow {
+            margin-top: -1px;
+        }
 
-	// content上下布局+靠左时，箭头位置靠左，更符合用户预期
-	&[data-align="start"][data-side="top"]>span:has(.#{$ns}-popover-arrow),
-	&[data-align="start"][data-side="bottom"]>span:has(.#{$ns}-popover-arrow) {
-		left: 1em !important; //这里1em，如果target小于2em，可能偏后
-		visibility: visible !important; // 避免箭头被隐藏
-	}
+        animation-name: slideDown;
+    }
 
-	.#{$ns}-popover-arrow polygon {
-		fill: var(--popover-background-color);
-	}
+    // content上下布局+靠左时，箭头位置靠左，更符合用户预期
+    &[data-align="start"][data-side="top"] > span:has(.#{$ns}-popover-arrow),
+    &[data-align="start"][data-side="bottom"] > span:has(.#{$ns}-popover-arrow) {
+        left: 1em !important; //这里1em，如果target小于2em，可能偏后
+        visibility: visible !important; // 避免箭头被隐藏
+    }
+
+    .#{$ns}-popover-arrow polygon {
+        fill: var(--popover-background-color);
+    }
 }
 
 // Tip 提示组件
 .#{$ns}-tip-content-wrap {
-	animation-duration: 0.3s;
-	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-	filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
-	z-index: 9999;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+    z-index: 9999;
 
-	.#{$ns}-tip-content {
-		background-color: var(--#{$ns}-color-background);
-		color: var(--#{$ns}-color-background);
-		border-radius: 4px;
-		padding: 0.4em 0.7em;
-		font-size: 0.85em;
-		max-width: min(20em, 100vw);
-		width: max-content;
-		line-height: 1.5;
-	}
+    .#{$ns}-tip-content {
+        background-color: var(--#{$ns}-color-background);
+        color: var(--#{$ns}-color-background);
+        border-radius: 4px;
+        padding: 0.4em 0.7em;
+        font-size: 0.85em;
+        max-width: min(20em, 100vw);
+        width: max-content;
+        line-height: 1.5;
+    }
 
-	&[data-side="top"] {
-		animation-name: slideUp;
-	}
+    &[data-side="top"] {
+        animation-name: slideUp;
+    }
 
-	&[data-side="bottom"] {
-		animation-name: slideDown;
-	}
+    &[data-side="bottom"] {
+        animation-name: slideDown;
+    }
 }

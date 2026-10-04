@@ -39,6 +39,9 @@
     }
 
     .#{$ns}-dialog-close-btn {
+        @include icon.icon-button;
+        @include com.biggerClickZone(1.5em);
+        line-height: 1;
         font-size: 1em;
         width: 1em;
         height: 1em;
@@ -46,8 +49,11 @@
         right: var(--#{$ns}-dialog-inner-padding);
         top: var(--#{$ns}-dialog-inner-padding);
         z-index: 1;
-        @include icon.icon-button;
-
+		opacity: 0.55;
+		transition: opacity 0.1s ease-in-out;
+		&:hover {
+			opacity: 1;
+		}
         &:before {
             content: "\e625";
         }
