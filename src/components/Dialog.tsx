@@ -45,6 +45,7 @@ export interface DialogProps {
     moveable?: boolean;
     clickMaskerToClose?: boolean;
     showTopCloser?: boolean;
+    escClose?: boolean;
 }
 
 interface DialogTitleProps {
@@ -81,6 +82,7 @@ interface DialogActionProps {
  * @param moveable - 是否允许拖动对话框
  * @param clickMaskerToClose - 是否允许点击遮罩层关闭对话框
  * @param showTopCloser - 是否显示右上角的关闭按钮
+ * @param escClose - 是否允许按 Esc 关闭对话框（默认 true）；焦点在对话框内且不在输入框里、右上角有关闭按钮时才生效
  */
 const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     {
@@ -96,6 +98,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         width = null,
         modal = true,
         clickMaskerToClose = false,
+        escClose = true,
     },
     ref,
 ) {
@@ -159,11 +162,26 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                 );
             }
         }
+        // Esc 关闭：焦点在对话框内、且不在输入框里时才关（输入框里的 Esc 归控件自己消费，如清空输入）
+        if (escClose && showTopCloser) {
+            const onKeyDown = (event: KeyboardEvent) => {
+                // 内层组件（菜单 / 下拉 / 选择器）已经处理过的 Esc 不再重复关闭本对话框
+                if (event.key !== "Escape" || event.defaultPrevented) {
+                    return;
+                }
+                const active = document.activeElement;
+                if (active && dlg.contains(active) && !isInputElement(active)) {
+                    setOpenRef.current(false);
+                }
+            };
+            dlg.addEventListener("keydown", onKeyDown);
+            cleanup.push(() => dlg.removeEventListener("keydown", onKeyDown));
+        }
 
         return () => {
             cleanup.forEach((fn) => fn());
         };
-    }, [open, moveable, showTopCloser, clickMaskerToClose, autoFocus]);
+    }, [open, moveable, showTopCloser, clickMaskerToClose, autoFocus, escClose]);
 
     if (!open) {
         return null;
@@ -734,6 +752,13 @@ const clampDialogIntoView = (dlg: HTMLDialogElement): void => {
         dlg.style.top = `${nextTop}px`;
     }
 };
+
+/**
+ * 是否输入类元素：这类元素里的 Esc 由控件自己消费（清空 / 取消输入 / 收起下拉），不用于关闭对话框
+ * @param {Element | null} el - 当前聚焦的元素
+ */
+const isInputElement = (el: Element | null): boolean =>
+    !!el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || (el as HTMLElement).isContentEditable);
 
 /**
  * 将焦点设置到容器内的第一个可聚焦元素上

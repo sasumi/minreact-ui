@@ -8,6 +8,7 @@ function DialogDemo() {
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
+    const [open4, setOpen4] = useState(false);
 
     const showCustom = () => {
         Dialog.show({
@@ -228,6 +229,22 @@ function DialogDemo() {
                     </div>
                     <Dialog.Action>
                         <NormalButton onClick={() => setOpen2(false)}>关闭</NormalButton>
+                    </Dialog.Action>
+                </Dialog>
+            </DemoSection>
+
+            <DemoSection
+                title="Esc 关闭"
+                description="escClose 默认 true：焦点在对话框内且不在输入框里时按 Esc 关闭；关闭按钮不显示或 escClose 为 false 时不生效"
+            >
+                <PrimaryButton onClick={() => setOpen4(true)}>打开对话框</PrimaryButton>
+                <Dialog open={open4} setOpen={setOpen4} escClose={false}>
+                    <div style={{ padding: "1rem" }}>
+                        <p>此对话框关闭了 Esc 关闭（escClose 为 false）</p>
+                        <p>需要通过点击右上角关闭按钮或下面的按钮关闭</p>
+                    </div>
+                    <Dialog.Action>
+                        <NormalButton onClick={() => setOpen4(false)}>关闭</NormalButton>
                     </Dialog.Action>
                 </Dialog>
             </DemoSection>
