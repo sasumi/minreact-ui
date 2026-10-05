@@ -14,6 +14,8 @@
     --spinner-size: calc(var(--#{$ns}-element-height, 1em) * 0.7);
     width: var(--spinner-size);
     height: var(--spinner-size);
+    min-width: var(--spinner-size); //防止父级采用 flex布局
+    min-height: var(--spinner-size);
     &[data-running="true"] {
         animation: rotate360 3s linear infinite;
     }
