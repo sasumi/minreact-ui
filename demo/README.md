@@ -19,10 +19,31 @@ pnpm dev
 ### 构建
 
 ```bash
+# 构建组件库（dist/）
 pnpm build
+
+# 构建静态 demo（demo/dist/，入口 demo/dist.html）
+pnpm build:demo
 ```
 
-构建后的 demo 文件将在 `dist` 目录中。
+### 静态访问模式
+
+组件库不需要构建，直接执行：
+
+```bash
+pnpm build:demo
+```
+
+产物：
+
+- `demo/dist.html` — 手写的静态入口页，引用 `./base.css` 与 `./dist/app.js`
+- `demo/dist/` — 打包产物（`app.js` / `app.css`），已在 `.gitignore` 中
+
+把 `demo/dist.html`、`demo/base.css`、`demo/dist/` 一起放到 web 根下的任意子目录即可用普通 web 服务访问，
+例如 `http://localhost/min-react-ui/demo/dist.html`。构建使用相对路径，且路由走 hash（`#/TimePicker`），
+所以不需要配置 history fallback，刷新任一页面也不会 404。
+
+`demo/index.html` 始终是 Vite 开发/HMR 入口，静态构建不会覆盖它。
 
 ## 目录结构
 

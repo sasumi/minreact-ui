@@ -24,6 +24,7 @@
     "scripts": {
         "dev": "vite demo --config vite.config.ts",
         "build": "tsc && vite build && tsc -p tsconfig.build.json && node scripts/copy-assets.js",
+        "build:demo": "vite build --config vite.demo.config.ts",
         "prebuild": "npm run generate:index",
         "prepublishOnly": "npm run build",
         "generate:index": "node scripts/generate-index.js",
@@ -34,6 +35,7 @@
         "@radix-ui/react-popover": "^1.1.23",
         "@radix-ui/react-tabs": "^1.1.21",
         "i18next": "^26.4.0",
+        "lunar-javascript": "^1.7.7",
         "minutool": "^1.0.31",
         "react-i18next": "^17.0.12",
         "react-toastify": "^11.1.0",

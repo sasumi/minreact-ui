@@ -136,6 +136,7 @@
 
     &-day {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: var(--#{$ns}-time-picker-day-height);
@@ -147,6 +148,39 @@
 
         &:hover {
             background-color: var(--#{$ns}-color-background-hover);
+        }
+    }
+
+    // 日期数字，下方可再挂农历 / 节气 / 节假日
+    &-day-number {
+        line-height: 1.15;
+    }
+
+    // 日期下方的农历、节气、节假日标记
+    &-day-label {
+        max-width: 100%;
+        overflow: hidden;
+        font-size: 0.6em;
+        line-height: 1.2;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: var(--#{$ns}-time-picker-muted-color);
+    }
+
+    &-day-label-holiday {
+        color: var(--#{$ns}-color-danger);
+    }
+
+    &-day-label-term {
+        color: var(--#{$ns}-color-success);
+    }
+
+    // 补位日期与选中 / 今天的强调色优先于附加信息的配色
+    &-day-outside,
+    &-day-selected,
+    &-day-today {
+        .#{$ns}-time-picker-day-label {
+            color: inherit;
         }
     }
 

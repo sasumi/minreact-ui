@@ -188,6 +188,16 @@ export {
 // WordCounter utilities
 export { default as WordCounter } from './components/WordCounter'
 
+// UseCalendarDayInfo utilities
+export type {
+  CalendarDayInfo,
+  CalendarDayInfoOptions,
+  HolidayConfigItem
+} from './hooks/useCalendarDayInfo'
+export {
+  useCalendarDayInfo
+} from './hooks/useCalendarDayInfo'
+
 // UseCookie utilities
 export type {
   CookieOptions

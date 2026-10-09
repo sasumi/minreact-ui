@@ -12,6 +12,7 @@
 - Dev server: `pnpm dev`
 - Lint: `pnpm lint`
 - Build/type-check: `pnpm build`
+- Static demo build: `pnpm build:demo` (outputs `demo/dist/`, entry page is `demo/dist.html`)
 - There is no test script configured yet.
 
 ## Codebase Map

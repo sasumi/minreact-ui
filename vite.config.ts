@@ -48,6 +48,8 @@ export default defineConfig(({ command }) => ({
                 "react-toastify",
                 "react-dom/client",
                 "minutool", // 保持外部化
+                // TimePicker 的农历 / 节气依赖，由使用方的打包器按需拆包
+                "lunar-javascript",
             ],
             output: {
                 globals: {
@@ -61,6 +63,7 @@ export default defineConfig(({ command }) => ({
                     "react-toastify": "ReactToastify",
                     "react-dom/client": "ReactDOM",
                     minutool: "minutool",
+                    "lunar-javascript": "LunarJavaScript",
                 },
             },
         },

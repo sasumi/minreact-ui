@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# demo 静态构建产物（由 pnpm build:demo 生成，入口是 demo/dist.html）
+demo/dist
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

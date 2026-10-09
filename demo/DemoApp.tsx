@@ -51,16 +51,18 @@ const components = [
 /** Sentinel used when the URL does not point at a specific component (the gallery). */
 const HOME = "";
 
-/** Resolve the active component from the URL. Prefers path routes such as
- * `/Dialog.html` or `/Dialog`, then falls back to hash routes like `#/Dialog`. */
+/** Resolve the active component from the URL.
+ * Hash routes such as `#/Dialog` are the canonical form: they survive static hosting
+ * (no history fallback needed) and work under any sub-path. Path routes like
+ * `/Dialog` or `/Dialog.html` are still accepted for direct links. */
 function getRouteFromLocation(): string {
-    const pathMatch = window.location.pathname.match(/\/([A-Za-z0-9]+?)(?:\.html)?\/?$/);
-    if (pathMatch && components.some((c) => c.name === pathMatch[1])) {
-        return pathMatch[1];
-    }
     const hash = window.location.hash.replace(/^#\/?/, "");
     if (hash && components.some((c) => c.name === hash)) {
         return hash;
+    }
+    const pathMatch = window.location.pathname.match(/\/([A-Za-z0-9]+?)(?:\.html)?\/?$/);
+    if (pathMatch && components.some((c) => c.name === pathMatch[1])) {
+        return pathMatch[1];
     }
     return HOME;
 }
@@ -80,7 +82,8 @@ function DemoApp() {
     }, []);
 
     const navigateTo = useCallback((name: string) => {
-        window.history.pushState(null, "", `/${name}.html`);
+        // 路由放在 hash 里：静态托管没有 history fallback，用 hash 刷新才不会 404
+        window.history.pushState(null, "", `#/${name}`);
         setActiveComponent(name);
     }, []);
 
@@ -98,7 +101,7 @@ function DemoApp() {
                     {components.map((item) => (
                         <a
                             key={item.name}
-                            href={`/${item.name}.html`}
+                            href={`#/${item.name}`}
                             className="component-card"
                             onClick={(event) => {
                                 event.preventDefault();

@@ -4,6 +4,7 @@ import { Popover } from "./Popover";
 import "./../styles/common.module.scss";
 import "./../styles/components/timepicker.scss";
 import { namespace } from "./../styles/namespace";
+import { useCalendarDayInfo, type CalendarDayInfo, type HolidayConfigItem } from "../hooks/useCalendarDayInfo";
 
 const CSS_NS = `${namespace}-time-picker`;
 
@@ -17,8 +18,14 @@ const FORMAT_DATETIME: TimePickerFormat = "datetime";
 /** 固定渲染 6 行，避免不同月份的面板高度跳动 */
 const WEEKS = 6;
 
-/** 表头顺序与网格列一致，一周从周一开始 */
-const WEEKDAY_LABELS = ["一", "二", "三", "四", "五", "六", "日"];
+/** 表头文字，下标与 Date.getDay() 一致（0 = 周日） */
+const WEEKDAY_NAMES = ["日", "一", "二", "三", "四", "五", "六"];
+
+/** 归一化「一周第一列」到 0（周日）- 6（周六），非法值回退到周日 */
+const normalizeWeekStart = (value: number) => (Number.isFinite(value) ? ((Math.trunc(value) % 7) + 7) % 7 : 0);
+
+/** 按「一周第一列」生成 7 个表头文字，顺序与网格列一致 */
+const buildWeekdayLabels = (weekStart: number) => Array.from({ length: 7 }, (_, index) => WEEKDAY_NAMES[(weekStart + index) % 7]);
 
 /**
  * 年月视图固定 4 行 4 列：前 12 个格子是本年的 1-12 月，后 4 个是次年 1-4 月补位
@@ -135,13 +142,14 @@ const formatValue = (date: Date, format: TimePickerFormat) => {
 };
 
 /**
- * 生成以周一为起始、固定 6 周的日期网格，含相邻月份的补位日期
+ * 生成固定 6 周的日期网格，含相邻月份的补位日期
  * @param year 展示的年份
  * @param month 展示的月份（0-11）
+ * @param weekStart 一周第一列，0（周日）- 6（周六）
  */
-const buildDays = (year: number, month: number): Date[] => {
-    // getDay() 以周日为 0，这里换算成以周一为 0
-    const offset = (new Date(year, month, 1).getDay() + 6) % 7;
+const buildDays = (year: number, month: number, weekStart: number): Date[] => {
+    // getDay() 以周日为 0，weekStart 也是同一套下标，两者相减即为首个补位日期跨过的天数
+    const offset = (new Date(year, month, 1).getDay() - weekStart + 7) % 7;
     return Array.from({ length: WEEKS * 7 }, (_, index) => new Date(year, month, 1 - offset + index));
 };
 
@@ -397,6 +405,18 @@ export interface TimePickerPanelProps {
     minuteLabel?: string;
     /** 【今日】按钮文案 */
     todayText?: string;
+    /** 是否显示农历（含农历节日），默认 false；启用时按需加载 lunar-javascript */
+    lunar?: boolean;
+    /** 是否显示节气，默认 false；与 lunar 同时开启时优先显示节气 */
+    solarTerm?: boolean;
+    /** 节假日数据：传 true 使用内置的 holiday.json（定期更新），传数组使用自定义数据，默认不启用 */
+    holiday?: boolean | HolidayConfigItem[];
+    /** 放假标记文案，默认「休」 */
+    holidayText?: string;
+    /** 调休上班标记文案，默认「补」 */
+    workdayText?: string;
+    /** 一周的第一列是星期几，0（周日）- 6（周六），默认 0 */
+    weekStart?: number;
     className?: string;
 }
 
@@ -413,6 +433,12 @@ export const TimePickerPanel = ({
     hourLabel = "小时",
     minuteLabel = "分钟",
     todayText = "今日",
+    lunar = false,
+    solarTerm = false,
+    holiday = false,
+    holidayText = "休",
+    workdayText = "补",
+    weekStart = 0,
     className,
 }: TimePickerPanelProps) => {
     const showDate = format !== FORMAT_TIME;
@@ -444,10 +470,27 @@ export const TimePickerPanel = ({
     /** 丢弃草稿修改，回到外部 value */
     const resetDraft = () => setDraftState({ source: valueKey, draft: toDraft(baseDate) });
 
-    const days = useMemo(() => buildDays(draft.year, draft.month), [draft.year, draft.month]);
+    /** 一周第一列归一化后的下标，供网格与表头共用 */
+    const firstDay = normalizeWeekStart(weekStart);
+    const weekdayLabels = useMemo(() => buildWeekdayLabels(firstDay), [firstDay]);
+    const days = useMemo(() => buildDays(draft.year, draft.month, firstDay), [draft.year, draft.month, firstDay]);
     const today = new Date();
     /** 草稿已经选中今天时不必再给「今日」入口 */
     const isToday = isSameDay(draft.selected, today);
+
+    // 每天对应的日历附加信息（节假日 > 节气 > 农历），未开启时全部为 null
+    const dayInfoList = useCalendarDayInfo(showDate ? days : [], { lunar, solarTerm, holiday, holidayText, workdayText });
+    /** 当前网格每天的附加信息，按时间戳索引 */
+    const dayInfos = useMemo(() => {
+        const map = new Map<number, CalendarDayInfo>();
+        days.forEach((day, index) => {
+            const info = dayInfoList[index];
+            if (info) {
+                map.set(day.getTime(), info);
+            }
+        });
+        return map;
+    }, [days, dayInfoList]);
 
     /** 通过 ˄ ˅ 或滚轮按当前视图的粒度前后切换 */
     const stepView = (step: number) => updateDraft((prev) => stepViewDraft(prev, view, step));
@@ -606,8 +649,8 @@ export const TimePickerPanel = ({
                         {view === VIEW_DATE && (
                             <>
                                 <div className={`${CSS_NS}-weekdays`}>
-                                    {WEEKDAY_LABELS.map((label) => (
-                                        <span key={label} className={`${CSS_NS}-weekday`}>
+                                    {weekdayLabels.map((label, index) => (
+                                        <span key={index} className={`${CSS_NS}-weekday`}>
                                             {label}
                                         </span>
                                     ))}
@@ -623,9 +666,11 @@ export const TimePickerPanel = ({
                                         } else if (isSameDay(day, today)) {
                                             classes.push(`${CSS_NS}-day-today`);
                                         }
+                                        const info = dayInfos.get(day.getTime());
                                         return (
                                             <Clickable key={day.getTime()} className={classes.join(" ")} onClick={() => selectDay(day)}>
-                                                {day.getDate()}
+                                                <span className={`${CSS_NS}-day-number`}>{day.getDate()}</span>
+                                                {info && <span className={`${CSS_NS}-day-label ${CSS_NS}-day-label-${info.kind}`}>{info.text}</span>}
                                             </Clickable>
                                         );
                                     })}
@@ -711,6 +756,18 @@ export interface TimePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
     confirmText?: string;
     /** 【今日】按钮文案，透传给面板 */
     todayText?: string;
+    /** 是否显示农历（含农历节日），默认 false；启用时按需加载 lunar-javascript */
+    lunar?: boolean;
+    /** 是否显示节气，默认 false；与 lunar 同时开启时优先显示节气 */
+    solarTerm?: boolean;
+    /** 节假日数据：传 true 使用内置的 holiday.json（定期更新），传数组使用自定义数据，默认不启用 */
+    holiday?: boolean | HolidayConfigItem[];
+    /** 放假标记文案，透传给面板 */
+    holidayText?: string;
+    /** 调休上班标记文案，透传给面板 */
+    workdayText?: string;
+    /** 一周的第一列是星期几，0（周日）- 6（周六），透传给面板 */
+    weekStart?: number;
 }
 
 /**
@@ -735,6 +792,12 @@ export const TimePicker = ({
     cancelText,
     confirmText,
     todayText,
+    lunar,
+    solarTerm,
+    holiday,
+    holidayText,
+    workdayText,
+    weekStart,
     className,
     ...inputProps
 }: TimePickerProps) => {
@@ -849,6 +912,12 @@ export const TimePicker = ({
                     cancelText={cancelText}
                     confirmText={confirmText}
                     todayText={todayText}
+                    lunar={lunar}
+                    solarTerm={solarTerm}
+                    holiday={holiday}
+                    holidayText={holidayText}
+                    workdayText={workdayText}
+                    weekStart={weekStart}
                     onChange={(next) => {
                         setText(next);
                         onChange?.(next);

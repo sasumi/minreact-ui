@@ -15,6 +15,10 @@ function TimePickerDemo() {
     const [custom, setCustom] = useState("2026-09-19 19:00");
     const [buttonValue, setButtonValue] = useState("2026-09-19 19:00");
     const [spanValue, setSpanValue] = useState("");
+    const [lunarValue, setLunarValue] = useState("2026-02-17");
+    const [solarTermValue, setSolarTermValue] = useState("2026-02-17");
+    const [holidayValue, setHolidayValue] = useState("2026-10-01");
+    const [weekStartValue, setWeekStartValue] = useState("2026-10-01");
 
     return (
         <div className="demo-page">
@@ -56,6 +60,28 @@ function TimePickerDemo() {
                 <div className="demo-row">
                     <TimePickerPanel format="datetime" value={inline} onChange={setInline} />
                     <span>当前值: {inline}</span>
+                </div>
+            </DemoSection>
+
+            <DemoSection title="一周起始日" description="weekStart 指定第一列是星期几，0 为周日（默认），1 为周一">
+                <div className="demo-row">
+                    <TimePickerPanel format="date" value={weekStartValue} onChange={setWeekStartValue} weekStart={1} />
+                    <span>weekStart=1：表头从「一」开始</span>
+                </div>
+            </DemoSection>
+
+            <DemoSection title="农历、节气与节假日" description="lunar 显示农历，solarTerm 显示节气，holiday 显示法定节假日（内置 holiday.json）；均默认关闭且按需加载">
+                <div className="demo-row">
+                    <TimePicker format="date" value={lunarValue} onChange={setLunarValue} lunar />
+                    <span>只开农历：节日当天显示节日名，其余显示农历日</span>
+                </div>
+                <div className="demo-row">
+                    <TimePicker format="date" value={solarTermValue} onChange={setSolarTermValue} solarTerm />
+                    <span>只开节气：2/4 立春、3/5 惊蛰</span>
+                </div>
+                <div className="demo-row">
+                    <TimePickerPanel format="date" value={holidayValue} onChange={setHolidayValue} lunar solarTerm holiday />
+                    <span>全部开启：假日 &gt; 节气 &gt; 农历</span>
                 </div>
             </DemoSection>
 
