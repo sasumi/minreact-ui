@@ -1,6 +1,6 @@
 import { bindClick, bindNodeMove, calcRemainingMSecs, detectedPrecision, findOne, lockElementInteraction, precisionToStep } from "minutool";
 import type { ComponentType, ReactNode } from "react";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Children, forwardRef, isValidElement, useEffect, useImperativeHandle, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import "./../styles/common.module.scss";
 import "./../styles/components/dialog.scss";
@@ -55,9 +55,14 @@ interface DialogTitleProps {
 
 interface DialogContentProps {
     children?: ReactNode;
+    iframeSrc?: string;
     className?: string;
     maxHeight?: string | number | null;
     maxWidth?: string | number | null;
+}
+
+interface DialogIframeProps {
+    iframeSrc?: string;
 }
 
 interface DialogActionProps {
@@ -68,8 +73,24 @@ interface DialogActionProps {
 }
 
 /**
+ * 递归检查子节点中是否存在 iframeSrc 属性（Dialog.Content 的 iframe 模式）
+ * @param node - 待检查的 React 节点
+ */
+const hasIframeSrc = (node: ReactNode): boolean => {
+    let found = false;
+    Children.forEach(node, (child) => {
+        if (found || !isValidElement(child)) {
+            return;
+        }
+        const props = child.props as DialogContentProps & { children?: ReactNode };
+        found = !!props.iframeSrc || hasIframeSrc(props.children);
+    });
+    return found;
+};
+
+/**
  * 对话框主组件
- * @param children - 对话框的子组件
+ * @param children - 对话框的子组件；内容里带 iframeSrc（Dialog.Content 的 iframe 模式）时自动追加 `-dialog-iframe` 类名
  * @param open - 是否打开对话框
  * @param setOpen - 设置对话框打开状态的函数
  * @param ref - 对话框的引用
@@ -191,7 +212,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         <div className={`${CSS_NS}-dialog-wrap`} data-modal={modal}>
             <div className={MASKER_CLASS_NAME}></div>
             <dialog
-                className={`${CSS_NS}-dialog ${className}`}
+                className={`${CSS_NS}-dialog${hasIframeSrc(children) ? ` ${CSS_NS}-dialog-iframe` : ""} ${className}`}
                 style={{
                     width: width ?? undefined,
                     maxHeight: maxHeight ?? undefined,
@@ -236,9 +257,10 @@ const Title = Object.assign(
  * 内容子组件
  */
 const Content = Object.assign(
-    ({ children, ...props }: DialogContentProps & React.HTMLAttributes<HTMLDivElement>) => {
+    ({ children, iframeSrc, ...props }: DialogContentProps & React.HTMLAttributes<HTMLDivElement>) => {
         return (
             <div {...props} className={`${CONTENT_CLASS_NAME} ${props.className || ""}`}>
+                {iframeSrc && <iframe src={iframeSrc} className={`${CONTENT_CLASS_NAME}-iframe`} />}
                 {children}
             </div>
         );
@@ -260,6 +282,10 @@ const Action = Object.assign(
     { _type: DialogActionSymbol },
 );
 
+/** showDialog 的 content 既可以是 ReactNode，也可以是仅描述 iframe 地址的对象 */
+const isIframeContent = (content: ReactNode | string | DialogIframeProps): content is DialogIframeProps =>
+    typeof content === "object" && content !== null && "iframeSrc" in content;
+
 /**
  * 显示自定义对话框
  * @param content - 对话框内容，可以是 ReactNode 或字符串
@@ -278,7 +304,7 @@ const showDialog = ({
     title?: ReactNode | string;
     children?: ReactNode | string;
     action?: ReactNode | string;
-    content?: ReactNode | string;
+    content?: ReactNode | string | DialogIframeProps;
     onClose?: () => boolean | void;
 }) => {
     let destroy: (() => void) | null = null;
@@ -296,7 +322,7 @@ const showDialog = ({
         return (
             <Dialog {...dlgProps} open={open} setOpen={handleSetOpen}>
                 {title && <Dialog.Title>{title}</Dialog.Title>}
-                {content && <Dialog.Content>{content}</Dialog.Content>}
+                {content && <Dialog.Content {...(isIframeContent(content) ? content : {})}>{isIframeContent(content) ? undefined : content}</Dialog.Content>}
                 {action && <Dialog.Action>{action}</Dialog.Action>}
                 {children}
             </Dialog>
@@ -330,20 +356,10 @@ const showDialogComponent = <P extends object>(DialogComponent: ComponentType<P 
     return unmountRef.current;
 };
 
-const showIframeDialog = ({
-    title = "",
-    url,
-    width = DIALOG_SIZE_NORMAL,
-    height = null,
-}: {
-    title?: string;
-    url: string;
-    width?: string;
-    height?: string | null;
-}) => {
+const showIframeDialog = ({ title = "", url, width = DIALOG_SIZE_NORMAL }: { title?: string; url: string; width?: string }) => {
     return showDialog({
         title,
-        content: <iframe src={url} style={{ width: "100%", height: height ?? "400px", border: "none" }} />,
+        content: { iframeSrc: url } as DialogIframeProps,
         width,
     });
 };
@@ -757,8 +773,7 @@ const clampDialogIntoView = (dlg: HTMLDialogElement): void => {
  * 是否输入类元素：这类元素里的 Esc 由控件自己消费（清空 / 取消输入 / 收起下拉），不用于关闭对话框
  * @param {Element | null} el - 当前聚焦的元素
  */
-const isInputElement = (el: Element | null): boolean =>
-    !!el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || (el as HTMLElement).isContentEditable);
+const isInputElement = (el: Element | null): boolean => !!el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || (el as HTMLElement).isContentEditable);
 
 /**
  * 将焦点设置到容器内的第一个可聚焦元素上

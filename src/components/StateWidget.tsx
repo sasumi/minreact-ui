@@ -1,21 +1,22 @@
 import { Spinner } from "./Spinner";
 import { namespace } from "./../styles/namespace";
+import type { ReactNode } from "react";
 import "./../styles/components/statewidget.scss";
 
 const CSS_NS = namespace + "-statewidget";
 
-export const LoadingHolder = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
+export const LoadingHolder = ({ text, ...props }: { text?: string | ReactNode; [key: string]: any } = {}) => {
     const className = [CSS_NS + "-loading", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
         <div className={className} {...props}>
-            <Spinner/>
+            <Spinner />
             {text}
         </div>
     );
 };
 
-export const EmptyHolder = ({ text, ...props }: { text?: string; [key: string]: any } = {}) => {
+export const EmptyHolder = ({ text, ...props }: { text?: string | ReactNode; [key: string]: any } = {}) => {
     const className = [CSS_NS + "-empty", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
@@ -25,7 +26,7 @@ export const EmptyHolder = ({ text, ...props }: { text?: string; [key: string]: 
     );
 };
 
-export const ErrorHolder = ({ error, ...props }: { error?: string; [key: string]: any } = {}) => {
+export const ErrorHolder = ({ error, ...props }: { error?: string | ReactNode; [key: string]: any } = {}) => {
     const className = [CSS_NS + "-error", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (

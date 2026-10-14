@@ -195,6 +195,7 @@ export type {
   HolidayConfigItem
 } from './hooks/useCalendarDayInfo'
 export {
+  preloadCalendarData,
   useCalendarDayInfo
 } from './hooks/useCalendarDayInfo'
 

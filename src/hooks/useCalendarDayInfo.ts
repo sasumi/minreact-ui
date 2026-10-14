@@ -37,6 +37,16 @@ const loadLunarModule = () => {
     return lunarModulePromise;
 };
 
+/**
+ * 预取农历模块（含节气）：农历 / 节气开关打开时，可在空闲期或交互意图（hover / 聚焦日期入口）时提前调用，
+ * 打开日期面板就不用等这个 chunk；失败静默忽略，下次仍可重试
+ */
+export const preloadCalendarData = (): Promise<void> =>
+    loadLunarModule().then(
+        () => undefined,
+        () => undefined,
+    );
+
 /** 启用时异步加载农历模块，返回 null 表示尚未就绪或加载失败 */
 const useLunarModule = (enabled: boolean): LunarModule | null => {
     const [module, setModule] = useState<LunarModule | null>(null);

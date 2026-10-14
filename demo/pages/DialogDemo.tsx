@@ -4,11 +4,26 @@ import { useState } from "react";
 import { Toast } from "../../src";
 import { DemoSection } from "../DemoApp";
 
+/** iframe 对话框的内联示例页面（data URL，不依赖外部站点） */
+const INLINE_IFRAME_HTML =
+    "data:text/html;charset=utf-8," +
+    encodeURIComponent(
+        `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><style>
+            body { margin: 0; padding: 1em; font: 14px/1.8 system-ui, sans-serif; }
+            h3 { margin: 0 0 0.5em; }
+        </style></head><body>
+            <h3>内联 HTML</h3>
+            <p>这段内容由 data: URL 提供，与宿主页面无关。</p>
+            <p>iframe 会撑满对话框内容区的高度。</p>
+        </body></html>`,
+    );
+
 function DialogDemo() {
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
     const [open4, setOpen4] = useState(false);
+    const [open5, setOpen5] = useState(false);
 
     const showCustom = () => {
         Dialog.show({
@@ -48,6 +63,22 @@ function DialogDemo() {
             .catch((err) => {
                 console.error("Prompt error:", err);
             });
+    };
+
+    // iframe 对话框：内容交给 iframe 承载，对话框自动带上 -dialog-iframe 类名
+    const showIframeInline = () => {
+        Dialog.showIframe({
+            title: "内联 HTML",
+            url: INLINE_IFRAME_HTML,
+        });
+    };
+
+    const showIframeLocalPage = () => {
+        Dialog.showIframe({
+            title: "站内页面 #/Button",
+            url: "#/Button",
+            width: DIALOG_SIZE_LARGE,
+        });
     };
 
     // 进度对话框：总量已知，到达总量后自动关闭
@@ -308,6 +339,21 @@ function DialogDemo() {
                 >
                     打开表单对话框
                 </PrimaryButton>
+            </DemoSection>
+
+            <DemoSection
+                title="Iframe 对话框"
+                description="Dialog.Content 传 iframeSrc 时用 iframe 承载内容：对话框自动追加 -dialog-iframe 类名，内容区去掉内边距、iframe 撑满高度"
+            >
+                <div className="demo-row">
+                    <PrimaryButton onClick={showIframeInline}>内联 HTML（data URL）</PrimaryButton>
+                    <PrimaryButton onClick={showIframeLocalPage}>站内页面</PrimaryButton>
+                    <PrimaryButton onClick={() => setOpen5(true)}>声明式用法</PrimaryButton>
+                </div>
+                <Dialog open={open5} setOpen={setOpen5} width={DIALOG_SIZE_NORMAL}>
+                    <Dialog.Title>声明式 iframe 对话框</Dialog.Title>
+                    <Dialog.Content iframeSrc="#/Button" />
+                </Dialog>
             </DemoSection>
 
             <DemoSection title="图片预览" description="在对话框中预览图片">
