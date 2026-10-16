@@ -19,9 +19,11 @@ export default defineConfig(({ command }) => ({
         },
     },
     server: {
+        host: true, // 监听 0.0.0.0，允许局域网访问，如 http://192.168.0.116:5180
         port: 5180,
     },
     preview: {
+        host: true,
         port: 5180,
     },
     build: {

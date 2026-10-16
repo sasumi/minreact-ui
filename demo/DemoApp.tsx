@@ -51,6 +51,18 @@ const components = [
 /** Sentinel used when the URL does not point at a specific component (the gallery). */
 const HOME = "";
 
+/** Sidebar collapse state survives reloads so the demo keeps the layout you chose. */
+const SIDEBAR_COLLAPSED_KEY = "minreactui-demo:sidebar-collapsed";
+
+function readSidebarCollapsed(): boolean {
+    try {
+        return window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1";
+    } catch {
+        // 隐私模式 / 禁用存储时读不到，按展开处理
+        return false;
+    }
+}
+
 /** Resolve the active component from the URL.
  * Hash routes such as `#/Dialog` are the canonical form: they survive static hosting
  * (no history fallback needed) and work under any sub-path. Path routes like
@@ -86,6 +98,18 @@ function DemoApp() {
         window.history.pushState(null, "", `#/${name}`);
         setActiveComponent(name);
     }, []);
+
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed);
+
+    useEffect(() => {
+        try {
+            window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, sidebarCollapsed ? "1" : "0");
+        } catch {
+            // 存储不可写时退化成只保留本次会话的收起状态
+        }
+    }, [sidebarCollapsed]);
+
+    const toggleSidebar = useCallback(() => setSidebarCollapsed((prev) => !prev), []);
 
     const ActiveDemo = components.find((c) => c.name === activeComponent);
 
@@ -135,11 +159,25 @@ function DemoApp() {
     );
 
     return (
-        <div className="demo-app">
-            <aside className="demo-sidebar">
+        <div className={`demo-app ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+            <aside className={`demo-sidebar ${sidebarCollapsed ? "collapsed" : ""}`} inert={sidebarCollapsed}>
                 <div className="demo-header">
-                    <h1>minreactui</h1>
-                    <p className="demo-subtitle">组件演示</p>
+                    <div className="demo-header-text">
+                        <h1>minreactui</h1>
+                        <p className="demo-subtitle">组件演示</p>
+                    </div>
+                    <button
+                        type="button"
+                        className="demo-sidebar-toggle"
+                        onClick={toggleSidebar}
+                        aria-label="收起侧边栏"
+                        aria-expanded={!sidebarCollapsed}
+                        title="收起侧边栏"
+                    >
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M15 6l-6 6 6 6" />
+                        </svg>
+                    </button>
                 </div>
                 <nav className="demo-nav">
                     {Object.entries(categorizedComponents).map(([category, items]) => (
@@ -161,6 +199,19 @@ function DemoApp() {
                     ))}
                 </nav>
             </aside>
+            {sidebarCollapsed && (
+                <button
+                    type="button"
+                    className="demo-sidebar-toggle demo-sidebar-toggle-floating"
+                    onClick={toggleSidebar}
+                    aria-label="展开侧边栏"
+                    title="展开侧边栏"
+                >
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9 6l6 6-6 6" />
+                    </svg>
+                </button>
+            )}
             <main className="demo-content">
                 <ActiveComponent />
             </main>

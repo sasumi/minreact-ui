@@ -114,6 +114,7 @@
     }
 
     &-iframe {
+        overflow:hidden;
         .#{$ns}-dialog-content {
             padding: 0 !important;
         }
@@ -200,7 +201,7 @@
 
 .#{$ns}-dialog-wrap {
     .#{$ns}-dialog-masker {
-        position: absolute;
+        position: fixed;
         inset: 0;
         background: var(--#{$ns}-dialog-masker-background);
         backdrop-filter: blur(3px);

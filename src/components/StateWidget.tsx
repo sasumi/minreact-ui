@@ -26,12 +26,12 @@ export const EmptyHolder = ({ text, ...props }: { text?: string | ReactNode; [ke
     );
 };
 
-export const ErrorHolder = ({ error, ...props }: { error?: string | ReactNode; [key: string]: any } = {}) => {
+export const ErrorHolder = ({ error, ...props }: { error?: string | ReactNode | Error; [key: string]: any } = {}) => {
     const className = [CSS_NS + "-error", props.className].filter(Boolean).join(" ");
     props.className = className;
     return (
         <span className={className} {...props}>
-            {error || "发生错误"}
+            {error instanceof Error ? error.message : error || "发生错误"}
         </span>
     );
 };
