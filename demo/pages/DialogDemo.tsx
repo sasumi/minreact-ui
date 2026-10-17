@@ -299,7 +299,7 @@ function DialogDemo() {
 
             <DemoSection
                 title="可拖动对话框"
-                description="moveable 为 true 时按住标题即可拖动；initPosition 只决定初始位置，拖动后使用实际位置；最后一个示例用 useLocalStorage 配合函数形式的 initPosition 恢复上次位置"
+                description="moveable 为 true 时按住标题即可拖动；initPosition 只决定初始位置，拖动后使用实际位置；最后一个示例用 onMoveEnd 持久化位置，并通过函数形式的 initPosition 恢复"
             >
                 <div className="demo-row">
                     <PrimaryButton onClick={showMoveable}>默认居中</PrimaryButton>
@@ -333,11 +333,11 @@ function DialogDemo() {
                     width={DIALOG_SIZE_NORMAL}
                     moveable
                     initPosition={getRememberedPosition}
-                    onMove={(x, y) => setSavedDialogPosition({ x: Math.round(x), y: Math.round(y) })}
+                    onMoveEnd={(x, y) => setSavedDialogPosition({ x: Math.round(x), y: Math.round(y) })}
                 >
                     <Dialog.Title>记住上次位置</Dialog.Title>
                     <Dialog.Content>
-                        <p>拖动时通过 onMove 把位置写入 useLocalStorage；initPosition 传函数，每次打开时读取最新值。</p>
+                        <p>拖动结束时通过 onMoveEnd 写入 useLocalStorage；initPosition 传函数，每次打开时读取最新值。</p>
                         <p>已保存位置：{savedDialogPosition ? `x: ${savedDialogPosition.x}, y: ${savedDialogPosition.y}` : "无"}</p>
                     </Dialog.Content>
                 </Dialog>

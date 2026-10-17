@@ -56,6 +56,8 @@ export interface DialogProps {
     moveable?: boolean;
     /** 拖动过程中的回调，参数为对话框当前视口坐标 */
     onMove?: (x: number, y: number) => void;
+    /** 拖动结束时的回调，参数为对话框最终视口坐标（未发生移动时不触发） */
+    onMoveEnd?: (x: number, y: number) => void;
     clickMaskerToClose?: boolean;
     showTopCloser?: boolean;
     escClose?: boolean;
@@ -170,6 +172,7 @@ const applyInitPositionStyle = (dlg: HTMLDialogElement, initPosition?: DialogIni
  * @param modal - 是否为模态对话框
  * @param moveable - 是否允许拖动对话框
  * @param onMove - 拖动过程中的回调，参数为对话框当前视口坐标 (x, y)
+ * @param onMoveEnd - 拖动结束时的回调，参数为对话框最终视口坐标 (x, y)
  * @param clickMaskerToClose - 是否允许点击遮罩层关闭对话框
  * @param showTopCloser - 是否显示右上角的关闭按钮
  * @param escClose - 是否允许按 Esc 关闭对话框（默认 true）；焦点在对话框内且不在输入框里、右上角有关闭按钮时才生效
@@ -182,6 +185,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         setOpen,
         moveable = false,
         onMove,
+        onMoveEnd,
         showTopCloser = true,
         className = "",
         maxHeight = null,
@@ -199,9 +203,11 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     // setOpen 可能每次渲染都是新函数（命令式包装器即如此），用 ref 让事件回调始终调用最新实现
     const setOpenRef = useRef(setOpen);
     setOpenRef.current = setOpen;
-    // onMove 同理：用 ref 避免父组件重建回调时重新绑定拖动（会重置位置）
+    // onMove / onMoveEnd 同理：用 ref 避免父组件重建回调时重新绑定拖动（会重置位置）
     const onMoveRef = useRef(onMove);
     onMoveRef.current = onMove;
+    const onMoveEndRef = useRef(onMoveEnd);
+    onMoveEndRef.current = onMoveEnd;
 
     useImperativeHandle(ref, () => dlgRef.current!, []);
 
@@ -226,19 +232,34 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
             let movePointerId: number | null = null;
             let moveOffsetX = 0;
             let moveOffsetY = 0;
+            let hasMoved = false;
+            let lastMoveX = 0;
+            let lastMoveY = 0;
 
             const stopTracking = () => {
                 movePointerId = null;
+                hasMoved = false;
                 window.removeEventListener("pointermove", onTrackMove);
-                window.removeEventListener("pointerup", stopTracking);
-                window.removeEventListener("pointercancel", stopTracking);
+                window.removeEventListener("pointerup", endTracking);
+                window.removeEventListener("pointercancel", endTracking);
+            };
+
+            // 拖动结束（抬起或取消）时回调一次最终坐标，外部无需在 onMove 里持续存储
+            const endTracking = () => {
+                if (hasMoved) {
+                    onMoveEndRef.current?.(lastMoveX, lastMoveY);
+                }
+                stopTracking();
             };
 
             const onTrackMove = (event: PointerEvent) => {
                 if (event.pointerId !== movePointerId) {
                     return;
                 }
-                onMoveRef.current?.(event.clientX - moveOffsetX, event.clientY - moveOffsetY);
+                lastMoveX = event.clientX - moveOffsetX;
+                lastMoveY = event.clientY - moveOffsetY;
+                hasMoved = true;
+                onMoveRef.current?.(lastMoveX, lastMoveY);
             };
 
             // 在标题上按下即开始拖动，必须早于 bindNodeMove 的监听（这里挂在对话框的捕获阶段）先把当前
@@ -249,14 +270,16 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                 if (event.button !== 0 || !target?.closest(`.${TITLE_CLASS_NAME}`)) {
                     return;
                 }
+                stopTracking();
                 const rect = dlg.getBoundingClientRect();
                 movePointerId = event.pointerId;
                 moveOffsetX = event.clientX - rect.left;
                 moveOffsetY = event.clientY - rect.top;
+                hasMoved = false;
                 materializePosition(dlg);
                 window.addEventListener("pointermove", onTrackMove);
-                window.addEventListener("pointerup", stopTracking);
-                window.addEventListener("pointercancel", stopTracking);
+                window.addEventListener("pointerup", endTracking);
+                window.addEventListener("pointercancel", endTracking);
             };
 
             dlg.addEventListener("pointerdown", onTitlePointerDown, true);
