@@ -193,7 +193,15 @@ function DialogDemo() {
                 <div className="demo-row">
                     <PrimaryButton
                         onClick={() =>
-                            Dialog.show({ title: "小尺寸", content: <div style={{ padding: "1rem" }}>小尺寸对话框</div>, width: DIALOG_SIZE_SMALL })
+                            Dialog.show({
+                                title: "小尺寸",
+                                content: (
+                                    <div className="small-dlg" style={{ padding: "1rem" }}>
+                                        小尺寸对话框
+                                    </div>
+                                ),
+                                width: DIALOG_SIZE_SMALL,
+                            })
                         }
                     >
                         小尺寸 (24em)
@@ -210,9 +218,7 @@ function DialogDemo() {
                         普通尺寸 (32em)
                     </PrimaryButton>
                     <PrimaryButton
-                        onClick={() =>
-                            Dialog.show({ title: "大尺寸", content: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, width: DIALOG_SIZE_LARGE })
-                        }
+                        onClick={() => Dialog.show({ title: "大尺寸", content: <div style={{ padding: "1rem" }}>大尺寸对话框</div>, width: DIALOG_SIZE_LARGE })}
                     >
                         大尺寸 (60em)
                     </PrimaryButton>
@@ -228,10 +234,7 @@ function DialogDemo() {
                 </div>
             </DemoSection>
 
-            <DemoSection
-                title="Dialog.showProgress 进度对话框"
-                description="返回 { updater, isAborted, close }，通过 updater(progress, total?) 推进进度"
-            >
+            <DemoSection title="Dialog.showProgress 进度对话框" description="返回 { updater, isAborted, close }，通过 updater(progress, total?) 推进进度">
                 <div className="demo-row">
                     <PrimaryButton onClick={showProgressBasic}>自动关闭</PrimaryButton>
                     <PrimaryButton onClick={showProgressGrowing}>总量动态变化</PrimaryButton>

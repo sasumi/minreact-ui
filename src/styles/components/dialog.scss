@@ -17,12 +17,13 @@
     max-width: var(--#{$ns}-dialog-max-width);
     position: fixed;
     z-index: var(--#{$ns}-dialog-zindex);
-    margin: auto;
-    inset: 0;
     border: none;
     padding: 0;
     display: flex;
     flex-direction: column;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
     .#{$ns}-dialog-title {
         flex-shrink: 0;
@@ -34,8 +35,9 @@
     .#{$ns}-dialog-content {
         flex: 1;
         padding: var(--#{$ns}-dialog-inner-padding); //内容块再往里面缩padding，避免内容贴边
-        overflow: auto;
         max-width: calc(100vw - 2em);
+        overflow: auto;
+        min-width: 0;
     }
 
     .#{$ns}-dialog-close-btn {
@@ -49,11 +51,11 @@
         right: var(--#{$ns}-dialog-inner-padding);
         top: var(--#{$ns}-dialog-inner-padding);
         z-index: 1;
-		opacity: 0.55;
-		transition: opacity 0.1s ease-in-out;
-		&:hover {
-			opacity: 1;
-		}
+        opacity: 0.55;
+        transition: opacity 0.1s ease-in-out;
+        &:hover {
+            opacity: 1;
+        }
         &:before {
             content: "\e625";
         }
@@ -114,7 +116,7 @@
     }
 
     &-iframe {
-        overflow:hidden;
+        overflow: hidden;
         .#{$ns}-dialog-content {
             padding: 0 !important;
         }
