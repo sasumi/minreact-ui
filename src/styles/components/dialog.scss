@@ -18,12 +18,20 @@
     position: fixed;
     z-index: var(--#{$ns}-dialog-zindex);
     border: none;
-    padding: 0;
     display: flex;
     flex-direction: column;
+
+    //用 transform 兼容 iOS safari 居中问题
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+
+    //修复 iOS safari 高度不能自动撑开问题
+    height: auto;
+
+    //去除默认 <dialog> margin 和 padding
+    margin: 0;
+    padding: 0;
 
     .#{$ns}-dialog-title {
         flex-shrink: 0;
@@ -204,7 +212,10 @@
 .#{$ns}-dialog-wrap {
     .#{$ns}-dialog-masker {
         position: fixed;
-        inset: 0;
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
         background: var(--#{$ns}-dialog-masker-background);
         backdrop-filter: blur(3px);
         z-index: var(--#{$ns}-dialog-zindex);
