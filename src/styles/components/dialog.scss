@@ -22,9 +22,16 @@
     flex-direction: column;
 
     //用 transform 兼容 iOS safari 居中问题
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    //初始位置由 initPosition 通过内联 CSS 变量覆盖；
+    //未传入的方向使用兜底值，保持居中
+    left: var(--#{$ns}-dialog-init-left, 50%);
+    top: var(--#{$ns}-dialog-init-top, 50%);
+    right: var(--#{$ns}-dialog-init-right, auto);
+    bottom: var(--#{$ns}-dialog-init-bottom, auto);
+    transform: translate(
+        var(--#{$ns}-dialog-init-translate-x, -50%),
+        var(--#{$ns}-dialog-init-translate-y, -50%)
+    );
 
     //修复 iOS safari 高度不能自动撑开问题
     height: auto;

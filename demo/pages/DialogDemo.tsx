@@ -1,7 +1,8 @@
 import { Dialog, DIALOG_SIZE_SMALL, DIALOG_SIZE_NORMAL, DIALOG_SIZE_LARGE } from "../../src/components/Dialog";
 import { PrimaryButton, NormalButton } from "../../src/components/Button";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Toast } from "../../src";
+import { useLocalStorage } from "../../src/hooks/useLocalStorage";
 import { DemoSection } from "../DemoApp";
 
 /** iframe 对话框的内联示例页面（data URL，不依赖外部站点） */
@@ -24,6 +25,66 @@ function DialogDemo() {
     const [open3, setOpen3] = useState(false);
     const [open4, setOpen4] = useState(false);
     const [open5, setOpen5] = useState(false);
+    const [openMoveable, setOpenMoveable] = useState(false);
+    const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
+    const [openRememberPosition, setOpenRememberPosition] = useState(false);
+    const [savedDialogPosition, setSavedDialogPosition] = useLocalStorage<{ x: number; y: number }>("minreactui-demo-dialog-position", null);
+    // 函数形式：每次打开时再读取存储值，打开期间 onMove 写入新位置也不会重置拖动
+    const getRememberedPosition = useCallback(
+        () => (savedDialogPosition ? { top: savedDialogPosition.y, left: savedDialogPosition.x } : null),
+        [savedDialogPosition],
+    );
+
+    // 初始位置：仅初始化时生效，拖动标题后以实际位置为准
+    const showAtTopLeft = () => {
+        Dialog.show({
+            title: "左上角",
+            content: <div style={{ padding: "1rem" }}>initPosition: {"{ top: 24, left: 24 }"}（数字按 px 处理）</div>,
+            width: DIALOG_SIZE_NORMAL,
+            initPosition: { top: 24, left: 24 },
+            moveable: true,
+        });
+    };
+
+    const showAtBottomRight = () => {
+        Dialog.show({
+            title: "右下角",
+            content: <div style={{ padding: "1rem" }}>initPosition: {'{ right: "2em", bottom: "2em" }'}（支持 CSS 长度）</div>,
+            width: DIALOG_SIZE_NORMAL,
+            initPosition: { right: "2em", bottom: "2em" },
+            moveable: true,
+        });
+    };
+
+    const showAtTopCenter = () => {
+        Dialog.show({
+            title: "顶部居中",
+            content: <div style={{ padding: "1rem" }}>只传 initPosition.top，水平方向仍然居中</div>,
+            width: DIALOG_SIZE_NORMAL,
+            initPosition: { top: "1.5em" },
+            moveable: true,
+        });
+    };
+
+    // 可拖动对话框：按住标题拖动，松开后保持实际位置
+    const showMoveable = () => {
+        Dialog.show({
+            title: "可拖动对话框",
+            content: <div style={{ padding: "1rem" }}>按住标题即可拖动，松开后位置保持不变</div>,
+            width: DIALOG_SIZE_NORMAL,
+            moveable: true,
+        });
+    };
+
+    const showMoveableWithInitPosition = () => {
+        Dialog.show({
+            title: "可拖动对话框（指定初始位置）",
+            content: <div style={{ padding: "1rem" }}>初始位置为 initPosition: {'{ top: "6em", left: "4em" }'}，拖动后以实际位置为准</div>,
+            width: DIALOG_SIZE_NORMAL,
+            moveable: true,
+            initPosition: { top: "6em", left: "4em" },
+        });
+    };
 
     const showCustom = () => {
         Dialog.show({
@@ -223,6 +284,63 @@ function DialogDemo() {
                         大尺寸 (60em)
                     </PrimaryButton>
                 </div>
+            </DemoSection>
+
+            <DemoSection
+                title="初始位置"
+                description="通过 initPosition: { top, left, right, bottom } 指定初始位置，支持 px、em 等 CSS 长度（数字按 px）；未传的方向保持居中；仅初始化时生效，拖动后以实际位置为准"
+            >
+                <div className="demo-row">
+                    <PrimaryButton onClick={showAtTopLeft}>左上角</PrimaryButton>
+                    <PrimaryButton onClick={showAtBottomRight}>右下角</PrimaryButton>
+                    <PrimaryButton onClick={showAtTopCenter}>顶部居中</PrimaryButton>
+                </div>
+            </DemoSection>
+
+            <DemoSection
+                title="可拖动对话框"
+                description="moveable 为 true 时按住标题即可拖动；initPosition 只决定初始位置，拖动后使用实际位置；最后一个示例用 useLocalStorage 配合函数形式的 initPosition 恢复上次位置"
+            >
+                <div className="demo-row">
+                    <PrimaryButton onClick={showMoveable}>默认居中</PrimaryButton>
+                    <PrimaryButton onClick={showMoveableWithInitPosition}>指定初始位置</PrimaryButton>
+                    <PrimaryButton
+                        onClick={() => {
+                            setDragPos(null);
+                            setOpenMoveable(true);
+                        }}
+                    >
+                        onMove 回调
+                    </PrimaryButton>
+                    <PrimaryButton onClick={() => setOpenRememberPosition(true)}>记住上次位置</PrimaryButton>
+                </div>
+                <Dialog
+                    open={openMoveable}
+                    setOpen={setOpenMoveable}
+                    width={DIALOG_SIZE_NORMAL}
+                    moveable
+                    onMove={(x, y) => setDragPos({ x, y })}
+                >
+                    <Dialog.Title>拖动坐标</Dialog.Title>
+                    <Dialog.Content>
+                        <p>拖动标题查看实时坐标</p>
+                        <p>当前位置：{dragPos ? `x: ${Math.round(dragPos.x)}, y: ${Math.round(dragPos.y)}` : "尚未拖动"}</p>
+                    </Dialog.Content>
+                </Dialog>
+                <Dialog
+                    open={openRememberPosition}
+                    setOpen={setOpenRememberPosition}
+                    width={DIALOG_SIZE_NORMAL}
+                    moveable
+                    initPosition={getRememberedPosition}
+                    onMove={(x, y) => setSavedDialogPosition({ x: Math.round(x), y: Math.round(y) })}
+                >
+                    <Dialog.Title>记住上次位置</Dialog.Title>
+                    <Dialog.Content>
+                        <p>拖动时通过 onMove 把位置写入 useLocalStorage；initPosition 传函数，每次打开时读取最新值。</p>
+                        <p>已保存位置：{savedDialogPosition ? `x: ${savedDialogPosition.x}, y: ${savedDialogPosition.y}` : "无"}</p>
+                    </Dialog.Content>
+                </Dialog>
             </DemoSection>
 
             <DemoSection title="Dialog.show 函数" description="通过函数式调用快速创建对话框">

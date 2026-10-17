@@ -29,6 +29,8 @@ export {
 
 // Dialog utilities
 export type {
+  DialogInitPosition,
+  DialogPosition,
   DialogProps
 } from './components/Dialog'
 export {

@@ -31,6 +31,17 @@ const DialogTitleSymbol = Symbol("DialogTitle");
 const DialogContentSymbol = Symbol("DialogContent");
 const DialogActionSymbol = Symbol("DialogAction");
 
+/** 对话框初始位置；数字按 px 处理，字符串按 CSS 长度处理 */
+export interface DialogPosition {
+    top?: string | number | null;
+    left?: string | number | null;
+    right?: string | number | null;
+    bottom?: string | number | null;
+}
+
+/** initPosition 的取值：位置对象，或返回位置对象的函数（函数在每次打开时求值） */
+export type DialogInitPosition = DialogPosition | (() => DialogPosition | null) | null;
+
 export interface DialogProps {
     children?: ReactNode | string;
     open: boolean;
@@ -43,9 +54,17 @@ export interface DialogProps {
     width?: string | null;
     autoFocus?: boolean;
     moveable?: boolean;
+    /** 拖动过程中的回调，参数为对话框当前视口坐标 */
+    onMove?: (x: number, y: number) => void;
     clickMaskerToClose?: boolean;
     showTopCloser?: boolean;
     escClose?: boolean;
+
+    /**
+     * 初始位置（top / left / right / bottom）；未传入的方向保持居中，仅初始化时生效，拖动后使用实际位置。
+     * 支持传对象或返回对象的函数：函数在每次打开时求值，适合直接读取 useLocalStorage 等外部状态
+     */
+    initPosition?: DialogInitPosition;
 }
 
 interface DialogTitleProps {
@@ -88,6 +107,55 @@ const hasIframeSrc = (node: ReactNode): boolean => {
     return found;
 };
 
+type CSSLength = string | number | null | undefined;
+
+/**
+ * 把尺寸参数转为 CSS 长度；数字按 px 处理，空值表示未指定
+ * @param value - 尺寸参数
+ */
+const toCssLength = (value: CSSLength): string | null => {
+    if (value === null || value === undefined || value === "") {
+        return null;
+    }
+    return typeof value === "number" ? `${value}px` : value;
+};
+
+/**
+ * 生成初始位置的 CSS 变量：只覆盖显式传入的方向，未传入的方向继续沿用样式表中的居中值
+ * @param initPosition - 初始位置
+ */
+const buildInitPositionStyle = (initPosition?: DialogPosition | null): Record<string, string> => {
+    const top = toCssLength(initPosition?.top);
+    const left = toCssLength(initPosition?.left);
+    const right = toCssLength(initPosition?.right);
+    const bottom = toCssLength(initPosition?.bottom);
+    const style: Record<string, string> = {};
+
+    if (left !== null || right !== null) {
+        style[`--${CSS_NS}-dialog-init-left`] = left ?? "auto";
+        style[`--${CSS_NS}-dialog-init-right`] = right ?? "auto";
+        style[`--${CSS_NS}-dialog-init-translate-x`] = "0";
+    }
+    if (top !== null || bottom !== null) {
+        style[`--${CSS_NS}-dialog-init-top`] = top ?? "auto";
+        style[`--${CSS_NS}-dialog-init-bottom`] = bottom ?? "auto";
+        style[`--${CSS_NS}-dialog-init-translate-y`] = "0";
+    }
+    return style;
+};
+
+/**
+ * 在显示对话框前写入初始位置；函数形式的 initPosition 在这里求值，保证每次打开都读取最新值
+ * @param dlg - 对话框元素
+ * @param initPosition - 初始位置或返回初始位置的函数
+ */
+const applyInitPositionStyle = (dlg: HTMLDialogElement, initPosition?: DialogInitPosition): void => {
+    const resolved = typeof initPosition === "function" ? initPosition() : initPosition;
+    Object.entries(buildInitPositionStyle(resolved)).forEach(([name, value]) => {
+        dlg.style.setProperty(name, value);
+    });
+};
+
 /**
  * 对话框主组件
  * @param children - 对话框的子组件；内容里带 iframeSrc（Dialog.Content 的 iframe 模式）时自动追加 `-dialog-iframe` 类名
@@ -101,9 +169,11 @@ const hasIframeSrc = (node: ReactNode): boolean => {
  * @param autoFocus - 是否自动聚焦第一个可聚焦元素
  * @param modal - 是否为模态对话框
  * @param moveable - 是否允许拖动对话框
+ * @param onMove - 拖动过程中的回调，参数为对话框当前视口坐标 (x, y)
  * @param clickMaskerToClose - 是否允许点击遮罩层关闭对话框
  * @param showTopCloser - 是否显示右上角的关闭按钮
  * @param escClose - 是否允许按 Esc 关闭对话框（默认 true）；焦点在对话框内且不在输入框里、右上角有关闭按钮时才生效
+ * @param initPosition - 初始位置（top / left / right / bottom）或返回初始位置的函数；未传入的方向保持居中，仅初始化时生效
  */
 const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     {
@@ -111,6 +181,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         open,
         setOpen,
         moveable = false,
+        onMove,
         showTopCloser = true,
         className = "",
         maxHeight = null,
@@ -120,6 +191,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         modal = true,
         clickMaskerToClose = false,
         escClose = true,
+        initPosition = null,
     },
     ref,
 ) {
@@ -127,6 +199,9 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     // setOpen 可能每次渲染都是新函数（命令式包装器即如此），用 ref 让事件回调始终调用最新实现
     const setOpenRef = useRef(setOpen);
     setOpenRef.current = setOpen;
+    // onMove 同理：用 ref 避免父组件重建回调时重新绑定拖动（会重置位置）
+    const onMoveRef = useRef(onMove);
+    onMoveRef.current = onMove;
 
     useImperativeHandle(ref, () => dlgRef.current!, []);
 
@@ -134,6 +209,10 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
     useEffect(() => {
         if (!open || !dlgRef.current) return;
         const dlg = dlgRef.current;
+        // 只在未显示时应用初始位置：effect 因其他依赖重跑时不会把拖动后的位置重置
+        if (!dlg.open) {
+            applyInitPositionStyle(dlg, initPosition);
+        }
         dlg.show();
         const cleanup: (() => void)[] = [];
         if (autoFocus) {
@@ -144,16 +223,47 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         // 关闭按钮把另一个也关掉」
         const titleEl = findOne(`.${TITLE_CLASS_NAME}`, dlg) as HTMLElement | null;
         if (moveable && titleEl) {
-            // 在标题上按下即开始拖动，必须早于 bindNodeMove 的监听（这里挂在对话框的捕获阶段）先把当前
-            // 位置落地：对话框靠 inset:0 + margin:auto 居中，只设 left/top 时 auto 边距会二次分配，位置不跟手
-            const onTitleMouseDown = (event: MouseEvent) => {
-                const target = event.target as Element | null;
-                if (event.button === 0 && target?.closest(`.${TITLE_CLASS_NAME}`)) {
-                    materializePosition(dlg);
-                }
+            let movePointerId: number | null = null;
+            let moveOffsetX = 0;
+            let moveOffsetY = 0;
+
+            const stopTracking = () => {
+                movePointerId = null;
+                window.removeEventListener("pointermove", onTrackMove);
+                window.removeEventListener("pointerup", stopTracking);
+                window.removeEventListener("pointercancel", stopTracking);
             };
-            dlg.addEventListener("mousedown", onTitleMouseDown, true);
-            cleanup.push(() => dlg.removeEventListener("mousedown", onTitleMouseDown, true));
+
+            const onTrackMove = (event: PointerEvent) => {
+                if (event.pointerId !== movePointerId) {
+                    return;
+                }
+                onMoveRef.current?.(event.clientX - moveOffsetX, event.clientY - moveOffsetY);
+            };
+
+            // 在标题上按下即开始拖动，必须早于 bindNodeMove 的监听（这里挂在对话框的捕获阶段）先把当前
+            // 位置落地：初始位置可能由 initPosition.right / bottom 或 translate 表达，只改 left/top 会二次定位。
+            // 用 pointerdown 而不是 mousedown：bindNodeMove 会 preventDefault 掉 pointerdown，连带屏蔽 mousedown
+            const onTitlePointerDown = (event: PointerEvent) => {
+                const target = event.target as Element | null;
+                if (event.button !== 0 || !target?.closest(`.${TITLE_CLASS_NAME}`)) {
+                    return;
+                }
+                const rect = dlg.getBoundingClientRect();
+                movePointerId = event.pointerId;
+                moveOffsetX = event.clientX - rect.left;
+                moveOffsetY = event.clientY - rect.top;
+                materializePosition(dlg);
+                window.addEventListener("pointermove", onTrackMove);
+                window.addEventListener("pointerup", stopTracking);
+                window.addEventListener("pointercancel", stopTracking);
+            };
+
+            dlg.addEventListener("pointerdown", onTitlePointerDown, true);
+            cleanup.push(() => {
+                stopTracking();
+                dlg.removeEventListener("pointerdown", onTitlePointerDown, true);
+            });
             cleanup.push(bindNodeMove(dlg, titleEl));
         }
         if (moveable) {
@@ -202,6 +312,8 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         return () => {
             cleanup.forEach((fn) => fn());
         };
+        // initPosition 只在打开时读取一次（函数形式可能依赖外部状态），放进依赖会随 onMove 更新重跑并打断拖动
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, moveable, showTopCloser, clickMaskerToClose, autoFocus, escClose]);
 
     if (!open) {
@@ -743,6 +855,8 @@ const materializePosition = (dlg: HTMLDialogElement): void => {
     dlg.style.margin = "0";
     dlg.style.right = "auto";
     dlg.style.bottom = "auto";
+    // 初始位置可能带 translate，落地为 left/top 后必须清掉，否则会偏移半个宽高
+    dlg.style.transform = "none";
     dlg.style.left = `${left}px`;
     dlg.style.top = `${top}px`;
 };
