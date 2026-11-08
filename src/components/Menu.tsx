@@ -15,6 +15,7 @@ export interface MenuItemData {
     title?: string; // 鼠标悬停时显示的提示文本，默认使用 label
     checked?: boolean | null; // null 表示不显示选中标记，true 显示选中，false 显示未选中
     extension?: ReactNode; // 扩展内容，显示在右侧
+    className?: string; // 额外自定义类名，附加到菜单项根节点（如危险项 / 强调项的单条样式）
     onClick?: (item: MenuItemData) => void; // 点击回调函数，点击菜单项时触发，并传入当前菜单项数据
 }
 
@@ -140,7 +141,7 @@ const MenuItem = (itemData: MenuItemData & { reserveIcon?: boolean }) => {
     const hasLeadingColumn = Boolean(itemData.reserveIcon) || itemData.checked !== null || Boolean(itemData.icon);
     return (
         <div
-            className={namespace + "-menu-item"}
+            className={namespace + "-menu-item" + (itemData.className ? " " + itemData.className : "")}
             title={!itemData.disabled ? itemData.title : undefined}
             aria-disabled={itemData.disabled}
             onClick={() => itemData.onClick?.(itemData)}
