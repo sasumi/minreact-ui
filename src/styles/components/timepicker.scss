@@ -353,4 +353,9 @@
     &-action[aria-disabled="true"] {
         color: var(--#{$ns}-time-picker-muted-color);
     }
+
+    // 清除：与取消 / 确定拉开一点距离
+    &-action-clear {
+        margin-right: 0.25em;
+    }
 }

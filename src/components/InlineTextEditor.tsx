@@ -1,8 +1,7 @@
-import { Clickable, NormalButton, SpanButton, SubmitButton } from "./Button";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import "./../styles/components/inlinetexteditor.scss";
 import { namespace } from "./../styles/namespace";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Icons } from "react-toastify";
+import { NormalButton, SubmitButton } from "./Button";
 
 const CSS_NS = `${namespace}-inline-text-editor`;
 const STATE_IDLE = "idle";

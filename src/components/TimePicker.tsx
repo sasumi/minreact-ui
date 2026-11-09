@@ -405,6 +405,14 @@ export interface TimePickerPanelProps {
     minuteLabel?: string;
     /** 【今日】按钮文案 */
     todayText?: string;
+    /** 清除按钮文案，默认「清除」 */
+    clearText?: string;
+    /**
+     * 清除处理，必填：
+     * - 传 false 表示允许清除，由面板内部清空（按空值回调 onChange）
+     * - 传函数时点击清除调用该函数，由外部决定如何清空
+     */
+    onClear: (() => void) | false;
     /** 是否显示农历（含农历节日），默认 false；启用时按需加载 lunar-javascript */
     lunar?: boolean;
     /** 是否显示节气，默认 false；与 lunar 同时开启时优先显示节气 */
@@ -433,6 +441,8 @@ export const TimePickerPanel = ({
     hourLabel = "小时",
     minuteLabel = "分钟",
     todayText = "今日",
+    clearText = "清除",
+    onClear,
     lunar = false,
     solarTerm = false,
     holiday = false,
@@ -540,6 +550,16 @@ export const TimePickerPanel = ({
     const handleCancel = () => {
         resetDraft();
         onCancel?.();
+    };
+
+    /** 清除：丢弃草稿后交给外部处理；传 false 时面板直接按空值回调 */
+    const handleClear = () => {
+        resetDraft();
+        if (onClear === false) {
+            onChange?.("");
+            return;
+        }
+        onClear();
     };
 
     const inDateView = view === VIEW_DATE;
@@ -715,6 +735,9 @@ export const TimePickerPanel = ({
                     </Popover>
                 )}
                 <div className={`${CSS_NS}-actions`}>
+                    <Clickable className={`${CSS_NS}-action ${CSS_NS}-action-clear`} onClick={handleClear}>
+                        {clearText}
+                    </Clickable>
                     <Clickable className={`${CSS_NS}-action`} onClick={handleCancel}>
                         {cancelText}
                     </Clickable>
@@ -756,6 +779,14 @@ export interface TimePickerProps extends Omit<React.InputHTMLAttributes<HTMLInpu
     confirmText?: string;
     /** 【今日】按钮文案，透传给面板 */
     todayText?: string;
+    /** 清除按钮文案，透传给面板；默认「清除」 */
+    clearText?: string;
+    /**
+     * 清除处理，必填：
+     * - 传 false 表示允许清除，由选择器内部清空（按空值回调 onChange）
+     * - 传函数时点击清除调用该函数，由外部决定如何清空
+     */
+    onClear: (() => void) | false;
     /** 是否显示农历（含农历节日），默认 false；启用时按需加载 lunar-javascript */
     lunar?: boolean;
     /** 是否显示节气，默认 false；与 lunar 同时开启时优先显示节气 */
@@ -792,6 +823,8 @@ export const TimePicker = ({
     cancelText,
     confirmText,
     todayText,
+    clearText,
+    onClear,
     lunar,
     solarTerm,
     holiday,
@@ -855,6 +888,14 @@ export const TimePicker = ({
     /** 自定义触发对象优先，没有就用内置输入框 */
     const triggerNode = typeof trigger === "function" ? trigger(displayValue) : trigger;
 
+    /** 清除：先收起面板，再交给外部清空值；传 false 时由面板走 onChange("") 自行清空 */
+    const handleClear = () => {
+        setOpen(false);
+        if (onClear !== false) {
+            onClear();
+        }
+    };
+
     return (
         <Popover open={open} onOpenChange={handleOpenChange}>
             {triggerNode ? (
@@ -912,6 +953,8 @@ export const TimePicker = ({
                     cancelText={cancelText}
                     confirmText={confirmText}
                     todayText={todayText}
+                    clearText={clearText}
+                    onClear={onClear === false ? false : handleClear}
                     lunar={lunar}
                     solarTerm={solarTerm}
                     holiday={holiday}
