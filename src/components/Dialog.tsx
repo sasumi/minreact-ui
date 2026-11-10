@@ -14,9 +14,14 @@ const TOP_CLOSER_CLASS_NAME = `${CSS_NS}-dialog-close-btn`;
 const CONTENT_CLASS_NAME = `${CSS_NS}-dialog-content`;
 const ACTION_CLASS_NAME = `${CSS_NS}-dialog-actions`;
 const MASKER_CLASS_NAME = `${CSS_NS}-dialog-masker`;
+const HEADER_EXTRA_CLASS_NAME = `${CSS_NS}-dialog-header-extra`;
+/** 顶部附加区域整体下移量，配合 transform 让对话框为其让出空间 */
+const HEADER_EXTRA_SHIFT_VAR = `--${CSS_NS}-dialog-header-shift`;
 
 /** 窗口尺寸变化后，拖动过的对话框与视口边缘保留的最小间距 */
 const VIEWPORT_EDGE_GAP = 8;
+/** 顶部附加区域与视口顶部之间预留的间距（px） */
+const HEADER_EXTRA_VIEWPORT_GAP = 8;
 
 /**
  * 对话框大小
@@ -30,6 +35,7 @@ export const DIALOG_SIZE_FULL = "90vw";
 const DialogTitleSymbol = Symbol("DialogTitle");
 const DialogContentSymbol = Symbol("DialogContent");
 const DialogActionSymbol = Symbol("DialogAction");
+const DialogHeaderExtraSymbol = Symbol("DialogHeaderExtra");
 
 /** 对话框初始位置；数字按 px 处理，字符串按 CSS 长度处理 */
 export interface DialogPosition {
@@ -93,6 +99,11 @@ interface DialogActionProps {
     gap?: string | number;
 }
 
+interface DialogHeaderExtraProps {
+    children?: ReactNode;
+    className?: string;
+}
+
 /**
  * 递归检查子节点中是否存在 iframeSrc 属性（Dialog.Content 的 iframe 模式）
  * @param node - 待检查的 React 节点
@@ -136,12 +147,13 @@ const buildInitPositionStyle = (initPosition?: DialogPosition | null): Record<st
     if (left !== null || right !== null) {
         style[`--${CSS_NS}-dialog-init-left`] = left ?? "auto";
         style[`--${CSS_NS}-dialog-init-right`] = right ?? "auto";
-        style[`--${CSS_NS}-dialog-init-translate-x`] = "0";
+        // 用 0% 而不是 0：transform 里的位移需要和 HeaderExtra 的 px 偏移相加
+        style[`--${CSS_NS}-dialog-init-translate-x`] = "0%";
     }
     if (top !== null || bottom !== null) {
         style[`--${CSS_NS}-dialog-init-top`] = top ?? "auto";
         style[`--${CSS_NS}-dialog-init-bottom`] = bottom ?? "auto";
-        style[`--${CSS_NS}-dialog-init-translate-y`] = "0";
+        style[`--${CSS_NS}-dialog-init-translate-y`] = "0%";
     }
     return style;
 };
@@ -159,8 +171,69 @@ const applyInitPositionStyle = (dlg: HTMLDialogElement, initPosition?: DialogIni
 };
 
 /**
+ * 计算 HeaderExtra 的排布：空间不足时先压缩对话框、再整体下移，极端情况才限制附加区域高度，
+ * 保证附加区域顶部始终不超出屏幕
+ * @param dlg - 对话框元素
+ * @param headerExtraEl - 顶部附加区域元素
+ * @returns 重新排布的函数
+ */
+const createHeaderExtraLayout = (dlg: HTMLDialogElement, headerExtraEl: HTMLElement) => {
+    const initialMaxHeight = dlg.style.maxHeight;
+    let appliedShift = 0;
+
+    const applyShift = (shift: number, positionedByStyle: boolean, rect: DOMRect): void => {
+        if (positionedByStyle) {
+            dlg.style.top = `${rect.top + shift}px`;
+        } else {
+            dlg.style.setProperty(HEADER_EXTRA_SHIFT_VAR, `${shift}px`);
+        }
+    };
+
+    return (): void => {
+        // 拖动后位置已落地为 left/top（transform 为 none）时只能改 top，否则通过 transform 变量位移
+        const positionedByStyle = dlg.style.transform === "none";
+        // 先撤销上一次的排布结果，避免位移与高度限制反复累加
+        if (positionedByStyle) {
+            dlg.style.top = `${dlg.getBoundingClientRect().top - appliedShift}px`;
+        } else {
+            dlg.style.setProperty(HEADER_EXTRA_SHIFT_VAR, "0px");
+        }
+        appliedShift = 0;
+        dlg.style.maxHeight = initialMaxHeight;
+
+        // 不受 max-height 影响的实际内容高度，间距取元素自身的下外边距
+        const headerHeight = headerExtraEl.scrollHeight;
+        const gap = parseFloat(getComputedStyle(headerExtraEl).marginBottom) || 0;
+        const neededHeight = headerHeight + gap;
+        const availableHeight = window.innerHeight - HEADER_EXTRA_VIEWPORT_GAP * 2 - neededHeight;
+
+        let rect = dlg.getBoundingClientRect();
+        if (rect.top - HEADER_EXTRA_VIEWPORT_GAP < neededHeight && rect.height > availableHeight) {
+            // 上下都没有余量时先压缩对话框，让「对话框 + 附加区域」能完整放进视口
+            dlg.style.maxHeight = `${Math.max(0, availableHeight)}px`;
+            rect = dlg.getBoundingClientRect();
+        }
+
+        const topSpace = rect.top - HEADER_EXTRA_VIEWPORT_GAP;
+        let shift = 0;
+        if (topSpace < neededHeight) {
+            const bottomSpace = Math.max(0, window.innerHeight - rect.bottom - HEADER_EXTRA_VIEWPORT_GAP);
+            shift = Math.min(neededHeight - topSpace, bottomSpace);
+        }
+        if (shift > 0) {
+            applyShift(shift, positionedByStyle, rect);
+        }
+        appliedShift = shift;
+
+        // 极端情况下（视口过小）仍放不下，再限制附加区域自身高度
+        const clippedHeight = neededHeight - topSpace - shift;
+        headerExtraEl.style.maxHeight = clippedHeight > 0 ? `${Math.max(0, headerHeight - clippedHeight)}px` : "";
+    };
+};
+
+/**
  * 对话框主组件
- * @param children - 对话框的子组件；内容里带 iframeSrc（Dialog.Content 的 iframe 模式）时自动追加 `-dialog-iframe` 类名
+ * @param children - 对话框的子组件；顶部附加区域用 Dialog.HeaderExtra 传入；内容里带 iframeSrc（Dialog.Content 的 iframe 模式）时自动追加 `-dialog-iframe` 类名
  * @param open - 是否打开对话框
  * @param setOpen - 设置对话框打开状态的函数
  * @param ref - 对话框的引用
@@ -221,6 +294,8 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
         }
         dlg.show();
         const cleanup: (() => void)[] = [];
+        // 顶部附加区域的排布函数，拖动结束后需要重新计算（对话框可能被拖到贴顶的位置）
+        let layoutHeaderExtra: (() => void) | null = null;
         if (autoFocus) {
             focusFirstElement(dlgRef.current);
         }
@@ -250,6 +325,7 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                     onMoveEndRef.current?.(lastMoveX, lastMoveY);
                 }
                 stopTracking();
+                layoutHeaderExtra?.();
             };
 
             const onTrackMove = (event: PointerEvent) => {
@@ -304,6 +380,21 @@ const DialogImpl = forwardRef<HTMLDialogElement, DialogProps>(function Dialog(
                     }),
                 );
             }
+        }
+        const headerExtraEl = findOne(`.${HEADER_EXTRA_CLASS_NAME}`, dlg) as HTMLElement | null;
+        if (headerExtraEl) {
+            const layout = createHeaderExtraLayout(dlg, headerExtraEl);
+            layoutHeaderExtra = layout;
+            layout();
+            // 对话框或附加区域尺寸变化、窗口尺寸变化后重新排布
+            const resizeObserver = new ResizeObserver(layout);
+            resizeObserver.observe(dlg);
+            resizeObserver.observe(headerExtraEl);
+            window.addEventListener("resize", layout);
+            cleanup.push(() => {
+                resizeObserver.disconnect();
+                window.removeEventListener("resize", layout);
+            });
         }
         if (clickMaskerToClose) {
             // 遮罩与对话框同级（都在 dialog-wrap 内），故在父节点里查找
@@ -389,6 +480,20 @@ const Title = Object.assign(
 );
 
 /**
+ * 顶部附加区域子组件：与对话框同宽，位于对话框上方，内容由业务自行实现
+ */
+const HeaderExtra = Object.assign(
+    ({ children, className, ...props }: DialogHeaderExtraProps & React.HTMLAttributes<HTMLDivElement>) => {
+        return (
+            <div {...props} className={`${HEADER_EXTRA_CLASS_NAME} ${className || ""}`}>
+                {children}
+            </div>
+        );
+    },
+    { _type: DialogHeaderExtraSymbol },
+);
+
+/**
  * 内容子组件
  */
 const Content = Object.assign(
@@ -424,6 +529,7 @@ const isIframeContent = (content: ReactNode | string | DialogIframeProps): conte
 /**
  * 显示自定义对话框
  * @param content - 对话框内容，可以是 ReactNode 或字符串
+ * @param headerExtra - 对话框顶部的附加区域内容
  * @param onClose - 对话框关闭时的回调函数，返回 false 可阻止关闭
  * @param dlgProps - 其他 Dialog 组件的属性
  * @returns 卸载函数
@@ -432,6 +538,7 @@ const showDialog = ({
     title,
     action,
     content,
+    headerExtra,
     children,
     onClose,
     ...dlgProps
@@ -439,6 +546,7 @@ const showDialog = ({
     title?: ReactNode | string;
     children?: ReactNode | string;
     action?: ReactNode | string;
+    headerExtra?: ReactNode | string;
     content?: ReactNode | string | DialogIframeProps;
     onClose?: () => boolean | void;
 }) => {
@@ -456,6 +564,7 @@ const showDialog = ({
         }, [open]);
         return (
             <Dialog {...dlgProps} open={open} setOpen={handleSetOpen}>
+                {headerExtra && <Dialog.HeaderExtra>{headerExtra}</Dialog.HeaderExtra>}
                 {title && <Dialog.Title>{title}</Dialog.Title>}
                 {content && <Dialog.Content {...(isIframeContent(content) ? content : {})}>{isIframeContent(content) ? undefined : content}</Dialog.Content>}
                 {action && <Dialog.Action>{action}</Dialog.Action>}
@@ -857,6 +966,7 @@ const alert = (
  */
 export const Dialog = Object.assign(DialogImpl, {
     Title,
+    HeaderExtra,
     Content,
     Action,
     show: showDialog,

@@ -25,6 +25,7 @@ function DialogDemo() {
     const [open3, setOpen3] = useState(false);
     const [open4, setOpen4] = useState(false);
     const [open5, setOpen5] = useState(false);
+    const [openHeaderExtra, setOpenHeaderExtra] = useState(false);
     const [openMoveable, setOpenMoveable] = useState(false);
     const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
     const [openRememberPosition, setOpenRememberPosition] = useState(false);
@@ -86,6 +87,67 @@ function DialogDemo() {
         });
     };
 
+    // 顶部附加区域内部的 UI 完全由业务实现，这里模拟登录提示条
+    const headerExtraNotice = (
+        <div style={{ display: "flex", alignItems: "center", gap: ".5em" }}>
+            <span
+                style={{
+                    width: "1.2em",
+                    height: "1.2em",
+                    borderRadius: "50%",
+                    background: "#1677ff",
+                    color: "#fff",
+                    fontSize: ".75em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                i
+            </span>
+            登录后才能保存路书
+        </div>
+    );
+
+    const loginContent = (
+        <div style={{ textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: "2em", marginBottom: "1em" }}>
+                <span style={{ borderBottom: "2px solid #1677ff", paddingBottom: ".25em" }}>微信登录</span>
+                <span style={{ opacity: 0.5 }}>账号登录</span>
+            </div>
+            <div
+                style={{
+                    width: "10em",
+                    height: "10em",
+                    margin: "0 auto",
+                    background: "repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 0 0 / 1.25em 1.25em",
+                    outline: "2px solid #000",
+                }}
+            />
+            <p style={{ opacity: 0.6, marginTop: "1em" }}>请使用微信扫码登录（47s）</p>
+        </div>
+    );
+
+    // 顶部附加区域：容器宽高由 Dialog.HeaderExtra 提供，内部 UI 由业务自行实现
+    const showHeaderExtra = () => {
+        Dialog.show({
+            headerExtra: headerExtraNotice,
+            content: loginContent,
+            width: DIALOG_SIZE_SMALL,
+        });
+    };
+
+    // 对话框贴近屏幕顶部时，附加区域会自动下移对话框 / 压缩自身，保证不超出屏幕
+    const showHeaderExtraNearTop = () => {
+        Dialog.show({
+            title: "靠近顶部",
+            headerExtra: headerExtraNotice,
+            content: <div style={{ padding: "1rem 0" }}>对话框贴近屏幕顶部时，顶部附加区域依然完整可见。</div>,
+            width: DIALOG_SIZE_NORMAL,
+            initPosition: { top: 8 },
+        });
+    };
+
     const showCustom = () => {
         Dialog.show({
             title: "自定义对话框",
@@ -139,6 +201,16 @@ function DialogDemo() {
             title: "站内页面 #/Button",
             url: "#/Button",
             width: DIALOG_SIZE_LARGE,
+        });
+    };
+
+    // iframe 内容 + 顶部附加区域：圆角裁剪只作用在内容区，附加区域不受影响
+    const showIframeWithHeaderExtra = () => {
+        Dialog.show({
+            title: "内联 HTML（带顶部提示）",
+            headerExtra: headerExtraNotice,
+            content: { iframeSrc: INLINE_IFRAME_HTML },
+            width: DIALOG_SIZE_NORMAL,
         });
     };
 
@@ -247,6 +319,21 @@ function DialogDemo() {
                         <p>这是一个基础的对话框内容</p>
                         <p>可以包含任何 React 组件</p>
                     </div>
+                </Dialog>
+            </DemoSection>
+
+            <DemoSection
+                title="顶部附加区域"
+                description="Dialog.HeaderExtra 在对话框上方提供与对话框同宽的容器，内部 UI 由业务自行实现；空间不足时对话框会为其让位，保证顶部不超出屏幕"
+            >
+                <div className="demo-row">
+                    <PrimaryButton onClick={showHeaderExtra}>Dialog.show 函数</PrimaryButton>
+                    <PrimaryButton onClick={() => setOpenHeaderExtra(true)}>子组件用法</PrimaryButton>
+                    <PrimaryButton onClick={showHeaderExtraNearTop}>贴近屏幕顶部</PrimaryButton>
+                </div>
+                <Dialog open={openHeaderExtra} setOpen={setOpenHeaderExtra} width={DIALOG_SIZE_SMALL}>
+                    <Dialog.HeaderExtra>{headerExtraNotice}</Dialog.HeaderExtra>
+                    <Dialog.Content>{loginContent}</Dialog.Content>
                 </Dialog>
             </DemoSection>
 
@@ -469,6 +556,7 @@ function DialogDemo() {
                 <div className="demo-row">
                     <PrimaryButton onClick={showIframeInline}>内联 HTML（data URL）</PrimaryButton>
                     <PrimaryButton onClick={showIframeLocalPage}>站内页面</PrimaryButton>
+                    <PrimaryButton onClick={showIframeWithHeaderExtra}>带顶部提示</PrimaryButton>
                     <PrimaryButton onClick={() => setOpen5(true)}>声明式用法</PrimaryButton>
                 </div>
                 <Dialog open={open5} setOpen={setOpen5} width={DIALOG_SIZE_NORMAL}>

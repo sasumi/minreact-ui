@@ -30,7 +30,7 @@
     bottom: var(--#{$ns}-dialog-init-bottom, auto);
     transform: translate(
         var(--#{$ns}-dialog-init-translate-x, -50%),
-        var(--#{$ns}-dialog-init-translate-y, -50%)
+        calc(var(--#{$ns}-dialog-init-translate-y, -50%) + var(--#{$ns}-dialog-header-shift, 0px))
     );
 
     //修复 iOS safari 高度不能自动撑开问题
@@ -39,6 +39,19 @@
     //去除默认 <dialog> margin 和 padding
     margin: 0;
     padding: 0;
+
+    .#{$ns}-dialog-header-extra {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        margin-bottom: 0.5em;
+        box-sizing: border-box;
+        padding: 0.75em var(--#{$ns}-dialog-inner-padding);
+        background-color: var(--#{$ns}-color-background);
+        box-shadow: var(--#{$ns}-panel-shadow-lite);
+        overflow: auto;
+    }
 
     .#{$ns}-dialog-title {
         flex-shrink: 0;
@@ -131,9 +144,22 @@
     }
 
     &-iframe {
-        overflow: hidden;
+        // 圆角裁剪下沉到内容区：对话框自身 overflow:hidden 会把顶部附加区域一起裁掉
         .#{$ns}-dialog-content {
             padding: 0 !important;
+            overflow: hidden;
+        }
+
+        // 只给贴着对话框上下边缘的内容块加圆角；HeaderExtra 绝对定位不占位，故单独判断
+        .#{$ns}-dialog-content:first-child,
+        .#{$ns}-dialog-header-extra + .#{$ns}-dialog-content {
+            border-top-left-radius: var(--#{$ns}-panel-radius);
+            border-top-right-radius: var(--#{$ns}-panel-radius);
+        }
+
+        .#{$ns}-dialog-content:last-child {
+            border-bottom-left-radius: var(--#{$ns}-panel-radius);
+            border-bottom-right-radius: var(--#{$ns}-panel-radius);
         }
 
         iframe {
