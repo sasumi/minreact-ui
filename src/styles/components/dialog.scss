@@ -47,9 +47,6 @@
         bottom: 100%;
         margin-bottom: 0.5em;
         box-sizing: border-box;
-        padding: 0.75em var(--#{$ns}-dialog-inner-padding);
-        background-color: var(--#{$ns}-color-background);
-        box-shadow: var(--#{$ns}-panel-shadow-lite);
         overflow: auto;
     }
 
@@ -150,19 +147,8 @@
             overflow: hidden;
         }
 
-        // 只给贴着对话框上下边缘的内容块加圆角；HeaderExtra 绝对定位不占位，故单独判断
-        .#{$ns}-dialog-content:first-child,
-        .#{$ns}-dialog-header-extra + .#{$ns}-dialog-content {
-            border-top-left-radius: var(--#{$ns}-panel-radius);
-            border-top-right-radius: var(--#{$ns}-panel-radius);
-        }
-
-        .#{$ns}-dialog-content:last-child {
-            border-bottom-left-radius: var(--#{$ns}-panel-radius);
-            border-bottom-right-radius: var(--#{$ns}-panel-radius);
-        }
-
         iframe {
+            border-radius: var(--#{$ns}-panel-radius);
             display: block;
             width: 100%;
             height: var(--init-height, var(--content-height, var(--default-height, 10em)));
