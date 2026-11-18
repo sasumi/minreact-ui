@@ -50,7 +50,6 @@ export const FilePicker = forwardRef<HTMLInputElement, FilePickerProps>(
                             }
                         }
                         onChange(maxCount === 1 ? files[0] : files);
-                        files.forEach((file) => onChange(file));
                         (e.target as HTMLInputElement).value = "";
                     }
                 }}

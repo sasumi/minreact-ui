@@ -92,6 +92,7 @@
         padding: var(--#{$ns}-dialog-inner-padding);
         gap: var(--gap, var(--#{$ns}-dialog-inner-padding));
         justify-content: var(--align, var(--#{$ns}-dialog-inner-padding));
+        align-items: center;
     }
 
     .#{$ns}-dialog-content ~ .#{$ns}-dialog-actions {
@@ -231,10 +232,10 @@
 .#{$ns}-dialog-wrap {
     .#{$ns}-dialog-masker {
         position: fixed;
-        left:0;
-        top:0;
-        right:0;
-        bottom:0;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
         background: var(--#{$ns}-dialog-masker-background);
         backdrop-filter: blur(3px);
         z-index: var(--#{$ns}-dialog-zindex);
