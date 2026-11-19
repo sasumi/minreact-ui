@@ -23,6 +23,7 @@ import TabsDemo from "./pages/TabsDemo";
 import SelectionDemo from "./pages/SelectionDemo";
 import TimePickerDemo from "./pages/TimePickerDemo";
 import InlineTextEditorDemo from "./pages/InlineTextEditorDemo";
+import ColorPickerDemo from "./pages/ColorPickerDemo";
 
 const components = [
     { name: "Button", label: "按钮", description: "多种样式的按钮组件，包括主按钮、普通按钮、文本按钮等", component: ButtonDemo, category: "基础组件" },
@@ -33,6 +34,7 @@ const components = [
     { name: "StepInput", label: "步进输入", description: "带加减按钮的数字输入组件", component: StepInputDemo, category: "表单组件" },
     { name: "RangeInput", label: "范围输入", description: "滑块式范围选择器", component: RangeInputDemo, category: "表单组件" },
     { name: "HistoryInput", label: "历史输入", description: "支持本地历史回填的输入框", component: HistoryInputDemo, category: "表单组件" },
+    { name: "ColorPicker", label: "颜色选择器", description: "取色器 + HEX 输入 + 透明度滑杆 + 调色板，支持空值与禁用", component: ColorPickerDemo, category: "表单组件" },
     { name: "Pagination", label: "分页", description: "数据分页组件", component: PaginationDemo, category: "数据组件" },
     { name: "AsyncList", label: "异步列表", description: "支持分页的异步数据列表组件", component: AsyncListDemo, category: "数据组件" },
     { name: "Menu", label: "菜单", description: "菜单组件", component: MenuDemo, category: "交互组件" },

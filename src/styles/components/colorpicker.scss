@@ -1,0 +1,380 @@
+@charset "UTF-8";
+@use "./../common.module.scss" as *;
+@use "./../mixins/misc.scss" as com;
+
+:root {
+    --#{$ns}-color-picker-width: 17em;
+    --#{$ns}-color-picker-swatch-size: 1.35em;
+    --#{$ns}-color-picker-checker-size: 0.5em;
+    --#{$ns}-color-picker-checker-color: #d9d9d9;
+    --#{$ns}-color-picker-checker-base: #ffffff;
+    --#{$ns}-color-picker-checker-image: repeating-conic-gradient(
+        var(--#{$ns}-color-picker-checker-color) 0% 25%,
+        var(--#{$ns}-color-picker-checker-base) 0% 50%
+    );
+}
+
+// 空值色块：透明棋盘格上叠一条红色斜线
+@mixin empty-slash {
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top right, transparent 44%, var(--#{$ns}-color-danger) 44%, var(--#{$ns}-color-danger) 56%, transparent 56%);
+    }
+}
+
+// 暗色主题下把透明棋盘调暗，避免大片白色干扰
+[data-theme="dark"] {
+    --#{$ns}-color-picker-checker-color: #4d4d4d;
+    --#{$ns}-color-picker-checker-base: #2b2b2b;
+}
+
+.#{$ns}-color-picker-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    height: 2em;
+    padding: 0 0.35em;
+    box-sizing: border-box;
+    border: 1px solid var(--#{$ns}-color-element-border);
+    border-radius: var(--#{$ns}-element-radius);
+    background-color: var(--#{$ns}-color-background);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    vertical-align: middle;
+
+    &:hover,
+    &[data-state="open"] {
+        border-color: var(--#{$ns}-color-element-border-active);
+    }
+
+    &:focus-visible {
+        @include com.focus-outline;
+    }
+
+    &:disabled {
+        @include com.disabled;
+    }
+
+    .#{$ns}-color-picker-swatch {
+        position: relative;
+        flex: none;
+        width: 1em;
+        height: 1em;
+        overflow: hidden;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: 3px;
+        background-image: var(--#{$ns}-color-picker-checker-image);
+        background-size: var(--#{$ns}-color-picker-checker-size) var(--#{$ns}-color-picker-checker-size);
+
+        // 未设置颜色：显示带斜线的空色块
+        &.is-empty {
+            @include empty-slash;
+        }
+    }
+
+    .#{$ns}-color-picker-swatch-fill {
+        position: absolute;
+        inset: 0;
+    }
+
+    .#{$ns}-color-picker-caret {
+        flex: none;
+        width: 0.7em;
+        height: 0.7em;
+        opacity: 0.6;
+    }
+}
+
+.#{$ns}-popover-content.#{$ns}-color-popover {
+    width: var(--#{$ns}-color-picker-width);
+    max-width: min(var(--#{$ns}-color-picker-width), calc(100vw - 2em));
+    max-height: min(30em, calc(100vh - 4em));
+    padding: 0.75em;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.#{$ns}-color-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    color: inherit;
+
+    .#{$ns}-color-panel-title {
+        margin-top: 0.35em;
+        opacity: 0.6;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .#{$ns}-color-custom {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    .#{$ns}-color-native {
+        position: relative;
+        flex: none;
+        width: 2.2em;
+        height: 1.8em;
+        overflow: hidden;
+        box-sizing: border-box;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: var(--#{$ns}-element-radius);
+        background-image: var(--#{$ns}-color-picker-checker-image);
+        background-size: var(--#{$ns}-color-picker-checker-size) var(--#{$ns}-color-picker-checker-size);
+        cursor: pointer;
+
+        &:hover,
+        &:focus-within {
+            border-color: var(--#{$ns}-color-element-border-active);
+        }
+
+        &:has(> input:disabled) {
+            @include com.disabled;
+        }
+
+        // 颜色画在自绘色块上，原生取色器透明覆盖：这样透明度与空值都能露出棋盘格
+        .#{$ns}-color-native-fill {
+            position: absolute;
+            inset: 0;
+
+            // 未设置颜色：显示带斜线的空色块
+            &.is-empty {
+                @include empty-slash;
+            }
+        }
+
+        input[type="color"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            border: none;
+            opacity: 0;
+            cursor: pointer;
+
+            &:disabled {
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .#{$ns}-color-hex {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+        height: 1.8em;
+        padding: 0 0.35em;
+        box-sizing: border-box;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: var(--#{$ns}-element-radius);
+        background-color: var(--#{$ns}-color-background);
+
+        &:focus-within {
+            border-color: var(--#{$ns}-color-element-border-active);
+        }
+
+        .#{$ns}-color-hex-prefix {
+            flex: none;
+            opacity: 0.5;
+        }
+
+        .#{$ns}-color-hex-input {
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            padding: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+
+            &:disabled {
+                @include com.disabled;
+            }
+        }
+    }
+
+    .#{$ns}-color-clear {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 1.8em;
+        height: 1.8em;
+        padding: 0;
+        box-sizing: border-box;
+        border: none;
+        background-color: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            border-color: var(--#{$ns}-color-danger);
+            color: var(--#{$ns}-color-danger);
+        }
+
+        &:disabled {
+            @include com.disabled;
+        }
+
+        svg {
+            width: 1em;
+            height: 1em;
+        }
+    }
+
+    .#{$ns}-color-alpha {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        margin-top: 0.35em;
+
+        .#{$ns}-color-alpha-label {
+            flex: none;
+            opacity: 0.6;
+        }
+
+        .#{$ns}-color-alpha-value {
+            flex: none;
+            width: 2.8em;
+            text-align: right;
+            opacity: 0.6;
+        }
+    }
+
+    .#{$ns}-color-alpha-range {
+        flex: 1;
+        min-width: 0;
+        height: 1em;
+        margin: 0;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+
+        &::-webkit-slider-runnable-track {
+            height: 0.5em;
+            border: 1px solid var(--#{$ns}-color-element-border);
+            border-radius: 999px;
+            background-image: linear-gradient(to right, transparent, var(--#{$ns}-color-alpha)), var(--#{$ns}-color-picker-checker-image);
+            background-size:
+                auto,
+                var(--#{$ns}-color-picker-checker-size) var(--#{$ns}-color-picker-checker-size);
+        }
+
+        &::-webkit-slider-thumb {
+            width: 0.8em;
+            height: 0.8em;
+            margin-top: -0.2em;
+            appearance: none;
+            border: 1px solid var(--#{$ns}-color-element-border-secondary);
+            border-radius: 50%;
+            background-color: var(--#{$ns}-color-background);
+            cursor: pointer;
+        }
+
+        &::-moz-range-track {
+            height: 0.5em;
+            border: 1px solid var(--#{$ns}-color-element-border);
+            border-radius: 999px;
+            background-image: linear-gradient(to right, transparent, var(--#{$ns}-color-alpha)), var(--#{$ns}-color-picker-checker-image);
+            background-size:
+                auto,
+                var(--#{$ns}-color-picker-checker-size) var(--#{$ns}-color-picker-checker-size);
+        }
+
+        &::-moz-range-thumb {
+            width: 0.8em;
+            height: 0.8em;
+            border: 1px solid var(--#{$ns}-color-element-border-secondary);
+            border-radius: 50%;
+            background-color: var(--#{$ns}-color-background);
+            cursor: pointer;
+        }
+
+        &:disabled {
+            @include com.disabled;
+        }
+    }
+
+    .#{$ns}-color-palette-head {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5em;
+    }
+
+    .#{$ns}-color-palette-select {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+        height: 1.7em;
+        padding: 0 0.45em;
+        box-sizing: border-box;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: var(--#{$ns}-element-radius);
+        background-color: var(--#{$ns}-color-background);
+        color: inherit;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover,
+        &[data-state="open"] {
+            border-color: var(--#{$ns}-color-element-border-active);
+        }
+
+        &::after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 4px solid currentColor;
+            opacity: 0.6;
+        }
+    }
+
+    .#{$ns}-color-swatches {
+        display: grid;
+        grid-template-columns: repeat(10, var(--#{$ns}-color-picker-swatch-size));
+        justify-content: space-between;
+        gap: 0.25em;
+        margin-top: 0.4em;
+
+        &.is-columns {
+            grid-auto-flow: column;
+        }
+    }
+
+    .#{$ns}-color-swatch {
+        width: var(--#{$ns}-color-picker-swatch-size);
+        height: var(--#{$ns}-color-picker-swatch-size);
+        padding: 0;
+        border: 1px solid var(--#{$ns}-color-element-border);
+        border-radius: 3px;
+        cursor: pointer;
+
+        &:hover {
+            outline: 1px solid var(--#{$ns}-color-element-border-active);
+        }
+
+        &.is-active {
+            border-color: var(--#{$ns}-color-element-border-active);
+            box-shadow: 0 0 0 1px var(--#{$ns}-color-element-border-active);
+        }
+
+        &:disabled {
+            @include com.disabled;
+        }
+    }
+}

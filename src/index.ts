@@ -27,6 +27,14 @@ export {
   SwitchButton
 } from './components/Button'
 
+// ColorPicker utilities
+export type {
+  ColorPickerProps
+} from './components/ColorPicker'
+export {
+  ColorPicker
+} from './components/ColorPicker'
+
 // Dialog utilities
 export type {
   DialogInitPosition,
@@ -189,6 +197,14 @@ export {
 
 // WordCounter utilities
 export { default as WordCounter } from './components/WordCounter'
+
+// ColorPalettes utilities
+export type {
+  ColorPalette
+} from './data/colorPalettes'
+export {
+  COLOR_PALETTES
+} from './data/colorPalettes'
 
 // UseCalendarDayInfo utilities
 export type {
